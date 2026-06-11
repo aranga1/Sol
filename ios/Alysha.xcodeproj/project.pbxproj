@@ -18,6 +18,7 @@
 		AF5CC8191FD1ECEA4C6A4BBA /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DF5C7A9BC25288C74E0CB8 /* KeychainService.swift */; };
 		B13E67385BBDCB6432107A57 /* TextNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BCB5465D47DB137C3C55F8A /* TextNoteView.swift */; };
 		BEE571CEDC9FBA68FDE19893 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E91726CDF932E2083F1167 /* OnboardingView.swift */; };
+		C95141A2C02355EE9E3658A6 /* DaemonStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75BD56D56732237F162D91C /* DaemonStatusViewModel.swift */; };
 		CEAA981254FCC2754EC41E0A /* QueryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC3BCE011EF1D2935BBBC9D /* QueryView.swift */; };
 		F5D2640E92EF69177B3DE12C /* AlyshApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FCF7F200FA674F7C1B5C832 /* AlyshApp.swift */; };
 /* End PBXBuildFile section */
@@ -38,6 +39,7 @@
 		BC65E0F4E8221FBD615A1A16 /* AlyshWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlyshWidget.swift; sourceTree = "<group>"; };
 		CBC3BCE011EF1D2935BBBC9D /* QueryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryView.swift; sourceTree = "<group>"; };
 		D102D5DB1FDDB84CA1589D37 /* ConnectionConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionConfig.swift; sourceTree = "<group>"; };
+		D75BD56D56732237F162D91C /* DaemonStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaemonStatusViewModel.swift; sourceTree = "<group>"; };
 		E525768EDEFA9D1FBA71B752 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		FEE59A9C1C0C4EDDBAA0265D /* QueryResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryResponse.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -69,6 +71,7 @@
 				53BD7526735F7DF0D2872797 /* Info.plist */,
 				D466457B0B5A7594973BA18C /* Models */,
 				A021D309B52EDF3CAD70C5CE /* Services */,
+				887E9477AA06766CF3E0E0B9 /* ViewModels */,
 				6D6AC858473D9ABD2CA6D136 /* Views */,
 			);
 			path = Alysha;
@@ -93,6 +96,14 @@
 				54B1507A1B3768696A1B1918 /* AlyshWidgetExtension */,
 				20612328C0B9DBA6F014047C /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		887E9477AA06766CF3E0E0B9 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				D75BD56D56732237F162D91C /* DaemonStatusViewModel.swift */,
+			);
+			path = ViewModels;
 			sourceTree = "<group>";
 		};
 		A021D309B52EDF3CAD70C5CE /* Services */ = {
@@ -199,6 +210,7 @@
 				678FD9224FE32CBB349E6066 /* APIClient.swift in Sources */,
 				F5D2640E92EF69177B3DE12C /* AlyshApp.swift in Sources */,
 				21A3A674AC2D64B116661B50 /* ConnectionConfig.swift in Sources */,
+				C95141A2C02355EE9E3658A6 /* DaemonStatusViewModel.swift in Sources */,
 				3F492F7E575808998B10B1A2 /* HomeView.swift in Sources */,
 				AF5CC8191FD1ECEA4C6A4BBA /* KeychainService.swift in Sources */,
 				22D045E01A8078CCE173540E /* Note.swift in Sources */,
