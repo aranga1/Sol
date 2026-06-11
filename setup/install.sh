@@ -214,6 +214,8 @@ ok "Tailscale IP: $TAILSCALE_IP"
 # ── 8. Obsidian plugin ────────────────────────────────────────────────────────
 section "8 / 8  Obsidian Local REST API plugin"
 
+PLUGIN_DATA="$VAULT_PATH/.obsidian/plugins/obsidian-local-rest-api/data.json"
+
 echo ""
 gum style \
   --border normal \
@@ -223,11 +225,52 @@ gum style \
   "Action required — do this in Obsidian:
   1. Open Obsidian and select the Alysha vault
   2. Settings → Community Plugins → disable Safe Mode
-  3. Browse → search 'Local REST API' → Install → Enable"
+  3. Browse → search 'Local REST API with MCP' (by Adam Coddington) → Install → Enable
+  4. Open the plugin settings → copy the API Key shown there"
 
 open -a Obsidian "$VAULT_PATH" 2>/dev/null || true
 echo ""
-gum confirm --affirmative "Done, Local REST API is enabled" --negative "" "Press confirm once the plugin is enabled." || true
+gum confirm \
+  --affirmative "Done, plugin is enabled and I have the API key" \
+  --negative "" \
+  "Confirm once 'Local REST API with MCP' is enabled." || true
+
+echo ""
+
+# Try to read the key from the plugin's data.json automatically
+OBSIDIAN_API_KEY_FROM_PLUGIN=""
+if [[ -f "$PLUGIN_DATA" ]]; then
+  OBSIDIAN_API_KEY_FROM_PLUGIN=$(python3 -c \
+    "import json; d=json.load(open('$PLUGIN_DATA')); print(d.get('apiKey',''))" 2>/dev/null || true)
+fi
+
+if [[ -n "$OBSIDIAN_API_KEY_FROM_PLUGIN" ]]; then
+  ok "API key read from plugin automatically"
+else
+  gum style --foreground 245 "  Could not read key from plugin file."
+  gum style --foreground 245 "  In Obsidian: Settings → Community Plugins → Local REST API → Options → copy the API Key"
+  echo ""
+  OBSIDIAN_API_KEY_FROM_PLUGIN=$(gum input --placeholder "Paste Obsidian Local REST API key here...")
+fi
+
+# Write the correct key into config.json
+step "Syncing Obsidian API key to config..."
+python3 - <<PYEOF
+import json
+path = "$CONFIG_DIR/config.json"
+with open(path) as f:
+    config = json.load(f)
+config["obsidian_api_key"] = "$OBSIDIAN_API_KEY_FROM_PLUGIN"
+with open(path, "w") as f:
+    json.dump(config, f, indent=2)
+PYEOF
+ok "Config updated with Obsidian API key"
+
+# Restart daemon so it picks up the new key
+step "Restarting daemon..."
+launchctl unload "$LAUNCHD_PLIST" 2>/dev/null || true
+launchctl load "$LAUNCHD_PLIST"
+ok "Daemon restarted"
 
 # ── QR code ───────────────────────────────────────────────────────────────────
 echo ""
