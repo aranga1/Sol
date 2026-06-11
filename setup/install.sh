@@ -73,24 +73,24 @@ install_brew_pkg ollama
 install_brew_pkg obsidian cask
 
 # ── 2. Ollama model ───────────────────────────────────────────────────────────
-section "2 / 8  Ollama model (phi3.5)"
+section "2 / 8  Ollama model (qwen2.5:3b)"
 
 spin "Starting Ollama service..." brew services start ollama
 sleep 2
 
-if ollama list 2>/dev/null | grep -q "phi3.5"; then
-  model_choice=$(ask "phi3.5 is already downloaded." \
+if ollama list 2>/dev/null | grep -q "qwen2.5:3b"; then
+  model_choice=$(ask "qwen2.5:3b is already downloaded." \
     "Keep existing model" \
     "Re-download (replace)")
   if [[ "$model_choice" == "Re-download (replace)" ]]; then
-    spin "Pulling phi3.5..." ollama pull phi3.5
-    ok "phi3.5 updated"
+    spin "Pulling qwen2.5:3b..." ollama pull qwen2.5:3b
+    ok "qwen2.5:3b updated"
   else
-    skip "Using existing phi3.5"
+    skip "Using existing qwen2.5:3b"
   fi
 else
-  spin "Pulling phi3.5 (~2 GB, this takes a few minutes)..." ollama pull phi3.5
-  ok "phi3.5 ready"
+  spin "Pulling qwen2.5:3b (~1.9 GB, this takes a few minutes)..." ollama pull qwen2.5:3b
+  ok "qwen2.5:3b ready"
 fi
 
 # ── 3. Obsidian vault ─────────────────────────────────────────────────────────
@@ -123,7 +123,7 @@ config = {
     "obsidian_api_key": "$OBSIDIAN_API_KEY",
     "obsidian_port": 27124,
     "daemon_api_key": "$DAEMON_API_KEY",
-    "ollama_model": "phi3.5",
+    "ollama_model": "qwen2.5:3b",
     "ollama_base_url": "http://localhost:11434"
 }
 with open("$CONFIG_DIR/config.json", "w") as f:
@@ -158,6 +158,7 @@ step "Installing launchd service..."
 sed \
   -e "s|DAEMON_VENV_PYTHON|$VENV/bin/python|g" \
   -e "s|DAEMON_MAIN_PY|$REPO_DIR/daemon/main.py|g" \
+  -e "s|DAEMON_REPO_DIR|$REPO_DIR|g" \
   -e "s|ALYSHA_CONFIG_PATH|$CONFIG_DIR/config.json|g" \
   -e "s|ALYSHA_LOG_PATH|$CONFIG_DIR/daemon.log|g" \
   "$REPO_DIR/daemon/com.alysha.daemon.plist" > "$LAUNCHD_PLIST"
@@ -228,9 +229,7 @@ $(gum style --foreground 255 "Step 1 ·") $(gum style --foreground 245 "If promp
 $(gum style --foreground 255 "Step 2 ·") $(gum style --foreground 245 "Go to Settings (bottom-left cog) → Community Plugins.")
             $(gum style --foreground 245 "If you see a 'Turn on community plugins' button, click it.")
 
-$(gum style --foreground 255 "Step 3 ·") $(gum style --foreground 245 "Click Browse, search for: Local REST API")
-            $(gum style --foreground 245 "Install the one by Adam Coddington (~496k downloads).")
-            $(gum style --foreground 245 "There are 3 results — pick the first one, NOT 'MCP REST' or 'Second Brain MCP'.")
+$(gum style --foreground 255 "Step 3 ·") $(gum style --foreground 245 "Click Browse, search for: Local REST API with MCP by Adam Coddington")
             $(gum style --foreground 245 "Click Install, then toggle it on to Enable.")
 
 $(gum style --foreground 255 "Step 4 ·") $(gum style --foreground 245 "You may see a message about HTTPS certificates or browser trust — ignore it.")

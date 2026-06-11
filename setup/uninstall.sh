@@ -77,8 +77,8 @@ echo ""
 gum style --bold "Ollama"
 step "Stopping Ollama service..."
 brew services stop ollama 2>/dev/null || true
-step "Removing phi3.5 model..."
-ollama rm phi3.5 2>/dev/null && ok "phi3.5 removed" || skip "phi3.5 not found"
+step "Removing qwen2.5:3b model..."
+ollama rm qwen2.5:3b 2>/dev/null && ok "qwen2.5:3b removed" || skip "qwen2.5:3b not found"
 echo ""
 ollama_choice=$(ask "Remove Ollama entirely? (~/.ollama/ can be several GB)" \
   "Yes, uninstall Ollama" \
@@ -88,7 +88,7 @@ if [[ "$ollama_choice" == "Yes, uninstall Ollama" ]]; then
   rm -rf "$HOME/.ollama"
   ok "Ollama and all models removed"
 else
-  skip "Ollama kept — phi3.5 was removed, other models are untouched"
+  skip "Ollama kept — qwen2.5:3b was removed, other models are untouched"
 fi
 echo ""
 
