@@ -5,97 +5,129 @@ CONFIG_DIR="$HOME/.alysha"
 VAULT_PATH="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Alysha"
 LAUNCHD_PLIST="$HOME/Library/LaunchAgents/com.alysha.daemon.plist"
 
-RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; NC='\033[0m'
-info()    { echo -e "${BLUE}[alysha]${NC} $*"; }
-success() { echo -e "${GREEN}[alysha]${NC} $*"; }
-warn()    { echo -e "${YELLOW}[alysha]${NC} $*"; }
-
-echo ""
-echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${RED}  Alysha Uninstall${NC}"
-echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
-echo "This will remove:"
-echo "  • Alysha daemon service (launchd)"
-echo "  • Daemon config and Python venv (~/.alysha/)"
-echo ""
-echo "This will NOT remove:"
-echo "  • Homebrew, Obsidian, Tailscale (shared tools)"
-echo "  • Your Obsidian vault (your notes are yours)"
-echo ""
-read -rp "Continue? [y/N] " confirm
-[[ "${confirm,,}" == "y" ]] || { echo "Aborted."; exit 0; }
-
-# 1. Stop and unload daemon
-info "Stopping daemon service..."
-if [[ -f "$LAUNCHD_PLIST" ]]; then
-  launchctl unload "$LAUNCHD_PLIST" 2>/dev/null || true
-  rm -f "$LAUNCHD_PLIST"
-  success "Daemon service removed"
-else
-  warn "No launchd plist found — skipping"
+# ── gum (TUI) ────────────────────────────────────────────────────────────────
+if ! command -v gum &>/dev/null; then
+  echo "Installing gum for terminal UI..."
+  brew install gum --quiet
 fi
 
-# 2. Remove config dir (venv, config.json, logs, QR code)
-info "Removing ~/.alysha/..."
-if [[ -d "$CONFIG_DIR" ]]; then
-  rm -rf "$CONFIG_DIR"
-  success "~/.alysha/ removed"
-else
-  warn "~/.alysha/ not found — skipping"
-fi
+# ── Header ───────────────────────────────────────────────────────────────────
+gum style \
+  --border rounded \
+  --border-foreground 196 \
+  --foreground 196 \
+  --bold \
+  --padding "1 4" \
+  --margin "1 0" \
+  "Alysha Uninstaller"
 
-# 3. Optionally delete the vault
+gum style --foreground 245 "This will remove the Alysha daemon, config, and any tools you choose below."
 echo ""
-echo -e "${YELLOW}Your Obsidian vault still exists at:${NC}"
-echo "  $VAULT_PATH"
-echo ""
-echo "Delete it? This permanently removes all your notes."
-read -rp "Delete vault? [y/N] " delete_vault
-if [[ "${delete_vault,,}" == "y" ]]; then
-  if [[ -d "$VAULT_PATH" ]]; then
-    rm -rf "$VAULT_PATH"
-    success "Vault deleted"
-  else
-    warn "Vault directory not found — skipping"
-  fi
-else
-  info "Vault kept — you can open it in Obsidian at any time"
-fi
 
-# 4. Remove Ollama and models
-info "Stopping Ollama service..."
+# ── Confirm ──────────────────────────────────────────────────────────────────
+if ! gum confirm --affirmative "Yes, uninstall" --negative "Cancel" "Continue with uninstall?"; then
+  gum style --foreground 245 "Aborted. Nothing was changed."
+  exit 0
+fi
+echo ""
+
+# ── Helper ───────────────────────────────────────────────────────────────────
+ask() {
+  # ask <header> <yes-label> <no-label>
+  gum choose \
+    --header "$1" \
+    --cursor "▸ " \
+    --cursor-prefix "  " \
+    --selected-prefix "✓ " \
+    "$2" "$3"
+}
+
+step() { gum style --foreground 33 "  → $*"; }
+ok()   { gum style --foreground 82 "  ✓ $*"; }
+skip() { gum style --foreground 245 "  – $*"; }
+
+# ── 1. Daemon service ─────────────────────────────────────────────────────────
+gum style --bold "Daemon & Config"
+step "Stopping Alysha daemon..."
+launchctl unload "$LAUNCHD_PLIST" 2>/dev/null || true
+rm -f "$LAUNCHD_PLIST"
+ok "Daemon service removed"
+
+step "Removing ~/.alysha/ (config, venv, logs)..."
+rm -rf "$CONFIG_DIR"
+ok "~/.alysha/ removed"
+echo ""
+
+# ── 2. Vault ──────────────────────────────────────────────────────────────────
+gum style --bold "Obsidian Vault"
+gum style --foreground 245 "  $VAULT_PATH"
+echo ""
+vault_choice=$(ask "Delete your vault? This permanently removes all your notes." \
+  "Yes, delete my notes" \
+  "No, keep my notes")
+if [[ "$vault_choice" == "Yes, delete my notes" ]]; then
+  rm -rf "$VAULT_PATH"
+  ok "Vault deleted"
+else
+  skip "Vault kept — open it any time in Obsidian"
+fi
+echo ""
+
+# ── 3. Ollama ─────────────────────────────────────────────────────────────────
+gum style --bold "Ollama"
+step "Stopping Ollama service..."
 brew services stop ollama 2>/dev/null || true
-
-info "Removing phi3.5 model..."
-ollama rm phi3.5 2>/dev/null && success "phi3.5 removed" || warn "phi3.5 not found — skipping"
-
+step "Removing phi3.5 model..."
+ollama rm phi3.5 2>/dev/null && ok "phi3.5 removed" || skip "phi3.5 not found"
 echo ""
-echo "Remove Ollama entirely? (~/.ollama/ contains all models — can be several GB)"
-echo "(Say no if you use Ollama for other projects)"
-read -rp "Remove Ollama + all models? [y/N] " remove_ollama
-if [[ "${remove_ollama,,}" == "y" ]]; then
-  brew uninstall ollama 2>/dev/null || warn "Ollama not installed via Homebrew — skipping brew uninstall"
+ollama_choice=$(ask "Remove Ollama entirely? (~/.ollama/ can be several GB)" \
+  "Yes, uninstall Ollama" \
+  "No, keep Ollama")
+if [[ "$ollama_choice" == "Yes, uninstall Ollama" ]]; then
+  brew uninstall ollama 2>/dev/null || skip "Ollama not installed via Homebrew"
   rm -rf "$HOME/.ollama"
-  success "Ollama and all models removed"
+  ok "Ollama and all models removed"
 else
-  info "Ollama kept — phi3.5 model was removed, other models are untouched"
+  skip "Ollama kept — phi3.5 was removed, other models are untouched"
 fi
-
-# 5. Optionally disconnect Tailscale
 echo ""
-echo "Disconnect this Mac from Tailscale?"
-echo "(Only do this if you're not using Tailscale for anything else)"
-read -rp "Disconnect Tailscale? [y/N] " ts_logout
-if [[ "${ts_logout,,}" == "y" ]]; then
-  sudo tailscale logout 2>/dev/null || tailscale logout 2>/dev/null || warn "Could not disconnect — run 'tailscale logout' manually"
-  success "Tailscale disconnected"
+
+# ── 4. Tailscale ──────────────────────────────────────────────────────────────
+gum style --bold "Tailscale"
+ts_choice=$(ask "Remove Tailscale? (say no if you use it for other things)" \
+  "Yes, uninstall Tailscale" \
+  "No, keep Tailscale")
+if [[ "$ts_choice" == "Yes, uninstall Tailscale" ]]; then
+  sudo tailscale logout 2>/dev/null || tailscale logout 2>/dev/null || true
+  brew uninstall tailscale 2>/dev/null || skip "Tailscale not installed via Homebrew"
+  ok "Tailscale removed"
+else
+  skip "Tailscale kept"
 fi
+echo ""
 
+# ── 5. Obsidian ───────────────────────────────────────────────────────────────
+gum style --bold "Obsidian"
+obs_choice=$(ask "Remove Obsidian app? (say no if you use it outside of Alysha)" \
+  "Yes, uninstall Obsidian" \
+  "No, keep Obsidian")
+if [[ "$obs_choice" == "Yes, uninstall Obsidian" ]]; then
+  brew uninstall --cask obsidian 2>/dev/null || skip "Obsidian not installed via Homebrew"
+  ok "Obsidian removed"
+else
+  skip "Obsidian kept"
+fi
 echo ""
-echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${GREEN}  Alysha uninstalled.${NC}"
-echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+
+# ── Done ──────────────────────────────────────────────────────────────────────
+gum style \
+  --border rounded \
+  --border-foreground 82 \
+  --foreground 82 \
+  --bold \
+  --padding "1 4" \
+  --margin "1 0" \
+  "Alysha uninstalled."
+
+gum style --foreground 245 "To reinstall: bash setup/install.sh"
 echo ""
-echo "To reinstall later: bash setup/install.sh"
-echo "To remove Obsidian/Ollama/Tailscale: brew uninstall <package>"
