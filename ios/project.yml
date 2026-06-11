@@ -27,6 +27,8 @@ targets:
               - alysha
         NSCameraUsageDescription: "Alysha uses your camera to scan the QR code from your Mac setup."
         NSMicrophoneUsageDescription: "Alysha uses your microphone to record voice notes."
+        LSApplicationQueriesSchemes:
+          - obsidian
     dependencies:
       - package: WhisperKit
         product: WhisperKit
