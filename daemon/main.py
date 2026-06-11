@@ -10,6 +10,7 @@ from daemon.rag import build_index, VaultWatcher
 from daemon.routes import health as health_router
 from daemon.routes import notes as notes_router
 from daemon.routes import query as query_router
+from daemon.routes import config as config_router
 
 
 @asynccontextmanager
@@ -73,6 +74,7 @@ async def api_key_middleware(request: Request, call_next):
 app.include_router(health_router.router)
 app.include_router(notes_router.router)
 app.include_router(query_router.router)
+app.include_router(config_router.router)
 
 
 if __name__ == "__main__":

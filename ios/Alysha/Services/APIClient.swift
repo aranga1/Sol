@@ -78,8 +78,30 @@ final class APIClient: ObservableObject {
         catch { throw AlyshAPIError.decodingError(error) }
     }
 
+    func getSystemPrompt() async throws -> SystemPromptResponse {
+        let req = try makeRequest("/api/config")
+        let (data, response) = try await session.data(for: req)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            throw AlyshAPIError.httpError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0)
+        }
+        do { return try JSONDecoder().decode(SystemPromptResponse.self, from: data) }
+        catch { throw AlyshAPIError.decodingError(error) }
+    }
+
+    func updateSystemPrompt(_ prompt: String) async throws -> SystemPromptResponse {
+        struct Body: Encodable { let system_prompt: String }
+        let req = try makeRequest("/api/config", method: "PATCH", body: Body(system_prompt: prompt))
+        let (data, response) = try await session.data(for: req)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            throw AlyshAPIError.httpError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0)
+        }
+        do { return try JSONDecoder().decode(SystemPromptResponse.self, from: data) }
+        catch { throw AlyshAPIError.decodingError(error) }
+    }
+
     func query(_ q: QueryRequest) async throws -> QueryResponse {
-        let req = try makeRequest("/api/query", method: "POST", body: q)
+        var req = try makeRequest("/api/query", method: "POST", body: q)
+        req.timeoutInterval = 120  // LLM inference can take 30-60s
         let (data, response) = try await session.data(for: req)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             throw AlyshAPIError.httpError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0)

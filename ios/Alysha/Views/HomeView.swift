@@ -3,37 +3,29 @@ import SwiftUI
 struct HomeView: View {
     var onResetConnection: () -> Void = {}
 
-    @State private var daemonVM = DaemonStatusViewModel()
+    @State private var isConnected = false
     @State private var showVoiceNote = false
     @State private var showTextNote = false
     @State private var queryText = ""
     @State private var navigateToQuery = false
-    @State private var showResetConfirmation = false
-    @Environment(\.scenePhase) private var scenePhase
+    @State private var showSettings = false
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 32) {
                 Spacer()
 
-                // Two large capture buttons
                 HStack(spacing: 24) {
-                    CaptureButton(
-                        icon: "mic.fill",
-                        label: "Voice Note",
-                        isEnabled: daemonVM.status == .reachable
-                    ) { showVoiceNote = true }
-
-                    CaptureButton(
-                        icon: "pencil",
-                        label: "Text Note",
-                        isEnabled: daemonVM.status == .reachable
-                    ) { showTextNote = true }
+                    CaptureButton(icon: "mic.fill", label: "Voice Note", isEnabled: isConnected) {
+                        showVoiceNote = true
+                    }
+                    CaptureButton(icon: "pencil", label: "Text Note", isEnabled: isConnected) {
+                        showTextNote = true
+                    }
                 }
 
                 Spacer()
 
-                // Query bar
                 HStack {
                     TextField("Ask your vault a question…", text: $queryText)
                         .textFieldStyle(.roundedBorder)
@@ -42,10 +34,9 @@ struct HomeView: View {
                     Button {
                         if !queryText.isEmpty { navigateToQuery = true }
                     } label: {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.title2)
+                        Image(systemName: "arrow.up.circle.fill").font(.title2)
                     }
-                    .disabled(queryText.isEmpty || daemonVM.status != .reachable)
+                    .disabled(queryText.isEmpty || !isConnected)
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 24)
@@ -53,45 +44,44 @@ struct HomeView: View {
             .navigationTitle("Alysha")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        showResetConfirmation = true
-                    } label: {
-                        Image(systemName: "gearshape")
-                            .foregroundStyle(.secondary)
+                    Button { showSettings = true } label: {
+                        Image(systemName: "gearshape").foregroundStyle(.secondary)
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    StatusDot(status: daemonVM.status)
+                    // Owns its own VM — only this view re-renders on status changes
+                    DaemonStatusIndicator { isConnected = $0 }
                 }
             }
-            .confirmationDialog(
-                "Reset Connection",
-                isPresented: $showResetConfirmation,
-                titleVisibility: .visible
-            ) {
-                Button("Scan a new QR code", role: .destructive) {
-                    onResetConnection()
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("This will clear your current Mac connection and return you to the setup screen.")
+            .sheet(isPresented: $showSettings) {
+                SettingsView(onResetConnection: onResetConnection)
             }
             .sheet(isPresented: $showVoiceNote) { VoiceNoteView() }
-            .sheet(isPresented: $showTextNote) {
-                TextNoteView(onSuccess: {
-                    // Could show a toast here in a future issue — dismiss is enough for now
-                })
-            }
+            .sheet(isPresented: $showTextNote) { TextNoteView(onSuccess: {}) }
             .navigationDestination(isPresented: $navigateToQuery) {
-                QueryView(initialQuestion: queryText)
-                    .onDisappear { queryText = "" }
-            }
-            .onAppear { daemonVM.startPolling() }
-            .onDisappear { daemonVM.stopPolling() }
-            .onChange(of: scenePhase) { _, newPhase in
-                if newPhase == .active { daemonVM.checkNow() }
+                QueryView(initialQuestion: queryText).onDisappear { queryText = "" }
             }
         }
+    }
+}
+
+// Isolated status view — owns DaemonStatusViewModel so only this subtree re-renders on polls
+private struct DaemonStatusIndicator: View {
+    let onStatusChange: (Bool) -> Void
+
+    @State private var vm = DaemonStatusViewModel()
+    @Environment(\.scenePhase) private var scenePhase
+
+    var body: some View {
+        StatusDot(status: vm.status)
+            .onAppear { vm.startPolling() }
+            .onDisappear { vm.stopPolling() }
+            .onChange(of: vm.status) { _, newStatus in
+                onStatusChange(newStatus == .reachable)
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active { vm.checkNow() }
+            }
     }
 }
 
@@ -104,10 +94,8 @@ private struct CaptureButton: View {
     var body: some View {
         Button(action: action) {
             VStack(spacing: 12) {
-                Image(systemName: icon)
-                    .font(.system(size: 44))
-                Text(label)
-                    .font(.headline)
+                Image(systemName: icon).font(.system(size: 44))
+                Text(label).font(.headline)
             }
             .frame(width: 140, height: 140)
             .background(.quaternary, in: RoundedRectangle(cornerRadius: 20))
@@ -123,7 +111,7 @@ private struct StatusDot: View {
     var body: some View {
         HStack(spacing: 4) {
             Circle()
-                .fill(color)
+                .fill(dotColor)
                 .frame(width: 10, height: 10)
             Text(label)
                 .font(.caption)
@@ -131,19 +119,19 @@ private struct StatusDot: View {
         }
     }
 
-    private var color: Color {
+    private var dotColor: Color {
         switch status {
-        case .checking: return .gray
-        case .reachable: return .green
-        case .unreachable: return .red
+        case .checking: .gray
+        case .reachable: .green
+        case .unreachable: .red
         }
     }
 
     private var label: String {
         switch status {
-        case .checking: return "Checking…"
-        case .reachable: return "Connected"
-        case .unreachable: return "Unreachable"
+        case .checking: "Checking…"
+        case .reachable: "Connected"
+        case .unreachable: "Unreachable"
         }
     }
 }
