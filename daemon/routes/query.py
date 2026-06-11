@@ -7,8 +7,13 @@ from daemon.rag import query as rag_query
 router = APIRouter()
 
 
+class HistoryMessage(BaseModel):
+    role: str   # "user" | "assistant"
+    content: str
+
 class QueryRequest(BaseModel):
     question: str
+    history: list[HistoryMessage] | None = None
 
     @field_validator("question")
     @classmethod
@@ -34,7 +39,19 @@ async def query_vault(request: Request, body: QueryRequest):
     if index is None:
         return JSONResponse(status_code=503, content={"detail": "Index not ready yet"})
 
-    answer, sources = rag_query(index, body.question)
+    try:
+        history = [{"role": m.role, "content": m.content} for m in (body.history or [])]
+        system_prompt = getattr(request.app.state.config, "system_prompt", None)
+        answer, sources = rag_query(index, body.question, history=history, system_prompt=system_prompt)
+    except Exception as e:
+        err = str(e)
+        if "timeout" in err.lower() or "timed out" in err.lower():
+            return JSONResponse(
+                status_code=504,
+                content={"detail": "LLM timed out — try a shorter question or try again"},
+            )
+        return JSONResponse(status_code=500, content={"detail": err})
+
     return QueryResponse(
         answer=answer,
         sources=[SourceItem(file=s["file"], title=s["title"]) for s in sources],

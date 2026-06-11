@@ -3,12 +3,14 @@ import time
 from pathlib import Path
 from typing import Callable
 
-from llama_index.core import SimpleDirectoryReader, VectorStoreIndex, StorageContext, Settings
+from llama_index.core import SimpleDirectoryReader, VectorStoreIndex, StorageContext, Settings, PromptTemplate
 from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.llms.ollama import Ollama
 from llama_index.embeddings.ollama import OllamaEmbedding
 from llama_index.vector_stores.faiss import FaissVectorStore
 import faiss
+
+from daemon.config import DEFAULT_SYSTEM_PROMPT
 
 
 def _configure_settings(ollama_base_url: str, ollama_model: str) -> None:
@@ -16,11 +18,12 @@ def _configure_settings(ollama_base_url: str, ollama_model: str) -> None:
     Settings.llm = Ollama(
         model=ollama_model,
         base_url=ollama_base_url,
-        request_timeout=60.0,
+        request_timeout=300.0,
     )
     Settings.embed_model = OllamaEmbedding(
         model_name="nomic-embed-text",
         base_url=ollama_base_url,
+        request_timeout=60.0,
     )
 
 
@@ -54,19 +57,37 @@ def build_index(vault_path: str, ollama_base_url: str, ollama_model: str) -> Vec
 def query(
     index: VectorStoreIndex,
     question: str,
-    top_k: int = 3,
+    history: list[dict] | None = None,
+    top_k: int = 5,
+    system_prompt: str | None = None,
 ) -> tuple[str, list[dict]]:
     """
     Query the index. Returns (answer_str, sources_list).
-    sources_list entries: {"file": relative_path, "title": note_title}
+    history entries: {"role": "user"|"assistant", "content": str}
     """
     if index is None:
         return "Index not ready yet.", []
 
     retriever = index.as_retriever(similarity_top_k=top_k)
-    query_engine = RetrieverQueryEngine.from_args(retriever)
+    qa_prompt = PromptTemplate(system_prompt or DEFAULT_SYSTEM_PROMPT)
+    query_engine = RetrieverQueryEngine.from_args(
+        retriever,
+        text_qa_template=qa_prompt,
+    )
 
-    response = query_engine.query(question)
+    if history:
+        history_text = "\n".join(
+            f"{'User' if m['role'] == 'user' else 'Alysha'}: {m['content']}"
+            for m in history
+        )
+        synthesis_prompt = (
+            f"Previous conversation:\n{history_text}\n\n"
+            f"Continue the conversation and answer this follow-up using the notes: {question}"
+        )
+    else:
+        synthesis_prompt = question
+
+    response = query_engine.query(synthesis_prompt)
     answer = str(response)
 
     if not answer or answer.strip() in ("", "Empty Response", "None"):

@@ -3,26 +3,26 @@ import SwiftUI
 @Observable
 @MainActor
 private final class QueryViewModel {
-    var question: String
-    var answer: String?
-    var sources: [SourceItem] = []
+    var messages: [ConversationMessage] = []
     var isLoading = false
     var errorMessage: String?
     var followUpText = ""
 
-    init(question: String) { self.question = question }
-
     func ask(_ q: String) async {
         guard !q.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        question = q
         isLoading = true
-        answer = nil
-        sources = []
         errorMessage = nil
+
+        let history = messages.flatMap { msg in [
+            HistoryMessage(role: "user", content: msg.question),
+            HistoryMessage(role: "assistant", content: msg.answer)
+        ]}
+
         do {
-            let resp = try await APIClient.shared.query(QueryRequest(question: q))
-            answer = resp.answer
-            sources = resp.sources
+            let resp = try await APIClient.shared.query(
+                QueryRequest(question: q, history: history.isEmpty ? nil : history)
+            )
+            messages.append(ConversationMessage(question: q, answer: resp.answer, sources: resp.sources))
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -33,96 +33,149 @@ private final class QueryViewModel {
 struct QueryView: View {
     var initialQuestion: String = ""
     @State private var vm: QueryViewModel
+    @State private var scrollID: UUID?
 
     init(initialQuestion: String = "") {
         self.initialQuestion = initialQuestion
-        _vm = State(initialValue: QueryViewModel(question: initialQuestion))
+        _vm = State(initialValue: QueryViewModel())
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                // Question header
-                if !vm.question.isEmpty {
-                    Text(vm.question)
-                        .font(.headline)
-                        .padding(.horizontal)
-                }
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
 
-                // Loading / answer / error
-                if vm.isLoading {
-                    ProgressView("Searching your vault…")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                } else if let answer = vm.answer {
-                    Text(answer)
-                        .padding(.horizontal)
-                        .textSelection(.enabled)
-
-                    if !vm.sources.isEmpty {
-                        Divider().padding(.horizontal)
-
-                        Text("Sources")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                    // Conversation thread
+                    ForEach(vm.messages) { msg in
+                        VStack(alignment: .leading, spacing: 12) {
+                            // Question bubble
+                            HStack {
+                                Spacer()
+                                Text(msg.question)
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 10)
+                                    .background(Color.indigo, in: RoundedRectangle(cornerRadius: 16))
+                                    .foregroundStyle(.white)
+                                    .padding(.leading, 60)
+                            }
                             .padding(.horizontal)
 
-                        ForEach(vm.sources) { source in
-                            Button {
-                                openInObsidian(source)
-                            } label: {
-                                HStack {
-                                    Image(systemName: "doc.text")
-                                        .foregroundStyle(.secondary)
-                                    Text(source.title)
-                                        .foregroundStyle(.primary)
-                                    Spacer()
-                                    Image(systemName: "arrow.up.right")
-                                        .foregroundStyle(.tertiary)
-                                        .font(.caption)
+                            // Answer + sources
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(msg.answer)
+                                    .textSelection(.enabled)
+                                    .padding(.horizontal)
+
+                                if !msg.sources.isEmpty {
+                                    VStack(alignment: .leading, spacing: 0) {
+                                        ForEach(msg.sources) { source in
+                                            Button { openInObsidian(source) } label: {
+                                                HStack {
+                                                    Image(systemName: "doc.text")
+                                                        .foregroundStyle(.secondary)
+                                                        .font(.caption)
+                                                    Text(source.title)
+                                                        .font(.caption)
+                                                        .foregroundStyle(.secondary)
+                                                    Spacer()
+                                                    Image(systemName: "arrow.up.right")
+                                                        .foregroundStyle(.tertiary)
+                                                        .font(.caption2)
+                                                }
+                                                .padding(.horizontal)
+                                                .padding(.vertical, 6)
+                                            }
+                                        }
+                                    }
                                 }
-                                .padding(.horizontal)
-                                .padding(.vertical, 6)
                             }
                         }
+                        .padding(.vertical, 12)
+                        .id(msg.id)
                     }
-                } else if let error = vm.errorMessage {
-                    VStack(spacing: 8) {
-                        Text(error).foregroundStyle(.red).padding(.horizontal)
-                        Button("Retry") { Task { await vm.ask(vm.question) } }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                }
 
-                Divider().padding(.horizontal)
-
-                // Follow-up question bar
-                HStack {
-                    TextField("Ask a follow-up…", text: $vm.followUpText)
-                        .textFieldStyle(.roundedBorder)
-                        .submitLabel(.search)
-                        .onSubmit { submitFollowUp() }
-                    Button(action: submitFollowUp) {
-                        Image(systemName: "arrow.up.circle.fill").font(.title2)
+                    // Loading indicator
+                    if vm.isLoading {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                ProgressView()
+                                Text("Thinking…")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Text("30–60 seconds")
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                            }
+                            .padding(.horizontal)
+                            .padding(.vertical, 12)
+                            Spacer()
+                        }
+                        .id("loading")
                     }
-                    .disabled(vm.followUpText.isEmpty || vm.isLoading)
+
+                    // Error
+                    if let error = vm.errorMessage {
+                        VStack(spacing: 8) {
+                            Text(error).foregroundStyle(.red).font(.caption).padding(.horizontal)
+                            Button("Retry") {
+                                if let last = vm.messages.last {
+                                    Task { await vm.ask(last.question) }
+                                }
+                            }
+                        }
+                        .padding()
+                    }
+
+                    // Empty state (no messages yet)
+                    if vm.messages.isEmpty && !vm.isLoading {
+                        Text("Ask anything about your notes.")
+                            .foregroundStyle(.tertiary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, 60)
+                    }
+
+                    Color.clear.frame(height: 80)  // space above input bar
                 }
-                .padding(.horizontal)
-                .padding(.bottom)
+                .padding(.top)
             }
-            .padding(.top)
+            .onChange(of: vm.messages.count) { _, _ in
+                withAnimation { proxy.scrollTo("loading", anchor: .bottom) }
+            }
+            .onChange(of: vm.isLoading) { _, loading in
+                if loading { withAnimation { proxy.scrollTo("loading", anchor: .bottom) } }
+            }
+        }
+        .safeAreaInset(edge: .bottom) {
+            inputBar
         }
         .navigationTitle("Ask Alysha")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            if !initialQuestion.isEmpty && vm.answer == nil && !vm.isLoading {
+            if !initialQuestion.isEmpty && vm.messages.isEmpty && !vm.isLoading {
                 Task { await vm.ask(initialQuestion) }
             }
         }
     }
 
-    private func submitFollowUp() {
+    private var inputBar: some View {
+        HStack(spacing: 8) {
+            TextField(vm.messages.isEmpty ? "Ask your vault…" : "Follow up…", text: $vm.followUpText)
+                .textFieldStyle(.roundedBorder)
+                .submitLabel(.send)
+                .onSubmit { submit() }
+            Button(action: submit) {
+                Image(systemName: "arrow.up.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(vm.followUpText.isEmpty || vm.isLoading ? Color.secondary : Color.indigo)
+            }
+            .disabled(vm.followUpText.isEmpty || vm.isLoading)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background(.regularMaterial)
+    }
+
+    private func submit() {
         let q = vm.followUpText
         vm.followUpText = ""
         Task { await vm.ask(q) }
@@ -131,10 +184,6 @@ struct QueryView: View {
     private func openInObsidian(_ source: SourceItem) {
         let encoded = source.file.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? source.file
         guard let url = URL(string: "obsidian://open?vault=Alysha&file=\(encoded)") else { return }
-        if UIApplication.shared.canOpenURL(url) {
-            UIApplication.shared.open(url)
-        } else {
-            // Obsidian not installed — show a brief note (handled via vm in a follow-up)
-        }
+        if UIApplication.shared.canOpenURL(url) { UIApplication.shared.open(url) }
     }
 }
