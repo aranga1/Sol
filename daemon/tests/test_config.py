@@ -9,7 +9,7 @@ VALID_CONFIG = {
     "vault_path": "/Users/test/vault",
     "daemon_port": 8765,
     "obsidian_api_key": "obs-key-abc123",
-    "obsidian_port": 27123,
+    "obsidian_port": 27124,
     "daemon_api_key": "daemon-key-xyz789",
     "ollama_model": "llama3.2",
     "ollama_base_url": "http://localhost:11434",
