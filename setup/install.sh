@@ -52,8 +52,23 @@ gum style \
 gum style --foreground 245 "  macOS $(sw_vers -productVersion)  ·  $(uname -m)"
 echo ""
 
+# ── Time estimate ─────────────────────────────────────────────────────────────
+gum style \
+  --border normal \
+  --border-foreground 245 \
+  --padding "0 2" \
+  "$(gum style --foreground 212 --bold "Estimated time on a fast connection (~100 Mbps):")
+
+  $(gum style --foreground 82 "~1 min")   Install dependencies (Homebrew, Python, Tailscale, Ollama, Obsidian)
+  $(gum style --foreground 82 "~4 min")   Download AI model  (qwen2.5:3b · 1.9 GB)
+  $(gum style --foreground 82 "~1 min")   Python environment + daemon setup
+  $(gum style --foreground 82 "~2 min")   Tailscale auth + Obsidian plugin setup
+  $(gum style --foreground 245 "─────────────────────────────────────────────")
+  $(gum style --foreground 212 --bold "~8 min")   Total (may vary — model download dominates)"
+echo ""
+
 # ── 1. Dependencies ───────────────────────────────────────────────────────────
-section "1 / 8  Dependencies"
+section "1 / 9  Dependencies"
 
 install_brew_pkg() {
   local pkg="$1" cask="${2:-}"
@@ -73,7 +88,7 @@ install_brew_pkg ollama
 install_brew_pkg obsidian cask
 
 # ── 2. Ollama model ───────────────────────────────────────────────────────────
-section "2 / 8  Ollama model (qwen2.5:3b)"
+section "2 / 9  Ollama model (qwen2.5:3b)"
 
 spin "Starting Ollama service..." brew services start ollama
 sleep 2
@@ -94,7 +109,7 @@ else
 fi
 
 # ── 3. Obsidian vault ─────────────────────────────────────────────────────────
-section "3 / 8  Obsidian vault"
+section "3 / 9  Obsidian vault"
 
 if [[ -d "$VAULT_PATH/.obsidian" ]]; then
   skip "Vault already exists at $VAULT_PATH"
@@ -105,7 +120,7 @@ else
 fi
 
 # ── 4. Daemon config ──────────────────────────────────────────────────────────
-section "4 / 8  Daemon config"
+section "4 / 9  Daemon config"
 
 mkdir -p "$CONFIG_DIR"
 
@@ -137,7 +152,7 @@ fi
 DAEMON_API_KEY=$(python3 -c "import json; d=json.load(open('$CONFIG_DIR/config.json')); print(d['daemon_api_key'])")
 
 # ── 5. Python venv ────────────────────────────────────────────────────────────
-section "5 / 8  Python environment"
+section "5 / 9  Python environment"
 
 if [[ -f "$VENV/bin/pip" ]]; then
   step "Venv exists — updating dependencies..."
@@ -152,7 +167,7 @@ else
 fi
 
 # ── 6. Daemon service ─────────────────────────────────────────────────────────
-section "6 / 8  Daemon service"
+section "6 / 9  Daemon service"
 
 step "Installing launchd service..."
 sed \
@@ -168,7 +183,7 @@ launchctl load "$LAUNCHD_PLIST"
 ok "Daemon service running"
 
 # ── 7. Tailscale ──────────────────────────────────────────────────────────────
-section "7 / 8  Tailscale"
+section "7 / 9  Tailscale"
 
 # Ensure tailscaled is running before any tailscale commands
 if ! brew services list | grep -q "tailscale.*started"; then
@@ -213,7 +228,7 @@ fi
 ok "Tailscale IP: $TAILSCALE_IP"
 
 # ── 8. Obsidian plugin ────────────────────────────────────────────────────────
-section "8 / 8  Obsidian Local REST API plugin"
+section "8 / 9  Obsidian Local REST API plugin"
 
 PLUGIN_DATA="$VAULT_PATH/.obsidian/plugins/obsidian-local-rest-api/data.json"
 
@@ -284,7 +299,7 @@ launchctl unload "$LAUNCHD_PLIST" 2>/dev/null || true
 launchctl load "$LAUNCHD_PLIST"
 ok "Daemon restarted"
 
-# ── QR code ───────────────────────────────────────────────────────────────────
+# ── QR code (connection) ──────────────────────────────────────────────────────
 echo ""
 step "Generating connection QR code..."
 "$VENV/bin/python" "$SCRIPT_DIR/qr_generate.py" \
@@ -293,6 +308,101 @@ step "Generating connection QR code..."
   --api-key "$DAEMON_API_KEY" \
   --output "$CONFIG_DIR/alysha-connect.png" \
   --terminal
+
+# ── 9. Apple Notes integration (optional) ────────────────────────────────────
+section "9 / 9  Apple Notes integration  (optional)"
+
+echo ""
+gum style --foreground 245 "  This step sets up two things:"
+gum style --foreground 245 "  • Obsidian Importer — bulk-import your existing Apple Notes into the vault"
+gum style --foreground 245 "  • iOS Shortcut     — send any Apple Note to Alysha in one tap going forward"
+echo ""
+
+apple_notes_choice=$(ask "Set up Apple Notes integration?" \
+  "Yes, set it up" \
+  "Skip for now")
+
+if [[ "$apple_notes_choice" == "Yes, set it up" ]]; then
+
+  # ── 9a. Obsidian Importer ───────────────────────────────────────────────────
+  gum style --bold "  Bulk import via Obsidian Importer"
+  echo ""
+  gum style \
+    --border normal \
+    --border-foreground 226 \
+    --padding "1 3" \
+    "$(gum style --foreground 226 --bold "Action required in Obsidian:")
+
+$(gum style --foreground 255 "Step 1 ·") $(gum style --foreground 245 "Obsidian is opening — switch to it now.")
+$(gum style --foreground 255 "Step 2 ·") $(gum style --foreground 245 "Go to Settings → Community Plugins → find 'Importer' → Enable it.")
+$(gum style --foreground 255 "Step 3 ·") $(gum style --foreground 245 "Open the Importer plugin (ribbon icon or command palette).")
+$(gum style --foreground 255 "Step 4 ·") $(gum style --foreground 245 "Select 'Apple Notes' as the source → click Import.")
+$(gum style --foreground 255 "Step 5 ·") $(gum style --foreground 245 "Imported notes appear under Imported/Apple Notes/ in your vault.")"
+
+  open -a Obsidian "$VAULT_PATH" 2>/dev/null || true
+  echo ""
+  gum confirm \
+    --affirmative "Done — notes imported" \
+    --negative "Skip import" \
+    "Confirm when the import is complete (or skip to do it later)." || true
+
+  ok "Obsidian Importer step complete"
+  echo ""
+
+  # ── 9b. iOS Shortcut ────────────────────────────────────────────────────────
+  gum style --bold "  iOS Shortcut — Send to Alysha"
+  echo ""
+
+  # Generate the shortcut file (idempotent)
+  step "Generating SendToAlysha.shortcut..."
+  "$VENV/bin/python" "$SCRIPT_DIR/generate_shortcut.py" \
+    --vault "Alysha" \
+    --output "$CONFIG_DIR/SendToAlysha.shortcut"
+  ok "Shortcut file written to $CONFIG_DIR/SendToAlysha.shortcut"
+
+  # Generate QR code pointing to the shortcut file
+  # Use shortcuts://import?url= pointing to the local file path as an AirDrop alternative,
+  # or if the user has hosted the release, point to that URL.
+  SHORTCUT_URL="https://github.com/aranga1/Alysha/releases/latest/download/SendToAlysha.shortcut"
+  SHORTCUT_INSTALL_URL="shortcuts://import?url=${SHORTCUT_URL}"
+
+  step "Generating shortcut QR code..."
+  "$VENV/bin/python" "$SCRIPT_DIR/qr_generate.py" \
+    --url "$SHORTCUT_INSTALL_URL" \
+    --output "$CONFIG_DIR/alysha-shortcut.png" \
+    --terminal \
+    --label "Scan to install iOS Shortcut" 2>/dev/null || \
+  "$VENV/bin/python" -c "
+import qrcode, sys
+qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_L)
+qr.add_data('$SHORTCUT_INSTALL_URL')
+qr.make(fit=True)
+qr.make_image().save('$CONFIG_DIR/alysha-shortcut.png')
+print('  QR code saved to $CONFIG_DIR/alysha-shortcut.png')
+print()
+print('  ── Scan on iPhone to install shortcut ──')
+print()
+qr.print_ascii(invert=True)
+" 2>/dev/null || skip "qrcode not installed — skipping shortcut QR"
+
+  echo ""
+  gum style \
+    --border normal \
+    --border-foreground 245 \
+    --padding "1 3" \
+    "$(gum style --foreground 212 --bold "After scanning the QR code on your iPhone:")
+
+$(gum style --foreground 255 "Step 1 ·") $(gum style --foreground 245 "Tap the QR link → Shortcuts app opens → tap 'Add Shortcut'.")
+$(gum style --foreground 255 "Step 2 ·") $(gum style --foreground 245 "To auto-send new Apple Notes: open Shortcuts → Automation tab.")
+$(gum style --foreground 255 "Step 3 ·") $(gum style --foreground 245 "New Automation → App → Apple Notes → 'Is Opened' (or use Share Sheet).")
+$(gum style --foreground 255 "Step 4 ·") $(gum style --foreground 245 "Add action: Run Shortcut → 'Send to Alysha'.")
+$(gum style --foreground 255 "Note  ·") $(gum style --foreground 245 "Or skip automation: in Apple Notes tap Share → Send to Alysha.")"
+
+  ok "Apple Notes integration complete"
+
+else
+  skip "Apple Notes integration skipped — run setup again any time to enable it"
+fi
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 echo ""
@@ -305,14 +415,14 @@ gum style \
   --margin "1 0" \
   "Alysha is ready!"
 
-gum style "  Vault    $(gum style --foreground 245 "$VAULT_PATH")"
-gum style "  Daemon   $(gum style --foreground 245 "http://$TAILSCALE_IP:$DAEMON_PORT")"
-gum style "  Logs     $(gum style --foreground 245 "$CONFIG_DIR/daemon.log")"
-gum style "  QR code  $(gum style --foreground 245 "$CONFIG_DIR/alysha-connect.png")"
+gum style "  Vault       $(gum style --foreground 245 "$VAULT_PATH")"
+gum style "  Daemon      $(gum style --foreground 245 "http://$TAILSCALE_IP:$DAEMON_PORT")"
+gum style "  Logs        $(gum style --foreground 245 "$CONFIG_DIR/daemon.log")"
+gum style "  Connect QR  $(gum style --foreground 245 "$CONFIG_DIR/alysha-connect.png")"
 echo ""
 gum style --foreground 245 "  iPhone next steps:"
 gum style --foreground 245 "  1. Install Tailscale → sign in with the same account"
 gum style --foreground 245 "  2. Install Alysha (see GitHub Releases)"
-gum style --foreground 245 "  3. Scan the QR code printed above"
+gum style --foreground 245 "  3. Scan the connection QR code printed above"
 gum style --foreground 245 "  4. Open Obsidian iOS → Open vault from iCloud → Alysha"
 echo ""
