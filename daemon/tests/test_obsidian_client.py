@@ -65,3 +65,25 @@ async def test_note_count():
     client = make_client(router)
     assert await client.note_count() == 2
     await client.close()
+
+
+@pytest.mark.asyncio
+async def test_note_count_on_non_2xx_returns_zero():
+    """note_count() must return 0 (not raise) when Obsidian returns a non-2xx."""
+    router = respx.MockRouter(assert_all_called=False)
+    router.get("/vault/").mock(return_value=Response(401, text="Unauthorized"))
+    client = make_client(router)
+    count = await client.note_count()
+    await client.close()
+    assert count == 0
+
+
+@pytest.mark.asyncio
+async def test_note_count_missing_files_key_returns_zero():
+    """note_count() must return 0 when response JSON has no 'files' key."""
+    router = respx.MockRouter(assert_all_called=False)
+    router.get("/vault/").mock(return_value=Response(200, json={}))
+    client = make_client(router)
+    count = await client.note_count()
+    await client.close()
+    assert count == 0

@@ -9,6 +9,9 @@ class ObsidianError(Exception):
     message: str
     status_code: int
 
+    def __post_init__(self):
+        super().__init__(self.message, self.status_code)
+
     def __str__(self) -> str:
         return f"ObsidianError({self.status_code}): {self.message}"
 
