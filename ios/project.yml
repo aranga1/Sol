@@ -1,4 +1,10 @@
 name: Alysha
+
+packages:
+  WhisperKit:
+    url: https://github.com/argmaxinc/WhisperKit
+    from: 1.0.0
+
 options:
   bundleIdPrefix: com.aakashranga
   deploymentTarget:
@@ -21,6 +27,9 @@ targets:
               - alysha
         NSCameraUsageDescription: "Alysha uses your camera to scan the QR code from your Mac setup."
         NSMicrophoneUsageDescription: "Alysha uses your microphone to record voice notes."
+    dependencies:
+      - package: WhisperKit
+        product: WhisperKit
     settings:
       SWIFT_VERSION: 6.0
       IPHONEOS_DEPLOYMENT_TARGET: 17.0
