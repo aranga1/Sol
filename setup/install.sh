@@ -169,44 +169,42 @@ ok "Daemon service running"
 # ── 7. Tailscale ──────────────────────────────────────────────────────────────
 section "7 / 8  Tailscale"
 
+# Ensure tailscaled is running before any tailscale commands
+if ! brew services list | grep -q "tailscale.*started"; then
+  step "Starting Tailscale daemon..."
+  sudo brew services start tailscale 2>/dev/null || brew services start tailscale 2>/dev/null || true
+  sleep 3
+fi
+
+tailscale_auth() {
+  local auth_choice
+  auth_choice=$(ask "How would you like to authenticate?" \
+    "Browser sign-in" \
+    "Paste a pre-auth key")
+  if [[ "$auth_choice" == "Paste a pre-auth key" ]]; then
+    ts_key=$(gum input --placeholder "tskey-auth-...")
+    tailscale up --auth-key="$ts_key" --accept-routes 2>/dev/null || true
+  else
+    tailscale up --accept-routes 2>/dev/null || true
+    gum confirm --affirmative "I've signed in" --negative "" \
+      "Complete sign-in in the browser, then confirm here." || true
+  fi
+}
+
 if tailscale status &>/dev/null 2>&1; then
   TAILSCALE_IP=$(tailscale ip -4 2>/dev/null || echo "")
   skip "Already connected — IP: ${TAILSCALE_IP:-unknown}"
   ts_choice=$(ask "Tailscale is already set up." \
     "Keep existing connection" \
     "Re-authenticate")
-  if [[ "$ts_choice" == "Keep existing connection" ]]; then
-    ok "Using existing Tailscale connection"
-  else
-    gum style --foreground 245 ""
-    gum style --foreground 245 "  1) Paste a pre-auth key (login.tailscale.com → Settings → Keys)"
-    gum style --foreground 245 "  2) Browser sign-in"
-    echo ""
-    auth_choice=$(ask "How would you like to re-authenticate?" \
-      "Paste a pre-auth key" \
-      "Browser sign-in")
-    if [[ "$auth_choice" == "Paste a pre-auth key" ]]; then
-      ts_key=$(gum input --placeholder "tskey-auth-...")
-      sudo tailscale up --auth-key="$ts_key" --accept-routes 2>/dev/null || tailscale up --auth-key="$ts_key"
-    else
-      sudo tailscale up --accept-routes 2>/dev/null || tailscale up
-      gum confirm --affirmative "I've signed in" --negative "" "Complete sign-in in the browser, then confirm." || true
-    fi
+  if [[ "$ts_choice" == "Re-authenticate" ]]; then
+    tailscale_auth
     TAILSCALE_IP=$(tailscale ip -4 2>/dev/null || echo "127.0.0.1")
   fi
 else
   gum style --foreground 245 "  Tailscale connects your iPhone to this Mac from anywhere."
   echo ""
-  auth_choice=$(ask "How would you like to authenticate?" \
-    "Paste a pre-auth key" \
-    "Browser sign-in")
-  if [[ "$auth_choice" == "Paste a pre-auth key" ]]; then
-    ts_key=$(gum input --placeholder "tskey-auth-...")
-    sudo tailscale up --auth-key="$ts_key" --accept-routes 2>/dev/null || tailscale up --auth-key="$ts_key"
-  else
-    sudo tailscale up --accept-routes 2>/dev/null || tailscale up
-    gum confirm --affirmative "I've signed in" --negative "" "Complete sign-in in the browser, then confirm." || true
-  fi
+  tailscale_auth
   TAILSCALE_IP=$(tailscale ip -4 2>/dev/null || echo "127.0.0.1")
 fi
 
