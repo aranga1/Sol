@@ -20,7 +20,7 @@ echo "  • Alysha daemon service (launchd)"
 echo "  • Daemon config and Python venv (~/.alysha/)"
 echo ""
 echo "This will NOT remove:"
-echo "  • Homebrew, Obsidian, Tailscale, Ollama (shared tools)"
+echo "  • Homebrew, Obsidian, Tailscale (shared tools)"
 echo "  • Your Obsidian vault (your notes are yours)"
 echo ""
 read -rp "Continue? [y/N] " confirm
@@ -63,7 +63,26 @@ else
   info "Vault kept — you can open it in Obsidian at any time"
 fi
 
-# 4. Optionally disconnect Tailscale
+# 4. Remove Ollama and models
+info "Stopping Ollama service..."
+brew services stop ollama 2>/dev/null || true
+
+info "Removing phi3.5 model..."
+ollama rm phi3.5 2>/dev/null && success "phi3.5 removed" || warn "phi3.5 not found — skipping"
+
+echo ""
+echo "Remove Ollama entirely? (~/.ollama/ contains all models — can be several GB)"
+echo "(Say no if you use Ollama for other projects)"
+read -rp "Remove Ollama + all models? [y/N] " remove_ollama
+if [[ "${remove_ollama,,}" == "y" ]]; then
+  brew uninstall ollama 2>/dev/null || warn "Ollama not installed via Homebrew — skipping brew uninstall"
+  rm -rf "$HOME/.ollama"
+  success "Ollama and all models removed"
+else
+  info "Ollama kept — phi3.5 model was removed, other models are untouched"
+fi
+
+# 5. Optionally disconnect Tailscale
 echo ""
 echo "Disconnect this Mac from Tailscale?"
 echo "(Only do this if you're not using Tailscale for anything else)"
