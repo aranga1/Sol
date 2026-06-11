@@ -17,7 +17,6 @@ def main():
 
     try:
         import qrcode
-        from qrcode.image.pure import PyPNGImage
     except ImportError:
         print("qrcode not installed — skipping QR generation", file=sys.stderr)
         print(f"\nManual connection info:\n{payload}\n")

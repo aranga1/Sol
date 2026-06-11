@@ -82,7 +82,6 @@ success "Python environment ready"
 
 # 8. launchd
 info "Installing daemon service..."
-SED_SAFE_VAULT=$(echo "$VAULT_PATH" | sed 's/[\/&]/\\&/g')
 sed \
   -e "s|DAEMON_VENV_PYTHON|$VENV/bin/python|g" \
   -e "s|DAEMON_MAIN_PY|$REPO_DIR/daemon/main.py|g" \
