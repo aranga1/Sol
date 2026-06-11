@@ -1,0 +1,36 @@
+name: Alysha
+options:
+  bundleIdPrefix: com.aakashranga
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "16.0"
+  swift: "6.0"
+
+targets:
+  Alysha:
+    type: application
+    platform: iOS
+    sources:
+      - Alysha
+    info:
+      path: Alysha/Info.plist
+      properties:
+        CFBundleDisplayName: Alysha
+        CFBundleURLTypes:
+          - CFBundleURLSchemes:
+              - alysha
+        NSCameraUsageDescription: "Alysha uses your camera to scan the QR code from your Mac setup."
+        NSMicrophoneUsageDescription: "Alysha uses your microphone to record voice notes."
+    settings:
+      SWIFT_VERSION: 6.0
+      IPHONEOS_DEPLOYMENT_TARGET: 17.0
+      PRODUCT_BUNDLE_IDENTIFIER: com.aakashranga.Alysha
+
+  AlyshWidgetExtension:
+    type: app-extension
+    platform: iOS
+    sources:
+      - AlyshWidgetExtension
+    settings:
+      SWIFT_VERSION: 6.0
+      PRODUCT_BUNDLE_IDENTIFIER: com.aakashranga.Alysha.widget

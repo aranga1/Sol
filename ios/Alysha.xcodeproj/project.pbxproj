@@ -1,0 +1,434 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		06D2ADED9B1950DD92D91395 /* AlyshWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA22F30AA5B3EF3850CCD61 /* AlyshWidgetBundle.swift */; };
+		09AD09537CF5305946F751FE /* AlyshWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC65E0F4E8221FBD615A1A16 /* AlyshWidget.swift */; };
+		21A3A674AC2D64B116661B50 /* ConnectionConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D102D5DB1FDDB84CA1589D37 /* ConnectionConfig.swift */; };
+		22D045E01A8078CCE173540E /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56C1208253AD24CB4BA475E2 /* Note.swift */; };
+		3F492F7E575808998B10B1A2 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06BAB5B588583DC1C941710A /* HomeView.swift */; };
+		3FC49D9FDE4C6F946A642216 /* QueryResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEE59A9C1C0C4EDDBAA0265D /* QueryResponse.swift */; };
+		6476050E19A8E9B842C7616C /* VoiceNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97A5F18839F6A0878F0B5E4D /* VoiceNoteView.swift */; };
+		678FD9224FE32CBB349E6066 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C411458A74D1BF80098D5DE /* APIClient.swift */; };
+		AF5CC8191FD1ECEA4C6A4BBA /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DF5C7A9BC25288C74E0CB8 /* KeychainService.swift */; };
+		B13E67385BBDCB6432107A57 /* TextNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BCB5465D47DB137C3C55F8A /* TextNoteView.swift */; };
+		BEE571CEDC9FBA68FDE19893 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E91726CDF932E2083F1167 /* OnboardingView.swift */; };
+		CEAA981254FCC2754EC41E0A /* QueryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC3BCE011EF1D2935BBBC9D /* QueryView.swift */; };
+		F5D2640E92EF69177B3DE12C /* AlyshApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FCF7F200FA674F7C1B5C832 /* AlyshApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		05DF5C7A9BC25288C74E0CB8 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		06BAB5B588583DC1C941710A /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		1BA22F30AA5B3EF3850CCD61 /* AlyshWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlyshWidgetBundle.swift; sourceTree = "<group>"; };
+		3BCB5465D47DB137C3C55F8A /* TextNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextNoteView.swift; sourceTree = "<group>"; };
+		4719D7EF02EB890E2420011A /* AlyshWidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = AlyshWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		4FCF7F200FA674F7C1B5C832 /* AlyshApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlyshApp.swift; sourceTree = "<group>"; };
+		53BD7526735F7DF0D2872797 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		56C1208253AD24CB4BA475E2 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		88E91726CDF932E2083F1167 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		8A6C459B5C6843A97F7EB96C /* Alysha.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Alysha.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		97A5F18839F6A0878F0B5E4D /* VoiceNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceNoteView.swift; sourceTree = "<group>"; };
+		9C411458A74D1BF80098D5DE /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		BC65E0F4E8221FBD615A1A16 /* AlyshWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlyshWidget.swift; sourceTree = "<group>"; };
+		CBC3BCE011EF1D2935BBBC9D /* QueryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryView.swift; sourceTree = "<group>"; };
+		D102D5DB1FDDB84CA1589D37 /* ConnectionConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionConfig.swift; sourceTree = "<group>"; };
+		E525768EDEFA9D1FBA71B752 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		FEE59A9C1C0C4EDDBAA0265D /* QueryResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryResponse.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		20612328C0B9DBA6F014047C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8A6C459B5C6843A97F7EB96C /* Alysha.app */,
+				4719D7EF02EB890E2420011A /* AlyshWidgetExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		54B1507A1B3768696A1B1918 /* AlyshWidgetExtension */ = {
+			isa = PBXGroup;
+			children = (
+				E525768EDEFA9D1FBA71B752 /* .gitkeep */,
+				BC65E0F4E8221FBD615A1A16 /* AlyshWidget.swift */,
+				1BA22F30AA5B3EF3850CCD61 /* AlyshWidgetBundle.swift */,
+			);
+			path = AlyshWidgetExtension;
+			sourceTree = "<group>";
+		};
+		598A41543D46B3914038F991 /* Alysha */ = {
+			isa = PBXGroup;
+			children = (
+				4FCF7F200FA674F7C1B5C832 /* AlyshApp.swift */,
+				53BD7526735F7DF0D2872797 /* Info.plist */,
+				D466457B0B5A7594973BA18C /* Models */,
+				A021D309B52EDF3CAD70C5CE /* Services */,
+				6D6AC858473D9ABD2CA6D136 /* Views */,
+			);
+			path = Alysha;
+			sourceTree = "<group>";
+		};
+		6D6AC858473D9ABD2CA6D136 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				06BAB5B588583DC1C941710A /* HomeView.swift */,
+				88E91726CDF932E2083F1167 /* OnboardingView.swift */,
+				CBC3BCE011EF1D2935BBBC9D /* QueryView.swift */,
+				3BCB5465D47DB137C3C55F8A /* TextNoteView.swift */,
+				97A5F18839F6A0878F0B5E4D /* VoiceNoteView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		86965CF7982764389AD305C2 = {
+			isa = PBXGroup;
+			children = (
+				598A41543D46B3914038F991 /* Alysha */,
+				54B1507A1B3768696A1B1918 /* AlyshWidgetExtension */,
+				20612328C0B9DBA6F014047C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A021D309B52EDF3CAD70C5CE /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				9C411458A74D1BF80098D5DE /* APIClient.swift */,
+				05DF5C7A9BC25288C74E0CB8 /* KeychainService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		D466457B0B5A7594973BA18C /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				D102D5DB1FDDB84CA1589D37 /* ConnectionConfig.swift */,
+				56C1208253AD24CB4BA475E2 /* Note.swift */,
+				FEE59A9C1C0C4EDDBAA0265D /* QueryResponse.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1D0754DF34FC5EEAC3458BBC /* Alysha */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3747210F7519B3BF5F5D1E96 /* Build configuration list for PBXNativeTarget "Alysha" */;
+			buildPhases = (
+				FA1A21F1185F2F9FEC398505 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Alysha;
+			packageProductDependencies = (
+			);
+			productName = Alysha;
+			productReference = 8A6C459B5C6843A97F7EB96C /* Alysha.app */;
+			productType = "com.apple.product-type.application";
+		};
+		EDD5B3228FB24AEFFF165A7C /* AlyshWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4CC0D097D2F8FD62401CA868 /* Build configuration list for PBXNativeTarget "AlyshWidgetExtension" */;
+			buildPhases = (
+				5AEFFA7A3530D5B323CA93E0 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AlyshWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = AlyshWidgetExtension;
+			productReference = 4719D7EF02EB890E2420011A /* AlyshWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D0CB50D4F22EA58B96F83FD4 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 45BC4AB7443BBCD1344B8094 /* Build configuration list for PBXProject "Alysha" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 86965CF7982764389AD305C2;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 20612328C0B9DBA6F014047C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				EDD5B3228FB24AEFFF165A7C /* AlyshWidgetExtension */,
+				1D0754DF34FC5EEAC3458BBC /* Alysha */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5AEFFA7A3530D5B323CA93E0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				09AD09537CF5305946F751FE /* AlyshWidget.swift in Sources */,
+				06D2ADED9B1950DD92D91395 /* AlyshWidgetBundle.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA1A21F1185F2F9FEC398505 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				678FD9224FE32CBB349E6066 /* APIClient.swift in Sources */,
+				F5D2640E92EF69177B3DE12C /* AlyshApp.swift in Sources */,
+				21A3A674AC2D64B116661B50 /* ConnectionConfig.swift in Sources */,
+				3F492F7E575808998B10B1A2 /* HomeView.swift in Sources */,
+				AF5CC8191FD1ECEA4C6A4BBA /* KeychainService.swift in Sources */,
+				22D045E01A8078CCE173540E /* Note.swift in Sources */,
+				BEE571CEDC9FBA68FDE19893 /* OnboardingView.swift in Sources */,
+				3FC49D9FDE4C6F946A642216 /* QueryResponse.swift in Sources */,
+				CEAA981254FCC2754EC41E0A /* QueryView.swift in Sources */,
+				B13E67385BBDCB6432107A57 /* TextNoteView.swift in Sources */,
+				6476050E19A8E9B842C7616C /* VoiceNoteView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0831323209FA323B17101D7E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		57AB19A6745AAB0747182AFA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aakashranga.Alysha.widget;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		59AC121A8C01CC564E292805 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		73EBCB1790207551C423DEA5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Alysha/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aakashranga.Alysha;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		9BED9F04EE19275EE658FCED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Alysha/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aakashranga.Alysha;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B29345B2549C7548B2B5F12C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aakashranga.Alysha.widget;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3747210F7519B3BF5F5D1E96 /* Build configuration list for PBXNativeTarget "Alysha" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9BED9F04EE19275EE658FCED /* Debug */,
+				73EBCB1790207551C423DEA5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		45BC4AB7443BBCD1344B8094 /* Build configuration list for PBXProject "Alysha" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				59AC121A8C01CC564E292805 /* Debug */,
+				0831323209FA323B17101D7E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		4CC0D097D2F8FD62401CA868 /* Build configuration list for PBXNativeTarget "AlyshWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				57AB19A6745AAB0747182AFA /* Debug */,
+				B29345B2549C7548B2B5F12C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D0CB50D4F22EA58B96F83FD4 /* Project object */;
+}
