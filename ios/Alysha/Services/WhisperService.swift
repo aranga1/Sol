@@ -44,11 +44,11 @@ final class WhisperService {
             WhisperKitConfig(
                 model: modelName,
                 modelFolder: folder,
-                download: download,
+                verbose: false,
                 prewarm: true,
                 load: true,
-                verbose: false
-            )
+                download: download
+            ) 
         )
         modelState = .ready
     }

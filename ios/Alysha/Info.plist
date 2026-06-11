@@ -33,6 +33,11 @@
 	<array>
 		<string>obsidian</string>
 	</array>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Alysha uses your camera to scan the QR code from your Mac setup.</string>
 	<key>NSMicrophoneUsageDescription</key>

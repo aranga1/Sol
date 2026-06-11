@@ -29,6 +29,8 @@ targets:
         NSMicrophoneUsageDescription: "Alysha uses your microphone to record voice notes."
         LSApplicationQueriesSchemes:
           - obsidian
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
     dependencies:
       - package: WhisperKit
         product: WhisperKit

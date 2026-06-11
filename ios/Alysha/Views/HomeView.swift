@@ -1,11 +1,14 @@
 import SwiftUI
 
 struct HomeView: View {
+    var onResetConnection: () -> Void = {}
+
     @State private var daemonVM = DaemonStatusViewModel()
     @State private var showVoiceNote = false
     @State private var showTextNote = false
     @State private var queryText = ""
     @State private var navigateToQuery = false
+    @State private var showResetConfirmation = false
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
@@ -49,9 +52,29 @@ struct HomeView: View {
             }
             .navigationTitle("Alysha")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        showResetConfirmation = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                            .foregroundStyle(.secondary)
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     StatusDot(status: daemonVM.status)
                 }
+            }
+            .confirmationDialog(
+                "Reset Connection",
+                isPresented: $showResetConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Scan a new QR code", role: .destructive) {
+                    onResetConnection()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This will clear your current Mac connection and return you to the setup screen.")
             }
             .sheet(isPresented: $showVoiceNote) { VoiceNoteView() }
             .sheet(isPresented: $showTextNote) {
