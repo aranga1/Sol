@@ -1,0 +1,161 @@
+name: iOS Build & OTA Distribution
+
+on:
+  push:
+    branches: [prd/alysha-second-brain, main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and distribute iOS app
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Xcode 16
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.0'
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: ios
+        run: xcodegen generate
+
+      - name: Import signing certificate
+        env:
+          APPLE_CERT_BASE64: ${{ secrets.APPLE_CERT_BASE64 }}
+          APPLE_CERT_PASSWORD: ${{ secrets.APPLE_CERT_PASSWORD }}
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/alysha.keychain-db
+          KEYCHAIN_PASSWORD=$(openssl rand -hex 16)
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          echo "$APPLE_CERT_BASE64" | base64 --decode > $RUNNER_TEMP/cert.p12
+          security import $RUNNER_TEMP/cert.p12 -P "$APPLE_CERT_PASSWORD" \
+            -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
+
+      - name: Install provisioning profile
+        env:
+          APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$APPLE_PROVISIONING_PROFILE" | base64 --decode \
+            > ~/Library/MobileDevice/Provisioning\ Profiles/Alysha.mobileprovision
+
+      - name: Build archive
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          xcodebuild archive \
+            -project ios/Alysha.xcodeproj \
+            -scheme Alysha \
+            -configuration Release \
+            -archivePath $RUNNER_TEMP/Alysha.xcarchive \
+            -destination "generic/platform=iOS" \
+            CODE_SIGN_STYLE=Manual \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            | xcpretty || true
+
+      - name: Export IPA
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          cat > $RUNNER_TEMP/ExportOptions.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>ad-hoc</string>
+            <key>teamID</key><string>${APPLE_TEAM_ID}</string>
+            <key>compileBitcode</key><false/>
+            <key>stripSwiftSymbols</key><true/>
+          </dict>
+          </plist>
+          EOF
+          xcodebuild -exportArchive \
+            -archivePath $RUNNER_TEMP/Alysha.xcarchive \
+            -exportPath $RUNNER_TEMP/export \
+            -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist \
+            | xcpretty || true
+
+      - name: Generate OTA manifest and install page
+        run: |
+          RUN_NUM=${{ github.run_number }}
+          TAG="ios-build-${RUN_NUM}"
+          REPO="${{ github.repository }}"
+          IPA_URL="https://github.com/${REPO}/releases/download/${TAG}/Alysha.ipa"
+
+          cat > $RUNNER_TEMP/manifest.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>items</key>
+            <array>
+              <dict>
+                <key>assets</key>
+                <array>
+                  <dict>
+                    <key>kind</key><string>software-package</string>
+                    <key>url</key><string>${IPA_URL}</string>
+                  </dict>
+                </array>
+                <key>metadata</key>
+                <dict>
+                  <key>bundle-identifier</key><string>com.aakashranga.Alysha</string>
+                  <key>bundle-version</key><string>1.0.${RUN_NUM}</string>
+                  <key>kind</key><string>software</string>
+                  <key>title</key><string>Alysha</string>
+                </dict>
+              </dict>
+            </array>
+          </dict>
+          </plist>
+          EOF
+
+          MANIFEST_URL="https://github.com/${REPO}/releases/download/${TAG}/manifest.plist"
+          cat > $RUNNER_TEMP/install.html << EOF
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Install Alysha</title>
+            <style>
+              body { font-family: -apple-system; text-align: center; padding: 60px 20px; }
+              a.btn { display: inline-block; background: #007AFF; color: white;
+                      padding: 16px 32px; border-radius: 12px; text-decoration: none;
+                      font-size: 18px; font-weight: 600; }
+              p { color: #666; }
+            </style>
+          </head>
+          <body>
+            <h1>Alysha</h1>
+            <p>Open this page in Safari on your iPhone, then tap Install.</p>
+            <a class="btn" href="itms-services://?action=download-manifest&url=${MANIFEST_URL}">
+              Install Alysha
+            </a>
+            <p style="margin-top:32px;font-size:13px">
+              After install: Settings → General → VPN &amp; Device Management → Trust the developer cert
+            </p>
+          </body>
+          </html>
+          EOF
+
+      - name: Create GitHub Release and upload assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="ios-build-${{ github.run_number }}"
+          gh release create "$TAG" \
+            --title "Alysha iOS Build #${{ github.run_number }}" \
+            --notes "Ad-hoc iOS build. Open install.html in Safari on your iPhone to install." \
+            $RUNNER_TEMP/export/Alysha.ipa \
+            $RUNNER_TEMP/manifest.plist \
+            $RUNNER_TEMP/install.html
