@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0FE1E97D71D51F79B2B4B809 /* AlyshWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0924CC8282712455CBAFEAC /* AlyshWidgetBundle.swift */; };
+		06D2ADED9B1950DD92D91395 /* AlyshWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA22F30AA5B3EF3850CCD61 /* AlyshWidgetBundle.swift */; };
+		09AD09537CF5305946F751FE /* AlyshWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC65E0F4E8221FBD615A1A16 /* AlyshWidget.swift */; };
 		21A3A674AC2D64B116661B50 /* ConnectionConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D102D5DB1FDDB84CA1589D37 /* ConnectionConfig.swift */; };
 		22D045E01A8078CCE173540E /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56C1208253AD24CB4BA475E2 /* Note.swift */; };
 		3F492F7E575808998B10B1A2 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06BAB5B588583DC1C941710A /* HomeView.swift */; };
 		3FC49D9FDE4C6F946A642216 /* QueryResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEE59A9C1C0C4EDDBAA0265D /* QueryResponse.swift */; };
 		6476050E19A8E9B842C7616C /* VoiceNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97A5F18839F6A0878F0B5E4D /* VoiceNoteView.swift */; };
 		678FD9224FE32CBB349E6066 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C411458A74D1BF80098D5DE /* APIClient.swift */; };
-		9CD27966BC33C96CD8B5A76D /* AlyshWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04EABEE724F07C7D641F3524 /* AlyshWidget.swift */; };
 		AF5CC8191FD1ECEA4C6A4BBA /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DF5C7A9BC25288C74E0CB8 /* KeychainService.swift */; };
 		B13E67385BBDCB6432107A57 /* TextNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BCB5465D47DB137C3C55F8A /* TextNoteView.swift */; };
 		BEE571CEDC9FBA68FDE19893 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E91726CDF932E2083F1167 /* OnboardingView.swift */; };
@@ -23,9 +23,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		04EABEE724F07C7D641F3524 /* AlyshWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlyshWidget.swift; sourceTree = "<group>"; };
 		05DF5C7A9BC25288C74E0CB8 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		06BAB5B588583DC1C941710A /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		1BA22F30AA5B3EF3850CCD61 /* AlyshWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlyshWidgetBundle.swift; sourceTree = "<group>"; };
 		3BCB5465D47DB137C3C55F8A /* TextNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextNoteView.swift; sourceTree = "<group>"; };
 		4719D7EF02EB890E2420011A /* AlyshWidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = AlyshWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FCF7F200FA674F7C1B5C832 /* AlyshApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlyshApp.swift; sourceTree = "<group>"; };
@@ -35,9 +35,9 @@
 		8A6C459B5C6843A97F7EB96C /* Alysha.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Alysha.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		97A5F18839F6A0878F0B5E4D /* VoiceNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceNoteView.swift; sourceTree = "<group>"; };
 		9C411458A74D1BF80098D5DE /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		BC65E0F4E8221FBD615A1A16 /* AlyshWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlyshWidget.swift; sourceTree = "<group>"; };
 		CBC3BCE011EF1D2935BBBC9D /* QueryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryView.swift; sourceTree = "<group>"; };
 		D102D5DB1FDDB84CA1589D37 /* ConnectionConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionConfig.swift; sourceTree = "<group>"; };
-		E0924CC8282712455CBAFEAC /* AlyshWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlyshWidgetBundle.swift; sourceTree = "<group>"; };
 		E525768EDEFA9D1FBA71B752 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		FEE59A9C1C0C4EDDBAA0265D /* QueryResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryResponse.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -52,19 +52,12 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		28618C57E9FD0E8DC9DA3067 /* Widgets */ = {
-			isa = PBXGroup;
-			children = (
-				04EABEE724F07C7D641F3524 /* AlyshWidget.swift */,
-				E0924CC8282712455CBAFEAC /* AlyshWidgetBundle.swift */,
-			);
-			path = Widgets;
-			sourceTree = "<group>";
-		};
 		54B1507A1B3768696A1B1918 /* AlyshWidgetExtension */ = {
 			isa = PBXGroup;
 			children = (
 				E525768EDEFA9D1FBA71B752 /* .gitkeep */,
+				BC65E0F4E8221FBD615A1A16 /* AlyshWidget.swift */,
+				1BA22F30AA5B3EF3850CCD61 /* AlyshWidgetBundle.swift */,
 			);
 			path = AlyshWidgetExtension;
 			sourceTree = "<group>";
@@ -77,7 +70,6 @@
 				D466457B0B5A7594973BA18C /* Models */,
 				A021D309B52EDF3CAD70C5CE /* Services */,
 				6D6AC858473D9ABD2CA6D136 /* Views */,
-				28618C57E9FD0E8DC9DA3067 /* Widgets */,
 			);
 			path = Alysha;
 			sourceTree = "<group>";
@@ -195,6 +187,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				09AD09537CF5305946F751FE /* AlyshWidget.swift in Sources */,
+				06D2ADED9B1950DD92D91395 /* AlyshWidgetBundle.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -204,8 +198,6 @@
 			files = (
 				678FD9224FE32CBB349E6066 /* APIClient.swift in Sources */,
 				F5D2640E92EF69177B3DE12C /* AlyshApp.swift in Sources */,
-				9CD27966BC33C96CD8B5A76D /* AlyshWidget.swift in Sources */,
-				0FE1E97D71D51F79B2B4B809 /* AlyshWidgetBundle.swift in Sources */,
 				21A3A674AC2D64B116661B50 /* ConnectionConfig.swift in Sources */,
 				3F492F7E575808998B10B1A2 /* HomeView.swift in Sources */,
 				AF5CC8191FD1ECEA4C6A4BBA /* KeychainService.swift in Sources */,

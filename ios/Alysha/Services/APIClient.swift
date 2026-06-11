@@ -42,21 +42,23 @@ final class APIClient: ObservableObject {
         return c
     }
 
-    private func makeRequest(_ path: String, method: String = "GET", body: (some Encodable)? = nil as String?) throws -> URLRequest {
+    private func makeRequest(_ path: String, method: String = "GET") throws -> URLRequest {
         let cfg = try config()
         var req = URLRequest(url: cfg.baseURL.appendingPathComponent(path))
         req.httpMethod = method
         req.setValue(cfg.apiKey, forHTTPHeaderField: "X-API-Key")
-        if let body {
-            req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            req.httpBody = try JSONEncoder().encode(body)
-        }
+        return req
+    }
+
+    private func makeRequest<T: Encodable>(_ path: String, method: String, body: T) throws -> URLRequest {
+        var req = try makeRequest(path, method: method)
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = try JSONEncoder().encode(body)
         return req
     }
 
     func health() async throws -> HealthResponse {
-        let cfg = try config()
-        var req = URLRequest(url: cfg.baseURL.appendingPathComponent("/api/health"))
+        var req = try makeRequest("/api/health")
         req.timeoutInterval = 5
         let (data, response) = try await session.data(for: req)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
