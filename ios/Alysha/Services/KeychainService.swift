@@ -11,6 +11,7 @@ enum KeychainService {
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: service,
             kSecAttrAccount: account,
+            kSecAttrAccessible: kSecAttrAccessibleWhenUnlocked,
             kSecValueData: data
         ]
         SecItemDelete(query as CFDictionary)
