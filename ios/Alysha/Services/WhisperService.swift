@@ -21,26 +21,17 @@ final class WhisperService {
     static let shared = WhisperService()
     var modelState: ModelState = .notDownloaded
     private var whisper: WhisperKit?
-    private let modelName = "openai_whisper-base.en"  // WhisperKit model identifier
-
-    private var modelCacheURL: URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("whisperkit-models")
-    }
+    private let modelName = "base.en"
 
     func downloadModelIfNeeded() async {
         switch modelState {
         case .notDownloaded, .failed: break
         default: return
         }
-        let cachedPath = modelCacheURL.appendingPathComponent(modelName)
         do {
-            if FileManager.default.fileExists(atPath: cachedPath.path) {
-                try await loadModel(folder: cachedPath.path, download: false)
-            } else {
-                try FileManager.default.createDirectory(at: modelCacheURL, withIntermediateDirectories: true)
-                try await loadModel(folder: cachedPath.path, download: true)
-            }
+            modelState = .downloading(progress: 0)
+            whisper = try await WhisperKit(model: modelName)
+            modelState = .ready
         } catch {
             modelState = .failed(error.localizedDescription)
         }
@@ -49,21 +40,6 @@ final class WhisperService {
     func retryDownload() async {
         modelState = .notDownloaded
         await downloadModelIfNeeded()
-    }
-
-    private func loadModel(folder: String, download: Bool) async throws {
-        modelState = .downloading(progress: 0)
-        whisper = try await WhisperKit(
-            WhisperKitConfig(
-                model: modelName,
-                modelFolder: folder,
-                verbose: false,
-                prewarm: true,
-                load: true,
-                download: download
-            )
-        )
-        modelState = .ready
     }
 
     func transcribe(audioURL: URL) async throws -> String {
