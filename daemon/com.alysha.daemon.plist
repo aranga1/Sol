@@ -6,12 +6,14 @@
   <key>ProgramArguments</key>
   <array>
     <string>DAEMON_VENV_PYTHON</string>
-    <string>DAEMON_MAIN_PY</string>
+    <string>-m</string>
+    <string>daemon.main</string>
   </array>
   <key>EnvironmentVariables</key>
   <dict>
     <key>ALYSHA_CONFIG</key><string>ALYSHA_CONFIG_PATH</string>
   </dict>
+  <key>WorkingDirectory</key><string>DAEMON_REPO_DIR</string>
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key><true/>
   <key>StandardOutPath</key><string>ALYSHA_LOG_PATH</string>
