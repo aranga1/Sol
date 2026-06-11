@@ -2,7 +2,9 @@ import SwiftUI
 
 @main
 struct AlyshApp: App {
+    @State private var isOnboarded = KeychainService.load() != nil
     @State private var deepLinkTarget: DeepLinkTarget?
+    @State private var pendingDeepLink: DeepLinkTarget?
 
     enum DeepLinkTarget {
         case voice, text
@@ -10,8 +12,15 @@ struct AlyshApp: App {
 
     var body: some Scene {
         WindowGroup {
-            if KeychainService.load() != nil {
+            if isOnboarded {
                 HomeView()
+                    .onAppear {
+                        // Consume any deep link that arrived during onboarding
+                        if let pending = pendingDeepLink {
+                            deepLinkTarget = pending
+                            pendingDeepLink = nil
+                        }
+                    }
                     .sheet(item: $deepLinkTarget) { target in
                         switch target {
                         case .voice: VoiceNoteView()
@@ -19,15 +28,20 @@ struct AlyshApp: App {
                         }
                     }
             } else {
-                OnboardingView()
+                OnboardingView(onConnected: { isOnboarded = true })
             }
         }
         .onOpenURL { url in
             guard url.scheme == "alysha" else { return }
-            switch url.host {
-            case "voice": deepLinkTarget = .voice
-            case "text": deepLinkTarget = .text
-            default: break
+            let target: DeepLinkTarget? = switch url.host {
+            case "voice": .voice
+            case "text": .text
+            default: nil
+            }
+            if isOnboarded {
+                deepLinkTarget = target
+            } else {
+                pendingDeepLink = target
             }
         }
     }

@@ -32,7 +32,7 @@ def client(config_file, monkeypatch):
 
 def test_health_no_auth_returns_200(client):
     response = client.get("/api/health")
-    # Health route doesn't exist yet (added in a future issue) — for now just verify it's not 401
+    # Health route is exempt from auth middleware
     assert response.status_code != 401
 
 

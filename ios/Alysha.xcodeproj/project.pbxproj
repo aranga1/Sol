@@ -17,11 +17,13 @@
 		678FD9224FE32CBB349E6066 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C411458A74D1BF80098D5DE /* APIClient.swift */; };
 		9A3C707A6E83F38086DADC31 /* WhisperService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A8B15663046933088DFD911 /* WhisperService.swift */; };
 		A716EF89B6D234AA73AE9B6B /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4767A08DCEC7D678663FBC84 /* WhisperKit */; };
+		AA016C7DDB77AB091724CA04 /* ManualEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49BF43A079F250FCBE150A9E /* ManualEntryView.swift */; };
 		AF5CC8191FD1ECEA4C6A4BBA /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DF5C7A9BC25288C74E0CB8 /* KeychainService.swift */; };
 		B13E67385BBDCB6432107A57 /* TextNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BCB5465D47DB137C3C55F8A /* TextNoteView.swift */; };
 		BEE571CEDC9FBA68FDE19893 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E91726CDF932E2083F1167 /* OnboardingView.swift */; };
 		CEAA981254FCC2754EC41E0A /* QueryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC3BCE011EF1D2935BBBC9D /* QueryView.swift */; };
 		F5D2640E92EF69177B3DE12C /* AlyshApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FCF7F200FA674F7C1B5C832 /* AlyshApp.swift */; };
+		FF5744957FBFECF9287B4D45 /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC4CB24441BAD07613C1C7C1 /* QRScannerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +33,7 @@
 		1BA22F30AA5B3EF3850CCD61 /* AlyshWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlyshWidgetBundle.swift; sourceTree = "<group>"; };
 		3BCB5465D47DB137C3C55F8A /* TextNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextNoteView.swift; sourceTree = "<group>"; };
 		4719D7EF02EB890E2420011A /* AlyshWidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = AlyshWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		49BF43A079F250FCBE150A9E /* ManualEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualEntryView.swift; sourceTree = "<group>"; };
 		4FCF7F200FA674F7C1B5C832 /* AlyshApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlyshApp.swift; sourceTree = "<group>"; };
 		53BD7526735F7DF0D2872797 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		56C1208253AD24CB4BA475E2 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
@@ -38,6 +41,7 @@
 		8A6C459B5C6843A97F7EB96C /* Alysha.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Alysha.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		97A5F18839F6A0878F0B5E4D /* VoiceNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceNoteView.swift; sourceTree = "<group>"; };
 		9C411458A74D1BF80098D5DE /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		AC4CB24441BAD07613C1C7C1 /* QRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
 		BC65E0F4E8221FBD615A1A16 /* AlyshWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlyshWidget.swift; sourceTree = "<group>"; };
 		CBC3BCE011EF1D2935BBBC9D /* QueryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryView.swift; sourceTree = "<group>"; };
 		D102D5DB1FDDB84CA1589D37 /* ConnectionConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionConfig.swift; sourceTree = "<group>"; };
@@ -92,7 +96,9 @@
 			isa = PBXGroup;
 			children = (
 				06BAB5B588583DC1C941710A /* HomeView.swift */,
+				49BF43A079F250FCBE150A9E /* ManualEntryView.swift */,
 				88E91726CDF932E2083F1167 /* OnboardingView.swift */,
+				AC4CB24441BAD07613C1C7C1 /* QRScannerView.swift */,
 				CBC3BCE011EF1D2935BBBC9D /* QueryView.swift */,
 				3BCB5465D47DB137C3C55F8A /* TextNoteView.swift */,
 				97A5F18839F6A0878F0B5E4D /* VoiceNoteView.swift */,
@@ -221,8 +227,10 @@
 				21A3A674AC2D64B116661B50 /* ConnectionConfig.swift in Sources */,
 				3F492F7E575808998B10B1A2 /* HomeView.swift in Sources */,
 				AF5CC8191FD1ECEA4C6A4BBA /* KeychainService.swift in Sources */,
+				AA016C7DDB77AB091724CA04 /* ManualEntryView.swift in Sources */,
 				22D045E01A8078CCE173540E /* Note.swift in Sources */,
 				BEE571CEDC9FBA68FDE19893 /* OnboardingView.swift in Sources */,
+				FF5744957FBFECF9287B4D45 /* QRScannerView.swift in Sources */,
 				3FC49D9FDE4C6F946A642216 /* QueryResponse.swift in Sources */,
 				CEAA981254FCC2754EC41E0A /* QueryView.swift in Sources */,
 				B13E67385BBDCB6432107A57 /* TextNoteView.swift in Sources */,

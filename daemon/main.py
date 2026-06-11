@@ -1,24 +1,34 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.routing import APIRouter
 
 from daemon.config import load_config
-
-
-# Empty router — routes will be added in future issues
-router = APIRouter()
+from daemon.obsidian_client import ObsidianClient
+from daemon.routes import health as health_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.config = load_config()
+    app.state.obsidian = ObsidianClient(
+        base_url=f"http://localhost:{app.state.config.obsidian_port}",
+        api_key=app.state.config.obsidian_api_key,
+    )
     print(f"Alysha daemon running on port {app.state.config.daemon_port}")
     yield
+    await app.state.obsidian.close()
 
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.middleware("http")
@@ -33,12 +43,7 @@ async def api_key_middleware(request: Request, call_next):
     return await call_next(request)
 
 
-@app.get("/api/health")
-async def health():
-    return {"status": "ok"}
-
-
-app.include_router(router)
+app.include_router(health_router.router)
 
 
 if __name__ == "__main__":
