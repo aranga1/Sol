@@ -126,7 +126,7 @@ read -rp "Press Enter once Local REST API is enabled..."
 
 # 11. QR code
 info "Generating connection QR code..."
-python3 "$SCRIPT_DIR/qr_generate.py" \
+"$VENV/bin/python" "$SCRIPT_DIR/qr_generate.py" \
   --host "$TAILSCALE_IP" \
   --port "$DAEMON_PORT" \
   --api-key "$DAEMON_API_KEY" \
