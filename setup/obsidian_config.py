@@ -22,7 +22,7 @@ def setup_vault(vault_path: str) -> None:
 
     # Enable community plugins
     (obsidian / "community-plugins.json").write_text(
-        json.dumps(["obsidian-local-rest-api"])
+        json.dumps(["obsidian-local-rest-api", "obsidian-importer"])
     )
 
     # Local REST API plugin config (API key set by install.sh via config.json)
@@ -33,6 +33,9 @@ def setup_vault(vault_path: str) -> None:
         "enableHttps": False,
         "apiKey": ""  # will be set when user enables plugin in Obsidian
     }, indent=2))
+
+    # Obsidian Importer plugin directory (Obsidian downloads the actual files on first open)
+    (obsidian / "plugins" / "obsidian-importer").mkdir(parents=True, exist_ok=True)
 
     # Welcome note
     welcome = vault / "Notes" / "Welcome to Alysha.md"
