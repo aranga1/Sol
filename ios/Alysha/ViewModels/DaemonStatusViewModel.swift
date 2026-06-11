@@ -27,14 +27,15 @@ final class DaemonStatusViewModel {
     }
 
     func checkNow() {
-        status = .checking
-        Task {
-            do {
-                _ = try await client.health()
-                status = .reachable
-            } catch {
-                status = .unreachable
-            }
+        Task { await ping() }
+    }
+
+    private func ping() async {
+        do {
+            _ = try await client.health()
+            if status != .reachable { status = .reachable }
+        } catch {
+            if status != .unreachable { status = .unreachable }
         }
     }
 }
