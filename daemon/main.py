@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from daemon.config import load_config
 from daemon.obsidian_client import ObsidianClient
 from daemon.routes import health as health_router
+from daemon.routes import notes as notes_router
 
 
 @asynccontextmanager
@@ -44,6 +45,7 @@ async def api_key_middleware(request: Request, call_next):
 
 
 app.include_router(health_router.router)
+app.include_router(notes_router.router)
 
 
 if __name__ == "__main__":
