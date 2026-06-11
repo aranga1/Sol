@@ -16,7 +16,7 @@ from daemon.routes import query as query_router
 async def lifespan(app: FastAPI):
     app.state.config = load_config()
     app.state.obsidian = ObsidianClient(
-        base_url=f"http://localhost:{app.state.config.obsidian_port}",
+        base_url=f"https://localhost:{app.state.config.obsidian_port}",
         api_key=app.state.config.obsidian_api_key,
     )
     print(f"Alysha daemon running on port {app.state.config.daemon_port}")
