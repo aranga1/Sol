@@ -80,17 +80,35 @@ struct VoiceNoteView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
-                // Model download progress
-                if case .downloading(let progress) = vm.whisperService.modelState {
+                // Model download progress / error
+                if case .downloading = vm.whisperService.modelState {
                     VStack(spacing: 8) {
                         Text("Downloading voice model\u{2026}")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                        ProgressView(value: progress)
-                            .padding(.horizontal)
-                        Text("\(Int(progress * 100))%")
+                        ProgressView()
+                            .padding(.top, 4)
+                        Text("~147 MB — this only happens once")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding()
+                } else if case .failed(let reason) = vm.whisperService.modelState {
+                    VStack(spacing: 12) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.system(size: 36))
+                            .foregroundStyle(.orange)
+                        Text("Download failed")
+                            .font(.headline)
+                        Text(reason)
                             .font(.caption)
                             .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                        Button("Try Again") {
+                            Task { await vm.whisperService.retryDownload() }
+                        }
+                        .buttonStyle(.borderedProminent)
                     }
                     .padding()
                 } else if vm.isTranscribing {
@@ -171,7 +189,7 @@ struct VoiceNoteView: View {
                 }
             }
             .onAppear {
-                Task { try? await vm.whisperService.downloadModelIfNeeded() }
+                Task { await vm.whisperService.downloadModelIfNeeded() }
             }
             .onDisappear { vm.cleanupAudio() }
         }

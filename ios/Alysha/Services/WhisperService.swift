@@ -5,6 +5,7 @@ import Network
 enum ModelState: Equatable {
     case notDownloaded
     case downloading(progress: Double)
+    case failed(String)
     case ready
     case transcribing
 }
@@ -27,15 +28,27 @@ final class WhisperService {
             .appendingPathComponent("whisperkit-models")
     }
 
-    func downloadModelIfNeeded() async throws {
-        guard case .notDownloaded = modelState else { return }
-        let cachedPath = modelCacheURL.appendingPathComponent(modelName)
-        if FileManager.default.fileExists(atPath: cachedPath.path) {
-            try await loadModel(folder: cachedPath.path, download: false)
-            return
+    func downloadModelIfNeeded() async {
+        switch modelState {
+        case .notDownloaded, .failed: break
+        default: return
         }
-        try FileManager.default.createDirectory(at: modelCacheURL, withIntermediateDirectories: true)
-        try await loadModel(folder: cachedPath.path, download: true)
+        let cachedPath = modelCacheURL.appendingPathComponent(modelName)
+        do {
+            if FileManager.default.fileExists(atPath: cachedPath.path) {
+                try await loadModel(folder: cachedPath.path, download: false)
+            } else {
+                try FileManager.default.createDirectory(at: modelCacheURL, withIntermediateDirectories: true)
+                try await loadModel(folder: cachedPath.path, download: true)
+            }
+        } catch {
+            modelState = .failed(error.localizedDescription)
+        }
+    }
+
+    func retryDownload() async {
+        modelState = .notDownloaded
+        await downloadModelIfNeeded()
     }
 
     private func loadModel(folder: String, download: Bool) async throws {
@@ -48,7 +61,7 @@ final class WhisperService {
                 prewarm: true,
                 load: true,
                 download: download
-            ) 
+            )
         )
         modelState = .ready
     }
