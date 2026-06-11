@@ -313,20 +313,16 @@ step "Generating connection QR code..."
 section "9 / 9  Apple Notes integration  (optional)"
 
 echo ""
-gum style --foreground 245 "  This step sets up two things:"
-gum style --foreground 245 "  • Obsidian Importer — bulk-import your existing Apple Notes into the vault"
-gum style --foreground 245 "  • iOS Shortcut     — send any Apple Note to Alysha in one tap going forward"
+gum style --foreground 245 "  Import your existing Apple Notes into the Alysha vault using the"
+gum style --foreground 245 "  Obsidian Importer plugin. Notes will be searchable via Alysha immediately."
 echo ""
 
-apple_notes_choice=$(ask "Set up Apple Notes integration?" \
-  "Yes, set it up" \
+apple_notes_choice=$(ask "Import Apple Notes into your vault now?" \
+  "Yes, import now" \
   "Skip for now")
 
-if [[ "$apple_notes_choice" == "Yes, set it up" ]]; then
+if [[ "$apple_notes_choice" == "Yes, import now" ]]; then
 
-  # ── 9a. Obsidian Importer ───────────────────────────────────────────────────
-  gum style --bold "  Bulk import via Obsidian Importer"
-  echo ""
   gum style \
     --border normal \
     --border-foreground 226 \
@@ -337,7 +333,9 @@ $(gum style --foreground 255 "Step 1 ·") $(gum style --foreground 245 "Obsidian
 $(gum style --foreground 255 "Step 2 ·") $(gum style --foreground 245 "Go to Settings → Community Plugins → find 'Importer' → Enable it.")
 $(gum style --foreground 255 "Step 3 ·") $(gum style --foreground 245 "Open the Importer plugin (ribbon icon or command palette).")
 $(gum style --foreground 255 "Step 4 ·") $(gum style --foreground 245 "Select 'Apple Notes' as the source → click Import.")
-$(gum style --foreground 255 "Step 5 ·") $(gum style --foreground 245 "Imported notes appear under Imported/Apple Notes/ in your vault.")"
+$(gum style --foreground 255 "Step 5 ·") $(gum style --foreground 245 "Imported notes appear under Imported/Apple Notes/ in your vault.")
+$(gum style --foreground 245 "────────────────────────────────────────────────────────────")
+$(gum style --foreground 245 "To import from iPhone: open the Alysha app → Help → Apple Notes import.")"
 
   open -a Obsidian "$VAULT_PATH" 2>/dev/null || true
   echo ""
@@ -346,51 +344,10 @@ $(gum style --foreground 255 "Step 5 ·") $(gum style --foreground 245 "Imported
     --negative "Skip import" \
     "Confirm when the import is complete (or skip to do it later)." || true
 
-  ok "Obsidian Importer step complete"
-  echo ""
-
-  # ── 9b. iOS Shortcut ────────────────────────────────────────────────────────
-  gum style --bold "  iOS Shortcut — Send to Alysha"
-  echo ""
-
-  # Generate the shortcut file (idempotent)
-  step "Generating SendToAlysha.shortcut..."
-  "$VENV/bin/python" "$SCRIPT_DIR/generate_shortcut.py" \
-    --vault "Alysha" \
-    --output "$CONFIG_DIR/SendToAlysha.shortcut"
-  ok "Shortcut file written to $CONFIG_DIR/SendToAlysha.shortcut"
-
-  # Signed iCloud shortcut link — works on both iOS and macOS
-  SHORTCUT_ICLOUD_URL="https://www.icloud.com/shortcuts/4d45d0b125794f85887921f9cd857851"
-
-  step "Generating shortcut install QR code..."
-  "$VENV/bin/python" "$SCRIPT_DIR/qr_generate.py" \
-    --url "$SHORTCUT_ICLOUD_URL" \
-    --label "Scan to install Send to Alysha shortcut" \
-    --output "$CONFIG_DIR/alysha-shortcut.png" \
-    --terminal || true
-
-  step "Opening shortcut in macOS Shortcuts app..."
-  open "$SHORTCUT_ICLOUD_URL" 2>/dev/null || true
-
-  echo ""
-  gum style \
-    --border normal \
-    --border-foreground 245 \
-    --padding "1 3" \
-    "$(gum style --foreground 212 --bold "Installing the shortcut on your iPhone:")
-
-$(gum style --foreground 255 "Step 1 ·") $(gum style --foreground 245 "A Shortcuts window just opened on your Mac — click 'Add Shortcut'.")
-$(gum style --foreground 255 "Step 2 ·") $(gum style --foreground 245 "iCloud will sync it to your iPhone automatically (Settings → iCloud → Shortcuts must be on).")
-$(gum style --foreground 255 "Step 3 ·") $(gum style --foreground 245 "On iPhone: open Apple Notes → tap Share → 'Send to Alysha'.")
-$(gum style --foreground 255 "Step 4 ·") $(gum style --foreground 245 "Optional automation: Shortcuts app → Automation → New → App → Apple Notes → Run Shortcut → Send to Alysha.")
-$(gum style --foreground 245 "─────────────────────────────────────────────────────────────────────────")
-$(gum style --foreground 245 "No iCloud sync? AirDrop $CONFIG_DIR/SendToAlysha.shortcut to your iPhone instead.")"
-
-  ok "Apple Notes integration complete"
+  ok "Apple Notes import complete"
 
 else
-  skip "Apple Notes integration skipped — run setup again any time to enable it"
+  skip "Apple Notes import skipped — run setup again any time to import"
 fi
 
 # ── Summary ───────────────────────────────────────────────────────────────────
