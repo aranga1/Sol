@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from datetime import datetime, timezone
 from typing import List, Literal, Optional
 from fastapi import APIRouter, Request
@@ -31,9 +32,14 @@ async def create_note(request: Request, body: NoteRequest):
     config = request.app.state.config
     obsidian = request.app.state.obsidian
 
-    # Filename: YYYY-MM-DDTHH-MM-SS-<source>.md (UTC)
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%S")
-    filename = f"{ts}-{body.source}.md"
+    if body.title:
+        # Use title as filename, sanitized for filesystem (keep alphanumeric, spaces→dash)
+        safe = re.sub(r"[^\w\s-]", "", body.title).strip()
+        safe = re.sub(r"\s+", "-", safe)
+        filename = f"{safe}.md"
+    else:
+        filename = f"{ts}-{body.source}.md"
 
     # Build YAML frontmatter
     tags_yaml = ""
