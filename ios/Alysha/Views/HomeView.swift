@@ -54,7 +54,11 @@ struct HomeView: View {
                 }
             }
             .sheet(isPresented: $showVoiceNote) { VoiceNoteView() }
-            .sheet(isPresented: $showTextNote) { TextNoteView() }
+            .sheet(isPresented: $showTextNote) {
+                TextNoteView(onSuccess: {
+                    // Could show a toast here in a future issue — dismiss is enough for now
+                })
+            }
             .navigationDestination(isPresented: $navigateToQuery) {
                 QueryView(initialQuestion: queryText)
                     .onDisappear { queryText = "" }
