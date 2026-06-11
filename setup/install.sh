@@ -183,11 +183,12 @@ tailscale_auth() {
     "Paste a pre-auth key")
   if [[ "$auth_choice" == "Paste a pre-auth key" ]]; then
     ts_key=$(gum input --placeholder "tskey-auth-...")
-    tailscale up --auth-key="$ts_key" --accept-routes 2>/dev/null || true
+    tailscale up --auth-key="$ts_key" --accept-routes
   else
-    tailscale up --accept-routes 2>/dev/null || true
-    gum confirm --affirmative "I've signed in" --negative "" \
-      "Complete sign-in in the browser, then confirm here." || true
+    gum style --foreground 245 "  A browser window will open — sign in and return here."
+    gum style --foreground 245 "  If no browser opens, copy the URL printed below:"
+    echo ""
+    tailscale up --accept-routes  # blocks until auth complete; prints URL to stdout
   fi
 }
 
