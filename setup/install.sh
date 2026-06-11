@@ -220,20 +220,31 @@ echo ""
 gum style \
   --border normal \
   --border-foreground 226 \
-  --foreground 226 \
-  --padding "0 2" \
-  "Action required — do this in Obsidian:
-  1. Open Obsidian and select the Alysha vault
-  2. Settings → Community Plugins → disable Safe Mode
-  3. Browse → search 'Local REST API with MCP' (by Adam Coddington) → Install → Enable
-  4. Open the plugin settings → copy the API Key shown there"
+  --padding "1 3" \
+  "$(gum style --foreground 226 --bold "Action required — Obsidian is opening now.")
+
+$(gum style --foreground 255 "Step 1 ·") $(gum style --foreground 245 "If prompted, open the Alysha vault from the vault switcher.")
+
+$(gum style --foreground 255 "Step 2 ·") $(gum style --foreground 245 "Go to Settings (bottom-left cog) → Community Plugins.")
+            $(gum style --foreground 245 "If you see a 'Turn on community plugins' button, click it.")
+
+$(gum style --foreground 255 "Step 3 ·") $(gum style --foreground 245 "Click Browse, search for: Local REST API")
+            $(gum style --foreground 245 "Install the one by Adam Coddington (~496k downloads).")
+            $(gum style --foreground 245 "There are 3 results — pick the first one, NOT 'MCP REST' or 'Second Brain MCP'.")
+            $(gum style --foreground 245 "Click Install, then toggle it on to Enable.")
+
+$(gum style --foreground 255 "Step 4 ·") $(gum style --foreground 245 "You may see a message about HTTPS certificates or browser trust — ignore it.")
+            $(gum style --foreground 245 "Alysha talks to the plugin directly and does not need that setup.")
+
+$(gum style --foreground 255 "Step 5 ·") $(gum style --foreground 245 "Click the plugin's Options button (or Settings → Community Plugins → Local REST API).")
+            $(gum style --foreground 245 "You will see an API Key field. Copy that key — you may need it in a moment.")"
 
 open -a Obsidian "$VAULT_PATH" 2>/dev/null || true
 echo ""
 gum confirm \
-  --affirmative "Done, plugin is enabled and I have the API key" \
+  --affirmative "Done — plugin is enabled" \
   --negative "" \
-  "Confirm once 'Local REST API with MCP' is enabled." || true
+  "Confirm here once you have completed all 5 steps above." || true
 
 echo ""
 
@@ -245,12 +256,14 @@ if [[ -f "$PLUGIN_DATA" ]]; then
 fi
 
 if [[ -n "$OBSIDIAN_API_KEY_FROM_PLUGIN" ]]; then
-  ok "API key read from plugin automatically"
+  ok "API key read from plugin automatically — no action needed"
 else
-  gum style --foreground 245 "  Could not read key from plugin file."
-  gum style --foreground 245 "  In Obsidian: Settings → Community Plugins → Local REST API → Options → copy the API Key"
+  gum style --foreground 226 "  Could not read the key automatically."
   echo ""
-  OBSIDIAN_API_KEY_FROM_PLUGIN=$(gum input --placeholder "Paste Obsidian Local REST API key here...")
+  gum style --foreground 245 "  In Obsidian: Settings → Community Plugins → Local REST API → Options"
+  gum style --foreground 245 "  Copy the value in the 'API Key' field and paste it below."
+  echo ""
+  OBSIDIAN_API_KEY_FROM_PLUGIN=$(gum input --placeholder "Paste the Obsidian Local REST API key here...")
 fi
 
 # Write the correct key into config.json
