@@ -4,6 +4,7 @@ import Combine
 enum DaemonStatus { case checking, reachable, unreachable }
 
 @Observable
+@MainActor
 final class DaemonStatusViewModel {
     var status: DaemonStatus = .checking
     private var timer: AnyCancellable?
@@ -30,9 +31,9 @@ final class DaemonStatusViewModel {
         Task {
             do {
                 _ = try await client.health()
-                await MainActor.run { status = .reachable }
+                status = .reachable
             } catch {
-                await MainActor.run { status = .unreachable }
+                status = .unreachable
             }
         }
     }
