@@ -360,43 +360,32 @@ $(gum style --foreground 255 "Step 5 ·") $(gum style --foreground 245 "Imported
     --output "$CONFIG_DIR/SendToAlysha.shortcut"
   ok "Shortcut file written to $CONFIG_DIR/SendToAlysha.shortcut"
 
-  # Generate QR code pointing to the shortcut file
-  # Use shortcuts://import?url= pointing to the local file path as an AirDrop alternative,
-  # or if the user has hosted the release, point to that URL.
-  SHORTCUT_URL="https://github.com/aranga1/Alysha/releases/latest/download/SendToAlysha.shortcut"
-  SHORTCUT_INSTALL_URL="shortcuts://import?url=${SHORTCUT_URL}"
+  # Signed iCloud shortcut link — works on both iOS and macOS
+  SHORTCUT_ICLOUD_URL="https://www.icloud.com/shortcuts/4d45d0b125794f85887921f9cd857851"
 
-  step "Generating shortcut QR code..."
+  step "Generating shortcut install QR code..."
   "$VENV/bin/python" "$SCRIPT_DIR/qr_generate.py" \
-    --url "$SHORTCUT_INSTALL_URL" \
+    --url "$SHORTCUT_ICLOUD_URL" \
+    --label "Scan to install Send to Alysha shortcut" \
     --output "$CONFIG_DIR/alysha-shortcut.png" \
-    --terminal \
-    --label "Scan to install iOS Shortcut" 2>/dev/null || \
-  "$VENV/bin/python" -c "
-import qrcode, sys
-qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_L)
-qr.add_data('$SHORTCUT_INSTALL_URL')
-qr.make(fit=True)
-qr.make_image().save('$CONFIG_DIR/alysha-shortcut.png')
-print('  QR code saved to $CONFIG_DIR/alysha-shortcut.png')
-print()
-print('  ── Scan on iPhone to install shortcut ──')
-print()
-qr.print_ascii(invert=True)
-" 2>/dev/null || skip "qrcode not installed — skipping shortcut QR"
+    --terminal || true
+
+  step "Opening shortcut in macOS Shortcuts app..."
+  open "$SHORTCUT_ICLOUD_URL" 2>/dev/null || true
 
   echo ""
   gum style \
     --border normal \
     --border-foreground 245 \
     --padding "1 3" \
-    "$(gum style --foreground 212 --bold "After scanning the QR code on your iPhone:")
+    "$(gum style --foreground 212 --bold "Installing the shortcut on your iPhone:")
 
-$(gum style --foreground 255 "Step 1 ·") $(gum style --foreground 245 "Tap the QR link → Shortcuts app opens → tap 'Add Shortcut'.")
-$(gum style --foreground 255 "Step 2 ·") $(gum style --foreground 245 "To auto-send new Apple Notes: open Shortcuts → Automation tab.")
-$(gum style --foreground 255 "Step 3 ·") $(gum style --foreground 245 "New Automation → App → Apple Notes → 'Is Opened' (or use Share Sheet).")
-$(gum style --foreground 255 "Step 4 ·") $(gum style --foreground 245 "Add action: Run Shortcut → 'Send to Alysha'.")
-$(gum style --foreground 255 "Note  ·") $(gum style --foreground 245 "Or skip automation: in Apple Notes tap Share → Send to Alysha.")"
+$(gum style --foreground 255 "Step 1 ·") $(gum style --foreground 245 "A Shortcuts window just opened on your Mac — click 'Add Shortcut'.")
+$(gum style --foreground 255 "Step 2 ·") $(gum style --foreground 245 "iCloud will sync it to your iPhone automatically (Settings → iCloud → Shortcuts must be on).")
+$(gum style --foreground 255 "Step 3 ·") $(gum style --foreground 245 "On iPhone: open Apple Notes → tap Share → 'Send to Alysha'.")
+$(gum style --foreground 255 "Step 4 ·") $(gum style --foreground 245 "Optional automation: Shortcuts app → Automation → New → App → Apple Notes → Run Shortcut → Send to Alysha.")
+$(gum style --foreground 245 "─────────────────────────────────────────────────────────────────────────")
+$(gum style --foreground 245 "No iCloud sync? AirDrop $CONFIG_DIR/SendToAlysha.shortcut to your iPhone instead.")"
 
   ok "Apple Notes integration complete"
 
