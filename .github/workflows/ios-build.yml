@@ -2,7 +2,7 @@ name: iOS Build & OTA Distribution
 
 on:
   push:
-    branches: [prd/alysha-second-brain, main]
+    branches: [main, 'prd/**', 'issue/**', 'feat/**', 'feature/**']
   workflow_dispatch:
 
 jobs:
