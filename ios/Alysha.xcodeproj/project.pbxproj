@@ -26,6 +26,7 @@
 		AA016C7DDB77AB091724CA04 /* ManualEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49BF43A079F250FCBE150A9E /* ManualEntryView.swift */; };
 		AF5CC8191FD1ECEA4C6A4BBA /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DF5C7A9BC25288C74E0CB8 /* KeychainService.swift */; };
 		B13E67385BBDCB6432107A57 /* TextNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BCB5465D47DB137C3C55F8A /* TextNoteView.swift */; };
+		B761953D31EF6B821E38FB5E /* AllChatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AEABFF52CAA2EB00BE2CF06 /* AllChatsView.swift */; };
 		BEE571CEDC9FBA68FDE19893 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E91726CDF932E2083F1167 /* OnboardingView.swift */; };
 		C95141A2C02355EE9E3658A6 /* DaemonStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75BD56D56732237F162D91C /* DaemonStatusViewModel.swift */; };
 		CBB664A45EEAA65AC2B5128D /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D95A2E0715ECC2A1AB2BE69 /* HistoryStore.swift */; };
@@ -49,6 +50,7 @@
 		53BD7526735F7DF0D2872797 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		563229B413D80112825DBEB6 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		56C1208253AD24CB4BA475E2 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		7AEABFF52CAA2EB00BE2CF06 /* AllChatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllChatsView.swift; sourceTree = "<group>"; };
 		88E91726CDF932E2083F1167 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		8A6C459B5C6843A97F7EB96C /* Alysha.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Alysha.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D95A2E0715ECC2A1AB2BE69 /* HistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
@@ -112,6 +114,7 @@
 		6D6AC858473D9ABD2CA6D136 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				7AEABFF52CAA2EB00BE2CF06 /* AllChatsView.swift */,
 				2C9DFD194C1CC056D73FE43A /* HelpView.swift */,
 				EA9E64E90AFAEB11C59553C4 /* HistoryView.swift */,
 				06BAB5B588583DC1C941710A /* HomeView.swift */,
@@ -255,6 +258,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				678FD9224FE32CBB349E6066 /* APIClient.swift in Sources */,
+				B761953D31EF6B821E38FB5E /* AllChatsView.swift in Sources */,
 				F5D2640E92EF69177B3DE12C /* AlyshApp.swift in Sources */,
 				21A3A674AC2D64B116661B50 /* ConnectionConfig.swift in Sources */,
 				4551F88B1E454CDA8A0E1C1D /* ConversationSession.swift in Sources */,

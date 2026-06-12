@@ -19,6 +19,7 @@ struct HomeView: View {
     // Drawer + Settings
     @State private var drawerOpen = false
     @State private var showSettings = false
+    @State private var navigateToAllChats = false
 
     private var drawerWidth: CGFloat { UIScreen.main.bounds.width * drawerFraction }
 
@@ -37,6 +38,9 @@ struct HomeView: View {
                         if let s = sessionToOpen {
                             QueryView(session: s).onDisappear { sessionToOpen = nil }
                         }
+                    }
+                    .navigationDestination(isPresented: $navigateToAllChats) {
+                        AllChatsView()
                     }
             }
             .offset(x: drawerOpen ? drawerWidth : 0)
@@ -61,7 +65,8 @@ struct HomeView: View {
                     navigateToSession = true
                 },
                 onNewConversation: { closeDrawer() },
-                onOpenSettings: { closeDrawer(); showSettings = true }
+                onOpenSettings: { closeDrawer(); showSettings = true },
+                onOpenAllChats: { closeDrawer(); navigateToAllChats = true }
             )
             .frame(width: drawerWidth)
             .shadow(color: .black.opacity(0.15), radius: 12, x: 4)
@@ -166,6 +171,9 @@ private struct DrawerView: View {
     let onSelectSession: (ConversationSession) -> Void
     let onNewConversation: () -> Void
     let onOpenSettings: () -> Void
+    let onOpenAllChats: () -> Void
+
+    private let rowHeight: CGFloat = 46
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -196,7 +204,7 @@ private struct DrawerView: View {
 
             Divider().padding(.vertical, 16)
 
-            // Recents
+            // Recents label
             Text("Recents")
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -208,41 +216,59 @@ private struct DrawerView: View {
                     .font(.subheadline)
                     .foregroundStyle(.tertiary)
                     .padding(.horizontal, 20)
-                    .padding(.top, 8)
+                Spacer()
             } else {
-                List {
-                    ForEach(store.sessions) { session in
-                        Button {
-                            onSelectSession(session)
-                        } label: {
-                            Text(session.title)
-                                .lineLimit(1)
-                                .foregroundStyle(.primary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button(role: .destructive) {
-                                store.delete(session)
+                // GeometryReader fills the space between the label and footer.
+                // We use it to count how many rows actually fit.
+                GeometryReader { geo in
+                    let maxFit = max(1, Int(geo.size.height / rowHeight))
+                    let needsAllChats = store.sessions.count > maxFit
+                    // Reserve one row for "All chats" button when needed
+                    let visibleCount = needsAllChats ? maxFit - 1 : min(store.sessions.count, maxFit)
+
+                    VStack(alignment: .leading, spacing: 0) {
+                        ForEach(Array(store.sessions.prefix(visibleCount))) { session in
+                            Button {
+                                onSelectSession(session)
                             } label: {
-                                Label("Delete", systemImage: "trash")
+                                Text(session.title)
+                                    .lineLimit(1)
+                                    .foregroundStyle(.primary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.horizontal, 20)
+                                    .frame(height: rowHeight)
+                            }
+                            Divider().padding(.horizontal, 20)
+                        }
+
+                        if needsAllChats {
+                            Button(action: onOpenAllChats) {
+                                HStack {
+                                    Text("All chats")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption2)
+                                        .foregroundStyle(.tertiary)
+                                }
+                                .padding(.horizontal, 20)
+                                .frame(height: rowHeight)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             }
                         }
+
+                        Spacer()
                     }
                 }
-                .listStyle(.plain)
             }
-
-            Spacer()
 
             Divider()
 
             // Settings
             Button(action: onOpenSettings) {
                 HStack(spacing: 12) {
-                    Image(systemName: "gearshape")
-                        .frame(width: 20)
-                    Text("Settings")
-                        .font(.body)
+                    Image(systemName: "gearshape").frame(width: 20)
+                    Text("Settings").font(.body)
                 }
                 .foregroundStyle(.primary)
                 .padding(.horizontal, 20)

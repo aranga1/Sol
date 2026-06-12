@@ -55,7 +55,7 @@ struct HistoryView: View {
                                 Label("Delete", systemImage: "trash")
                             }
                         } preview: {
-                            ConversationPreview(session: session)
+                            ConversationPreviewCard(session: session)
                         }
                     }
                 }
@@ -66,44 +66,4 @@ struct HistoryView: View {
     }
 }
 
-private struct ConversationPreview: View {
-    let session: ConversationSession
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ForEach(session.messages.prefix(3)) { msg in
-                VStack(alignment: .leading, spacing: 6) {
-                    // Question — right aligned
-                    HStack {
-                        Spacer(minLength: 32)
-                        Text(msg.question)
-                            .font(.caption)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(Color.indigo, in: RoundedRectangle(cornerRadius: 12))
-                            .foregroundStyle(.white)
-                    }
-                    // Answer — left aligned
-                    HStack {
-                        markdownText(msg.answer)
-                            .font(.caption)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
-                        Spacer(minLength: 32)
-                    }
-                }
-            }
-
-            if session.messages.count > 3 {
-                Text("+ \(session.messages.count - 3) more…")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-            }
-        }
-        .padding(12)
-        .frame(minWidth: 260, maxWidth: 340)
-        .background(Color(.systemBackground))
-    }
-}
+// Preview reused from AllChatsView.swift (ConversationPreviewCard)
