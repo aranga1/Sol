@@ -23,9 +23,10 @@ class ObsidianClient:
         api_key: str,
         transport: Optional[httpx.AsyncBaseTransport] = None,
     ):
+        token = api_key.removeprefix("Bearer ").strip()
         self._client = httpx.AsyncClient(
             base_url=base_url,
-            headers={"Authorization": f"Bearer {api_key}"},
+            headers={"Authorization": f"Bearer {token}"},
             timeout=10.0,
             verify=False,  # local-only, self-signed cert acceptable
             transport=transport,
