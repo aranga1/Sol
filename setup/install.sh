@@ -60,11 +60,11 @@ gum style \
   "$(gum style --foreground 212 --bold "Estimated time on a fast connection (~100 Mbps):")
 
   $(gum style --foreground 82 "~1 min")   Install dependencies (Homebrew, Python, Tailscale, Ollama, Obsidian)
-  $(gum style --foreground 82 "~4 min")   Download AI model  (qwen2.5:3b · 1.9 GB)
+  $(gum style --foreground 82 "~8 min")   Download AI model  (qwen2.5:7b · 4.7 GB)
   $(gum style --foreground 82 "~1 min")   Python environment + daemon setup
   $(gum style --foreground 82 "~2 min")   Tailscale auth + Obsidian plugin setup
   $(gum style --foreground 245 "─────────────────────────────────────────────")
-  $(gum style --foreground 212 --bold "~8 min")   Total (may vary — model download dominates)"
+  $(gum style --foreground 212 --bold "~12 min")   Total (may vary — model download dominates)"
 echo ""
 
 # ── 1. Dependencies ───────────────────────────────────────────────────────────
@@ -94,24 +94,24 @@ install_brew_pkg ollama
 install_brew_pkg obsidian cask
 
 # ── 2. Ollama model ───────────────────────────────────────────────────────────
-section "2 / 9  Ollama model (qwen2.5:3b)"
+section "2 / 9  Ollama model (qwen2.5:7b)"
 
 spin "Starting Ollama service..." brew services start ollama
 sleep 2
 
-if ollama list 2>/dev/null | grep -q "qwen2.5:3b"; then
-  model_choice=$(ask "qwen2.5:3b is already downloaded." \
+if ollama list 2>/dev/null | grep -q "qwen2.5:7b"; then
+  model_choice=$(ask "qwen2.5:7b is already downloaded." \
     "Keep existing model" \
     "Re-download (replace)")
   if [[ "$model_choice" == "Re-download (replace)" ]]; then
-    spin "Pulling qwen2.5:3b..." ollama pull qwen2.5:3b
-    ok "qwen2.5:3b updated"
+    spin "Pulling qwen2.5:7b..." ollama pull qwen2.5:7b
+    ok "qwen2.5:7b updated"
   else
-    skip "Using existing qwen2.5:3b"
+    skip "Using existing qwen2.5:7b"
   fi
 else
-  spin "Pulling qwen2.5:3b (~1.9 GB, this takes a few minutes)..." ollama pull qwen2.5:3b
-  ok "qwen2.5:3b ready"
+  spin "Pulling qwen2.5:7b (~4.7 GB, this takes a few minutes)..." ollama pull qwen2.5:7b
+  ok "qwen2.5:7b ready"
 fi
 
 # ── 3. Obsidian vault ─────────────────────────────────────────────────────────
@@ -144,7 +144,7 @@ config = {
     "obsidian_api_key": "$OBSIDIAN_API_KEY",
     "obsidian_port": 27124,
     "daemon_api_key": "$DAEMON_API_KEY",
-    "ollama_model": "qwen2.5:3b",
+    "ollama_model": "qwen2.5:7b",
     "ollama_base_url": "http://localhost:11434"
 }
 with open("$CONFIG_DIR/config.json", "w") as f:

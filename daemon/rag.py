@@ -58,6 +58,31 @@ def build_index(vault_path: str, ollama_base_url: str, ollama_model: str) -> Vec
     )
 
 
+_NEEDS_VAULT_PROMPT = """\
+Does answering the following question require searching the user's personal notes or vault?
+Answer YES if the question is about the user's own memories, notes, people they know, \
+events in their life, or anything that would only be found in personal records.
+Answer NO if the question can be answered from general knowledge alone \
+(e.g. greetings, questions about the assistant, general facts, math).
+Reply with exactly one word: YES or NO.
+
+Question: {question}
+Answer:"""
+
+_DIRECT_SYSTEM = (
+    "You are Alysha, a personal second-brain assistant. "
+    "Answer the user's question conversationally. "
+    "Do not reference any notes or documents."
+)
+
+
+def _needs_vault(question: str) -> bool:
+    """Single YES/NO call to decide whether RAG retrieval is needed."""
+    prompt = _NEEDS_VAULT_PROMPT.format(question=question)
+    result = Settings.llm.complete(prompt)
+    return str(result).strip().upper().startswith("Y")
+
+
 def query(
     index: VectorStoreIndex,
     question: str,
@@ -72,6 +97,19 @@ def query(
     if index is None:
         return "Index not ready yet.", []
 
+    # ── Intent routing: skip RAG for general / meta questions ─────────────────
+    if not _needs_vault(question):
+        history_prefix = ""
+        if history:
+            history_prefix = "\n".join(
+                f"{'User' if m['role'] == 'user' else 'Alysha'}: {m['content']}"
+                for m in history
+            ) + "\n\n"
+        direct_prompt = f"{_DIRECT_SYSTEM}\n\n{history_prefix}User: {question}\nAlysha:"
+        answer = str(Settings.llm.complete(direct_prompt)).strip()
+        return answer or "How can I help?", []
+
+    # ── RAG path ───────────────────────────────────────────────────────────────
     retriever = index.as_retriever(similarity_top_k=top_k)
 
     # Inject conversation history into the system prompt (not into {query_str})
