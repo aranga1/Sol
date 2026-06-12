@@ -73,26 +73,38 @@ extension Color {
     }
 }
 
-// ── Liquid-glass button background ────────────────────────────────────────────
-struct GlassBackground: ViewModifier {
-    var cornerRadius: CGFloat = 21
-    func body(content: Content) -> some View {
-        content
-            .background(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .fill(DS.glassGradient)
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: cornerRadius))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .strokeBorder(Color.white.opacity(0.62), lineWidth: 1)
-                    )
-                    .shadow(color: Color(hex: "#50321E").opacity(0.32), radius: 16, x: 0, y: 5)
-            )
+// ── Liquid Glass ───────────────────────────────────────────────────────────────
+// On iOS 26+ this uses Apple's real .glassEffect() API.
+// On older OS it falls back to the hand-rolled ultraThinMaterial version.
+extension View {
+    /// Apply liquid glass to any shape. `interactive` adds the press-response animation.
+    @ViewBuilder
+    func liquidGlass<S: Shape>(shape: S, interactive: Bool = false) -> some View {
+        if #available(iOS 26, *) {
+            if interactive {
+                self.glassEffect(.regular.interactive(), in: shape)
+            } else {
+                self.glassEffect(in: shape)
+            }
+        } else {
+            self.modifier(FallbackGlass(shape: shape))
+        }
+    }
+
+    /// Legacy alias kept for existing call sites that pass a cornerRadius.
+    func glassBackground(cornerRadius: CGFloat = 21) -> some View {
+        liquidGlass(shape: RoundedRectangle(cornerRadius: cornerRadius))
     }
 }
 
-extension View {
-    func glassBackground(cornerRadius: CGFloat = 21) -> some View {
-        modifier(GlassBackground(cornerRadius: cornerRadius))
+private struct FallbackGlass<S: Shape>: ViewModifier {
+    let shape: S
+    func body(content: Content) -> some View {
+        content.background(
+            shape.fill(DS.glassGradient)
+                .background(.ultraThinMaterial, in: shape)
+                .overlay(shape.strokeBorder(Color.white.opacity(0.62), lineWidth: 1))
+                .shadow(color: Color(hex: "#50321E").opacity(0.32), radius: 16, x: 0, y: 5)
+        )
     }
 }

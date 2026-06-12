@@ -284,22 +284,17 @@ struct HomeView: View {
         HStack {
             // Hamburger button
             Button { openDrawer() } label: {
-                ZStack {
-                    Circle()
-                        .fill(Color.clear)
-                        .frame(width: 42, height: 42)
-                        .glassBackground(cornerRadius: 21)
-
-                    VStack(spacing: 4.5) {
-                        ForEach(0..<3, id: \.self) { _ in
-                            RoundedRectangle(cornerRadius: 1.5)
-                                .fill(DS.inkMid)
-                                .frame(width: 18, height: 1.8)
-                        }
+                VStack(spacing: 4.5) {
+                    ForEach(0..<3, id: \.self) { _ in
+                        RoundedRectangle(cornerRadius: 1.5)
+                            .fill(DS.inkMid)
+                            .frame(width: 18, height: 1.8)
                     }
                 }
                 .frame(width: 42, height: 42)
+                .liquidGlass(shape: Circle(), interactive: true)
             }
+            .buttonStyle(.plain)
 
             Spacer()
 
@@ -382,21 +377,10 @@ private struct StatusPill: View {
                         .padding(.trailing, 4)
                 }
             }
-            .padding(.horizontal, expanded ? 12 : 0)
-            .padding(.vertical, expanded ? 7 : 0)
-            .background {
-                if expanded {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(DS.glassGradient)
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .strokeBorder(Color.white.opacity(0.62), lineWidth: 1)
-                        )
-                        .shadow(color: Color(hex: "#50321E").opacity(0.32), radius: 16, x: 0, y: 5)
-                }
-            }
-            .animation(.easeInOut(duration: 0.2), value: expanded)
+            .padding(.horizontal, expanded ? 12 : 7)
+            .padding(.vertical, 7)
+            .liquidGlass(shape: Capsule(), interactive: true)
+            .animation(.easeInOut(duration: 0.25), value: expanded)
         }
         .buttonStyle(.plain)
         .onAppear { vm.startPolling() }
@@ -484,7 +468,7 @@ private struct ModePopup: View {
             .padding(.leading, 7)
             .padding(.trailing, 17)
             .padding(.vertical, 7)
-            .glassBackground(cornerRadius: 30)
+            .liquidGlass(shape: Capsule(), interactive: true)
         }
         .buttonStyle(.plain)
         .scaleEffect(appeared ? 1.0 : 0.78)
