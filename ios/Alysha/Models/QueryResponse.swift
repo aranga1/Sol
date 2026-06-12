@@ -10,7 +10,7 @@ struct QueryRequest: Codable {
     let history: [HistoryMessage]?
 }
 
-struct SourceItem: Codable, Identifiable {
+struct SourceItem: Codable, Identifiable, Hashable {
     let file: String
     let title: String
     var id: String { file }
@@ -21,7 +21,7 @@ struct QueryResponse: Codable {
     let sources: [SourceItem]
 }
 
-struct ConversationMessage: Identifiable, Codable {
+struct ConversationMessage: Identifiable, Codable, Hashable {
     let id: UUID
     let question: String
     let answer: String

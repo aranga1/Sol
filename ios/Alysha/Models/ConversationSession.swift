@@ -1,6 +1,6 @@
 import Foundation
 
-struct ConversationSession: Identifiable, Codable {
+struct ConversationSession: Identifiable, Codable, Hashable {
     let id: UUID
     let startedAt: Date
     var messages: [ConversationMessage]
