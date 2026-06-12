@@ -14,17 +14,18 @@ struct HomeView: View {
 
     // Navigation
     @State private var queryText = ""
-    @State private var navigateToQuery = false
-    @State private var sessionToOpen: ConversationSession? = nil
-    @State private var navigateToSession = false
     @State private var navigateToAllChats = false
 
     // Sheets
     @State private var showSettings = false
-    @State private var showVoiceNote = false
-    @State private var showTextNote = false
     @State private var showObsidianAlert = false
-    @State private var voiceTranscript = ""
+
+    // Full-screen overlays (slide up)
+    @State private var showChat = false
+    @State private var chatQuestion = ""
+    @State private var chatSession: ConversationSession? = nil
+    @State private var showComposer = false
+    @State private var composerMode: ComposerMode = .text
 
     // Drawer
     @State private var drawerOpen = false
@@ -41,28 +42,20 @@ struct HomeView: View {
 
     var body: some View {
         ZStack(alignment: .leading) {
-            // Main NavigationStack
+            // Main NavigationStack (history / all-chats only — chat + composer are overlays)
             NavigationStack {
                 ZStack {
-                    // Parchment background
                     DS.parchment.ignoresSafeArea()
-
-                    // Animated background blobs + flowing wave lines
                     blobLayer
                     waveLayer
-
-                    // Main content
                     mainContent
 
-                    // Mode popup (above everything)
                     if popOpen {
-                        // Dimmer tap-to-close
                         Color.clear
                             .contentShape(Rectangle())
                             .ignoresSafeArea()
                             .onTapGesture { withAnimation(.easeOut(duration: 0.18)) { popOpen = false } }
                             .zIndex(8)
-
                         ModePopup(barMode: $barMode, popOpen: $popOpen, hoveredMode: $hoveredMode)
                             .zIndex(9)
                     }
@@ -70,23 +63,15 @@ struct HomeView: View {
                 .onPreferenceChange(ModeItemFrameKey.self) { popupItemFrames = $0 }
                 .navigationTitle("")
                 .navigationBarHidden(true)
-                .navigationDestination(isPresented: $navigateToQuery) {
-                    QueryView(initialQuestion: queryText).onDisappear { queryText = "" }
-                }
-                .navigationDestination(isPresented: $navigateToSession) {
-                    if let s = sessionToOpen {
-                        QueryView(session: s).onDisappear { sessionToOpen = nil }
-                    }
-                }
                 .navigationDestination(isPresented: $navigateToAllChats) {
                     AllChatsView()
                 }
             }
             .offset(x: drawerOpen ? drawerWidth : 0)
             .animation(.easeInOut(duration: 0.28), value: drawerOpen)
-            .allowsHitTesting(!drawerOpen)
+            .allowsHitTesting(!drawerOpen && !showChat && !showComposer)
 
-            // Dim overlay
+            // Dim overlay (drawer)
             if drawerOpen {
                 Color.black.opacity(0.38)
                     .ignoresSafeArea()
@@ -100,8 +85,9 @@ struct HomeView: View {
             DrawerView(
                 onSelectSession: { session in
                     closeDrawer()
-                    sessionToOpen = session
-                    navigateToSession = true
+                    chatSession = session
+                    chatQuestion = ""
+                    withAnimation(.spring(response: 0.42, dampingFraction: 0.88)) { showChat = true }
                 },
                 onNewConversation: { closeDrawer() },
                 onOpenSettings: { closeDrawer(); showSettings = true },
@@ -113,16 +99,34 @@ struct HomeView: View {
             .offset(x: drawerOpen ? 0 : -drawerWidth)
             .animation(.easeInOut(duration: 0.28), value: drawerOpen)
             .zIndex(11)
+
+            // ── Chat overlay (slides up) ───────────────────────────────────
+            if showChat {
+                Group {
+                    if let session = chatSession {
+                        QueryView(session: session, onDismiss: dismissChat)
+                    } else {
+                        QueryView(initialQuestion: chatQuestion, onDismiss: dismissChat)
+                    }
+                }
+                .transition(.move(edge: .bottom))
+                .zIndex(20)
+            }
+
+            // ── Composer overlay (slides up from bar) ─────────────────────
+            if showComposer {
+                NoteComposerView(mode: composerMode) {
+                    withAnimation(.spring(response: 0.38, dampingFraction: 0.88)) { showComposer = false }
+                }
+                .transition(.move(edge: .bottom))
+                .zIndex(21)
+            }
         }
         .sheet(isPresented: $showSettings) {
             SettingsView(onResetConnection: onResetConnection)
         }
-        .sheet(isPresented: $showVoiceNote) {
-            VoiceNoteView(initialTranscript: voiceTranscript)
-                .onDisappear { voiceTranscript = "" }
-        }
-        .sheet(isPresented: $showTextNote) {
-            TextNoteView(onSuccess: {})
+        .sheet(isPresented: $showSettings) {
+            SettingsView(onResetConnection: onResetConnection)
         }
         .alert("Obsidian Not Installed", isPresented: $showObsidianAlert) {
             Button("OK", role: .cancel) {}
@@ -133,16 +137,37 @@ struct HomeView: View {
         .gesture(
             DragGesture(minimumDistance: 20)
                 .onEnded { v in
+                    guard !showChat && !showComposer else { return }
                     if v.translation.width > 60 && v.startLocation.x < 44 { openDrawer() }
                     else if v.translation.width < -60 { closeDrawer() }
                 }
         )
+        .animation(.spring(response: 0.42, dampingFraction: 0.88), value: showChat)
+        .animation(.spring(response: 0.38, dampingFraction: 0.88), value: showComposer)
         .onAppear {
-            // Blob animation timer
             Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { _ in
                 blobPhase += 0.016
             }
         }
+    }
+
+    private func dismissChat() {
+        withAnimation(.spring(response: 0.42, dampingFraction: 0.88)) {
+            showChat = false
+            chatSession = nil
+            chatQuestion = ""
+        }
+    }
+
+    func openChatForQuery(_ question: String) {
+        chatQuestion = question
+        chatSession = nil
+        withAnimation(.spring(response: 0.42, dampingFraction: 0.88)) { showChat = true }
+    }
+
+    func openComposer(mode: ComposerMode) {
+        composerMode = mode
+        withAnimation(.spring(response: 0.38, dampingFraction: 0.88)) { showComposer = true }
     }
 
     // MARK: - Background blobs
@@ -273,10 +298,11 @@ struct HomeView: View {
                 hoveredMode: $hoveredMode,
                 popupItemFrames: popupItemFrames,
                 queryText: $queryText,
-                navigateToQuery: $navigateToQuery,
-                showTextNote: $showTextNote,
-                showVoiceNote: $showVoiceNote,
-                voiceTranscript: $voiceTranscript
+                onSendQuery: { q in openChatForQuery(q) },
+                onOpenTextComposer: { openComposer(mode: .text) },
+                onOpenVoiceComposer: { transcript, duration in
+                    openComposer(mode: .voice(transcript: transcript, duration: duration))
+                }
             )
             .padding(.horizontal, 16)
             .padding(.bottom, 30)
@@ -520,10 +546,9 @@ struct CaptureBar: View {
     @Binding var hoveredMode: CaptureMode?
     var popupItemFrames: [CaptureMode: CGRect]
     @Binding var queryText: String
-    @Binding var navigateToQuery: Bool
-    @Binding var showTextNote: Bool
-    @Binding var showVoiceNote: Bool
-    @Binding var voiceTranscript: String
+    var onSendQuery: (String) -> Void
+    var onOpenTextComposer: () -> Void
+    var onOpenVoiceComposer: (String, Int) -> Void  // (transcript, durationSeconds)
 
     // Long-press-then-drag state for the mode button
     @State private var pressTimer: Timer?
@@ -630,12 +655,12 @@ struct CaptureBar: View {
                     .tint(DS.terracotta)
                     .submitLabel(.search)
                     .onSubmit {
-                        if !queryText.isEmpty { navigateToQuery = true }
+                        if !queryText.isEmpty { let q = queryText; queryText = ""; onSendQuery(q) }
                     }
 
             case .text:
                 Button {
-                    showTextNote = true
+                    onOpenTextComposer()
                 } label: {
                     Text("Write a note\u{2026}")
                         .font(.system(size: 16))
@@ -787,8 +812,7 @@ struct CaptureBar: View {
         levels = Array(repeating: 0.2, count: 54)
 
         let transcript = await WhisperService.shared.stopRealtimeRecording()
-        voiceTranscript = transcript
-        showVoiceNote = true
+        onOpenVoiceComposer(transcript, recordSeconds)
     }
 }
 

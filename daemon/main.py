@@ -12,6 +12,7 @@ from daemon.routes import notes as notes_router
 from daemon.routes import query as query_router
 from daemon.routes import config as config_router
 from daemon.routes import notifications as notifications_router
+from daemon.routes import tags as tags_router
 
 
 @asynccontextmanager
@@ -77,6 +78,7 @@ app.include_router(notes_router.router)
 app.include_router(query_router.router)
 app.include_router(config_router.router)
 app.include_router(notifications_router.router)
+app.include_router(tags_router.router)
 
 
 if __name__ == "__main__":

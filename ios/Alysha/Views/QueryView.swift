@@ -63,18 +63,26 @@ private final class QueryViewModel {
 struct QueryView: View {
     var initialQuestion: String = ""
     var existingSession: ConversationSession? = nil
+    var onDismiss: (() -> Void)? = nil
     @State private var vm: QueryViewModel
     @State private var scrollID: UUID?
     @State private var thinkPhase = false
+    @Environment(\.dismiss) private var dismiss
 
-    init(initialQuestion: String = "") {
+    init(initialQuestion: String = "", onDismiss: (() -> Void)? = nil) {
         self.initialQuestion = initialQuestion
+        self.onDismiss = onDismiss
         _vm = State(initialValue: QueryViewModel())
     }
 
-    init(session: ConversationSession) {
+    init(session: ConversationSession, onDismiss: (() -> Void)? = nil) {
         self.existingSession = session
+        self.onDismiss = onDismiss
         _vm = State(initialValue: QueryViewModel())
+    }
+
+    private func goBack() {
+        if let onDismiss { onDismiss() } else { dismiss() }
     }
 
     var body: some View {
@@ -166,12 +174,20 @@ struct QueryView: View {
         .toolbarBackground(DS.parchment, for: .navigationBar)
         .toolbarColorScheme(.light, for: .navigationBar)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: goBack) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(DS.inkMid)
+                }
+            }
             ToolbarItem(placement: .principal) {
                 Text("Ask Alysha")
                     .font(DS.newsreader(20, weight: .medium))
                     .foregroundStyle(DS.inkDark)
             }
         }
+        .navigationBarBackButtonHidden(onDismiss != nil)
         .onAppear {
             if let session = existingSession {
                 vm.loadSession(session)

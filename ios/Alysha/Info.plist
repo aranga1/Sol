@@ -42,5 +42,10 @@
 	<string>Alysha uses your camera to scan the QR code from your Mac setup.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Alysha uses your microphone to record voice notes.</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Newsreader.ttf</string>
+		<string>Newsreader-Italic.ttf</string>
+	</array>
 </dict>
 </plist>
