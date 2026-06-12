@@ -34,9 +34,9 @@ async def create_note(request: Request, body: NoteRequest):
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%S")
     if body.title:
-        # Use title as filename, sanitized for filesystem (keep alphanumeric, spaces→dash)
-        safe = re.sub(r"[^\w\s-]", "", body.title).strip()
-        safe = re.sub(r"\s+", "-", safe)
+        # Sanitize for filesystem: strip special chars, collapse whitespace, keep spaces
+        safe = re.sub(r"[^\w\s\-]", "", body.title).strip()
+        safe = re.sub(r"\s+", " ", safe)
         filename = f"{safe}.md"
     else:
         filename = f"{ts}-{body.source}.md"
@@ -54,10 +54,8 @@ async def create_note(request: Request, body: NoteRequest):
         f"---\n\n"
     )
 
-    if body.title:
-        note_content = frontmatter + f"# {body.title}\n\n{body.content}"
-    else:
-        note_content = frontmatter + body.content
+    # Title is already the filename — don't repeat it as a # heading inside the note
+    note_content = frontmatter + body.content
 
     file_path = await obsidian.create_note(filename, note_content)
     return NoteResponse(file_path=file_path)
