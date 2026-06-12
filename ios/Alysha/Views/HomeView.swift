@@ -184,53 +184,51 @@ struct HomeView: View {
     }
 
     // MARK: - Flowing wave lines
-
-    // Three sine waves scrolling at different speeds/directions, matching the design:
-    //   Wave 1 — 34% from top, terracotta 13% opacity, period 21 s, scrolls left
-    //   Wave 2 — 52% from top, amber 12% opacity,     period 28 s, scrolls right
-    //   Wave 3 — 67% from top, dark terracotta 9%,    period 34 s, scrolls left
+    // TimelineView drives Canvas at display refresh rate — the only reliable way
+    // to get continuous Canvas animation in SwiftUI.
     private var waveLayer: some View {
-        Canvas { ctx, size in
-            drawWave(ctx: ctx, size: size,
-                     yFraction: 0.34, amplitude: 36, wavelength: 200,
-                     color: Color(hex: "#A23E2D").opacity(0.13), lineWidth: 2,
-                     phase: blobPhase, period: 21, direction: -1)
-            drawWave(ctx: ctx, size: size,
-                     yFraction: 0.52, amplitude: 46, wavelength: 200,
-                     color: Color(hex: "#B5701F").opacity(0.12), lineWidth: 2,
-                     phase: blobPhase, period: 28, direction: 1)
-            drawWave(ctx: ctx, size: size,
-                     yFraction: 0.67, amplitude: 33, wavelength: 200,
-                     color: Color(hex: "#8C3322").opacity(0.09), lineWidth: 1.5,
-                     phase: blobPhase, period: 34, direction: -1)
+        TimelineView(.animation) { tl in
+            let t = tl.date.timeIntervalSinceReferenceDate
+            Canvas { ctx, size in
+                // Wave 1 — 34% height, terracotta, scrolls left, period 21 s
+                drawWave(ctx: ctx, size: size, t: t,
+                         yFraction: 0.34, amplitude: 36, wavelength: 200,
+                         color: Color(hex: "#A23E2D").opacity(0.13), lineWidth: 2,
+                         period: 21, direction: -1.0)
+                // Wave 2 — 52% height, amber, scrolls right, period 28 s
+                drawWave(ctx: ctx, size: size, t: t,
+                         yFraction: 0.52, amplitude: 46, wavelength: 200,
+                         color: Color(hex: "#B5701F").opacity(0.12), lineWidth: 2,
+                         period: 28, direction: 1.0)
+                // Wave 3 — 67% height, dark terracotta, scrolls left, period 34 s
+                drawWave(ctx: ctx, size: size, t: t,
+                         yFraction: 0.67, amplitude: 33, wavelength: 200,
+                         color: Color(hex: "#8C3322").opacity(0.09), lineWidth: 1.5,
+                         period: 34, direction: -1.0)
+            }
         }
         .ignoresSafeArea()
         .allowsHitTesting(false)
     }
 
     private func drawWave(
-        ctx: GraphicsContext, size: CGSize,
+        ctx: GraphicsContext, size: CGSize, t: Double,
         yFraction: Double, amplitude: Double, wavelength: Double,
         color: Color, lineWidth: Double,
-        phase: Double, period: Double, direction: Double
+        period: Double, direction: Double
     ) {
         let centerY = size.height * yFraction
-        // phase advances at 0.016/frame; convert to a pixel offset that repeats every wavelength
-        let pixelsPerPhaseUnit = wavelength / (period / 0.016)  // one full wave per `period` seconds
-        let offset = (phase * pixelsPerPhaseUnit * direction)
-                        .truncatingRemainder(dividingBy: wavelength)
+        // How many pixels the wave shifts per second = one full wavelength per `period` seconds
+        let pixelOffset = (t / period).truncatingRemainder(dividingBy: 1.0) * wavelength * direction
 
         var path = Path()
-        let step: Double = 3
-        var x = -wavelength
-        var first = true
+        var x = -wavelength * 2
+        var isFirst = true
         while x <= size.width + wavelength {
-            let angle = (x + offset) * .pi * 2 / wavelength
-            let y = centerY + amplitude * sin(angle)
-            let pt = CGPoint(x: x, y: y)
-            if first { path.move(to: pt); first = false }
-            else { path.addLine(to: pt) }
-            x += step
+            let angle = (x - pixelOffset) * .pi * 2 / wavelength
+            let pt = CGPoint(x: x, y: centerY + amplitude * sin(angle))
+            if isFirst { path.move(to: pt); isFirst = false } else { path.addLine(to: pt) }
+            x += 3
         }
         ctx.stroke(path, with: .color(color),
                    style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round))
@@ -240,29 +238,31 @@ struct HomeView: View {
 
     private var mainContent: some View {
         VStack(spacing: 0) {
-            // Top bar
+            // Top bar — matches design padding-top: 60, horizontal: 18
             topBar
                 .padding(.top, 60)
                 .padding(.horizontal, 18)
 
-            Spacer()
-
-            // Center title
+            // Title sits immediately below the top bar (margin-top: 26 in design)
             VStack(spacing: 13) {
                 Text("Alysha")
-                    .font(DS.newsreader(39, weight: .medium))
+                    .font(DS.serif(39, weight: .medium))
                     .foregroundStyle(DS.inkDark.opacity(0.62))
+                    .tracking(-0.015 * 39)
 
                 Text("How can I help you today?")
-                    .font(DS.newsreader(19, italic: true))
+                    .font(DS.serif(19, weight: .medium, italic: true))
                     .foregroundStyle(DS.inkDark.opacity(0.46))
             }
+            .padding(.top, 26)
+            .frame(maxWidth: .infinity)
 
+            // Flexible middle: hint text vertically centered with bottom offset
+            // matching the design's padding-bottom: 132 (accounts for capture bar height)
             Spacer()
-
-            // Hint text
             hintText
-                .padding(.bottom, 22)
+            Spacer()
+            Color.clear.frame(height: 96) // visual offset toward capture bar
 
             // Capture bar
             CaptureBar(
