@@ -45,8 +45,9 @@ struct HomeView: View {
                     // Parchment background
                     DS.parchment.ignoresSafeArea()
 
-                    // Animated background blobs
+                    // Animated background blobs + flowing wave lines
                     blobLayer
+                    waveLayer
 
                     // Main content
                     mainContent
@@ -180,6 +181,59 @@ struct HomeView: View {
         }
         .ignoresSafeArea()
         .allowsHitTesting(false)
+    }
+
+    // MARK: - Flowing wave lines
+
+    // Three sine waves scrolling at different speeds/directions, matching the design:
+    //   Wave 1 — 34% from top, terracotta 13% opacity, period 21 s, scrolls left
+    //   Wave 2 — 52% from top, amber 12% opacity,     period 28 s, scrolls right
+    //   Wave 3 — 67% from top, dark terracotta 9%,    period 34 s, scrolls left
+    private var waveLayer: some View {
+        Canvas { ctx, size in
+            drawWave(ctx: ctx, size: size,
+                     yFraction: 0.34, amplitude: 36, wavelength: 200,
+                     color: Color(hex: "#A23E2D").opacity(0.13), lineWidth: 2,
+                     phase: blobPhase, period: 21, direction: -1)
+            drawWave(ctx: ctx, size: size,
+                     yFraction: 0.52, amplitude: 46, wavelength: 200,
+                     color: Color(hex: "#B5701F").opacity(0.12), lineWidth: 2,
+                     phase: blobPhase, period: 28, direction: 1)
+            drawWave(ctx: ctx, size: size,
+                     yFraction: 0.67, amplitude: 33, wavelength: 200,
+                     color: Color(hex: "#8C3322").opacity(0.09), lineWidth: 1.5,
+                     phase: blobPhase, period: 34, direction: -1)
+        }
+        .ignoresSafeArea()
+        .allowsHitTesting(false)
+    }
+
+    private func drawWave(
+        ctx: GraphicsContext, size: CGSize,
+        yFraction: Double, amplitude: Double, wavelength: Double,
+        color: Color, lineWidth: Double,
+        phase: Double, period: Double, direction: Double
+    ) {
+        let centerY = size.height * yFraction
+        // phase advances at 0.016/frame; convert to a pixel offset that repeats every wavelength
+        let pixelsPerPhaseUnit = wavelength / (period / 0.016)  // one full wave per `period` seconds
+        let offset = (phase * pixelsPerPhaseUnit * direction)
+                        .truncatingRemainder(dividingBy: wavelength)
+
+        var path = Path()
+        let step: Double = 3
+        var x = -wavelength
+        var first = true
+        while x <= size.width + wavelength {
+            let angle = (x + offset) * .pi * 2 / wavelength
+            let y = centerY + amplitude * sin(angle)
+            let pt = CGPoint(x: x, y: y)
+            if first { path.move(to: pt); first = false }
+            else { path.addLine(to: pt) }
+            x += step
+        }
+        ctx.stroke(path, with: .color(color),
+                   style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round))
     }
 
     // MARK: - Main content
