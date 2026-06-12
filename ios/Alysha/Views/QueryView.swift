@@ -36,12 +36,57 @@ private final class QueryViewModel {
         ]}
 
         do {
-            let resp = try await APIClient.shared.query(
+            let (bytes, response) = try await APIClient.shared.queryStream(
                 QueryRequest(question: q, history: history.isEmpty ? nil : history)
             )
+            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+                throw AlyshAPIError.httpError(
+                    statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0
+                )
+            }
+
+            // Add placeholder bubble immediately so the user sees activity
             pendingQuestion = nil
-            let msg = ConversationMessage(question: q, answer: resp.answer, sources: resp.sources)
-            messages.append(msg)
+            let msgID = UUID()
+            messages.append(ConversationMessage(id: msgID, question: q, answer: "", sources: []))
+
+            var accumulated = ""
+            var sources: [SourceItem] = []
+
+            for try await line in bytes.lines {
+                guard line.hasPrefix("data: ") else { continue }
+                let payload = String(line.dropFirst(6))
+                guard let data = payload.data(using: .utf8),
+                      let event = try? JSONDecoder().decode(SSEEvent.self, from: data)
+                else { continue }
+
+                switch event.type {
+                case "token":
+                    accumulated += event.content ?? ""
+                    if let idx = messages.indices.last {
+                        messages[idx] = ConversationMessage(
+                            id: msgID, question: q,
+                            answer: accumulated, sources: sources
+                        )
+                    }
+                case "sources":
+                    sources = event.sources ?? []
+                    if let idx = messages.indices.last {
+                        messages[idx] = ConversationMessage(
+                            id: msgID, question: q,
+                            answer: accumulated, sources: sources
+                        )
+                    }
+                case "error":
+                    errorMessage = event.content ?? "Unknown error"
+                    messages.removeLast()
+                case "done":
+                    break
+                default:
+                    break
+                }
+            }
+
             persistSession()
         } catch {
             pendingQuestion = nil

@@ -16,19 +16,29 @@ struct SourceItem: Codable, Identifiable, Hashable {
     var id: String { file }
 }
 
-struct QueryResponse: Codable {
-    let answer: String
-    let sources: [SourceItem]
+// SSE event emitted by /api/query stream
+struct SSEEvent: Decodable {
+    let type: String          // "token" | "sources" | "done" | "error"
+    let content: String?      // present for type=token and type=error
+    let sources: [SourceItem]? // present for type=sources
 }
 
 struct ConversationMessage: Identifiable, Codable, Hashable {
     let id: UUID
     let question: String
-    let answer: String
-    let sources: [SourceItem]
+    var answer: String         // var so we can stream into it via array replacement
+    var sources: [SourceItem]  // var for same reason
 
     init(question: String, answer: String, sources: [SourceItem]) {
         self.id = UUID()
+        self.question = question
+        self.answer = answer
+        self.sources = sources
+    }
+
+    // Used during streaming to preserve stable UUID across replacements
+    init(id: UUID, question: String, answer: String, sources: [SourceItem]) {
+        self.id = id
         self.question = question
         self.answer = answer
         self.sources = sources
