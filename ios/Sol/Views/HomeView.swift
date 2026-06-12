@@ -38,8 +38,6 @@ struct HomeView: View {
     @State private var hoveredMode: CaptureMode? = nil
     @State private var popupItemFrames: [CaptureMode: CGRect] = [:]
 
-    // Background blobs
-    @State private var blobPhase: Double = 0
 
     var body: some View {
         ZStack(alignment: .leading) {
@@ -47,8 +45,7 @@ struct HomeView: View {
             NavigationStack {
                 ZStack {
                     DS.parchment.ignoresSafeArea()
-                    blobLayer
-                    waveLayer
+                    BreathingBackground()
                     mainContent
 
                     if popOpen {
@@ -164,11 +161,7 @@ struct HomeView: View {
         .onChange(of: showComposer) { _, showing in
             if !showing && pendingAllChats { pendingAllChats = false; navigateToAllChats = true }
         }
-        .onAppear {
-            Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { _ in
-                blobPhase += 0.016
-            }
-        }
+        .onAppear { }
     }
 
     private func dismissChat() {
@@ -192,95 +185,6 @@ struct HomeView: View {
 
     // MARK: - Background blobs
 
-    private var blobLayer: some View {
-        GeometryReader { geo in
-            let w = geo.size.width
-            let h = geo.size.height
-
-            ZStack {
-                Circle()
-                    .fill(Color(hex: "#C97B5A").opacity(0.13))
-                    .frame(width: 280, height: 280)
-                    .blur(radius: 10)
-                    .offset(
-                        x: w * 0.15 + CGFloat(sin(blobPhase * 0.4) * 30),
-                        y: h * 0.18 + CGFloat(cos(blobPhase * 0.3) * 20)
-                    )
-
-                Circle()
-                    .fill(Color(hex: "#8C3322").opacity(0.09))
-                    .frame(width: 220, height: 220)
-                    .blur(radius: 10)
-                    .offset(
-                        x: w * 0.72 + CGFloat(cos(blobPhase * 0.35) * 25),
-                        y: h * 0.42 + CGFloat(sin(blobPhase * 0.28) * 35)
-                    )
-
-                Circle()
-                    .fill(Color(hex: "#B5701F").opacity(0.08))
-                    .frame(width: 180, height: 180)
-                    .blur(radius: 10)
-                    .offset(
-                        x: w * 0.45 + CGFloat(sin(blobPhase * 0.22) * 40),
-                        y: h * 0.72 + CGFloat(cos(blobPhase * 0.45) * 22)
-                    )
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        }
-        .ignoresSafeArea()
-        .allowsHitTesting(false)
-    }
-
-    // MARK: - Flowing wave lines
-    // TimelineView drives Canvas at display refresh rate — the only reliable way
-    // to get continuous Canvas animation in SwiftUI.
-    private var waveLayer: some View {
-        TimelineView(.animation) { tl in
-            let t = tl.date.timeIntervalSinceReferenceDate
-            Canvas { ctx, size in
-                // Wave 1 — 34% height, terracotta, scrolls left, period 21 s
-                drawWave(ctx: ctx, size: size, t: t,
-                         yFraction: 0.34, amplitude: 36, wavelength: 200,
-                         color: Color(hex: "#A23E2D").opacity(0.13), lineWidth: 2,
-                         period: 21, direction: -1.0)
-                // Wave 2 — 52% height, amber, scrolls right, period 28 s
-                drawWave(ctx: ctx, size: size, t: t,
-                         yFraction: 0.52, amplitude: 46, wavelength: 200,
-                         color: Color(hex: "#B5701F").opacity(0.12), lineWidth: 2,
-                         period: 28, direction: 1.0)
-                // Wave 3 — 67% height, dark terracotta, scrolls left, period 34 s
-                drawWave(ctx: ctx, size: size, t: t,
-                         yFraction: 0.67, amplitude: 33, wavelength: 200,
-                         color: Color(hex: "#8C3322").opacity(0.09), lineWidth: 1.5,
-                         period: 34, direction: -1.0)
-            }
-        }
-        .ignoresSafeArea()
-        .allowsHitTesting(false)
-    }
-
-    private func drawWave(
-        ctx: GraphicsContext, size: CGSize, t: Double,
-        yFraction: Double, amplitude: Double, wavelength: Double,
-        color: Color, lineWidth: Double,
-        period: Double, direction: Double
-    ) {
-        let centerY = size.height * yFraction
-        // How many pixels the wave shifts per second = one full wavelength per `period` seconds
-        let pixelOffset = (t / period).truncatingRemainder(dividingBy: 1.0) * wavelength * direction
-
-        var path = Path()
-        var x = -wavelength * 2
-        var isFirst = true
-        while x <= size.width + wavelength {
-            let angle = (x - pixelOffset) * .pi * 2 / wavelength
-            let pt = CGPoint(x: x, y: centerY + amplitude * sin(angle))
-            if isFirst { path.move(to: pt); isFirst = false } else { path.addLine(to: pt) }
-            x += 3
-        }
-        ctx.stroke(path, with: .color(color),
-                   style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round))
-    }
 
     // MARK: - Main content
 
@@ -291,13 +195,9 @@ struct HomeView: View {
                 .padding(.top, 60)
                 .padding(.horizontal, 18)
 
-            // Title sits immediately below the top bar (margin-top: 26 in design)
-            VStack(spacing: 13) {
-                Text("Alysha")
-                    .font(DS.newsreader(39, weight: .medium))
-                    .foregroundStyle(DS.inkDark.opacity(0.62))
-                    .tracking(-0.015 * 39)
-
+            // Sol mark + subtitle
+            VStack(spacing: 16) {
+                SolMarkView(size: 72)
                 Text("How can I help you today?")
                     .font(DS.newsreader(19, weight: .regular, italic: true))
                     .foregroundStyle(DS.inkDark.opacity(0.46))
