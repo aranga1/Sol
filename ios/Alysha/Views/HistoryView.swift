@@ -1,10 +1,8 @@
 import SwiftUI
 
 struct HistoryView: View {
-    var onContinue: ([ConversationMessage]) -> Void
     @ObservedObject private var store = HistoryStore.shared
     @Environment(\.dismiss) private var dismiss
-    @State private var selectedSession: ConversationSession?
 
     var body: some View {
         NavigationStack {
@@ -18,7 +16,9 @@ struct HistoryView: View {
                 } else {
                     List {
                         ForEach(store.sessions) { session in
-                            Button { selectedSession = session } label: {
+                            NavigationLink {
+                                QueryView(initialHistory: session.messages)
+                            } label: {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(session.title)
                                         .font(.body)
@@ -36,6 +36,15 @@ struct HistoryView: View {
                                 }
                                 .padding(.vertical, 2)
                             }
+                            .contextMenu {
+                                Button(role: .destructive) {
+                                    store.delete(session)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            } preview: {
+                                ConversationPreview(session: session)
+                            }
                         }
                         .onDelete { store.delete(at: $0) }
                     }
@@ -48,69 +57,53 @@ struct HistoryView: View {
                     Button("Done") { dismiss() }
                 }
             }
-            .sheet(item: $selectedSession) { session in
-                SessionDetailView(session: session) { messages in
-                    dismiss()  // dismiss HistoryView sheet
-                    onContinue(messages)
-                }
-            }
         }
     }
 }
 
-private struct SessionDetailView: View {
+private struct ConversationPreview: View {
     let session: ConversationSession
-    let onContinue: ([ConversationMessage]) -> Void
-    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(session.messages) { msg in
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack {
-                                Spacer()
-                                Text(msg.question)
-                                    .padding(.horizontal, 14)
-                                    .padding(.vertical, 10)
-                                    .background(Color.indigo, in: RoundedRectangle(cornerRadius: 16))
-                                    .foregroundStyle(.white)
-                                    .padding(.leading, 60)
-                            }
-                            .padding(.horizontal)
-
-                            HStack {
-                                Text(msg.answer)
-                                    .textSelection(.enabled)
-                                    .padding(.horizontal, 14)
-                                    .padding(.vertical, 10)
-                                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
-                                    .padding(.trailing, 60)
-                                Spacer()
-                            }
-                            .padding(.horizontal)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                ForEach(session.messages.prefix(3)) { msg in
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Spacer()
+                            Text(msg.question)
+                                .font(.subheadline)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(Color.indigo, in: RoundedRectangle(cornerRadius: 14))
+                                .foregroundStyle(.white)
+                                .padding(.leading, 40)
                         }
-                        .padding(.vertical, 12)
+
+                        HStack {
+                            Text(msg.answer)
+                                .font(.subheadline)
+                                .lineLimit(4)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 14))
+                                .padding(.trailing, 40)
+                            Spacer()
+                        }
                     }
-                    Color.clear.frame(height: 80)
                 }
-                .padding(.top)
-            }
-            .navigationTitle(session.startedAt.formatted(date: .abbreviated, time: .shortened))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Continue") {
-                        dismiss()  // dismiss SessionDetailView sheet
-                        onContinue(session.messages)
-                    }
-                    .bold()
+
+                if session.messages.count > 3 {
+                    Text("+ \(session.messages.count - 3) more message\(session.messages.count - 3 == 1 ? "" : "s")")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
+            .padding()
         }
+        .frame(width: 320)
+        .frame(minHeight: 200)
+        .background(Color(.systemBackground))
     }
 }
