@@ -257,12 +257,11 @@ struct HomeView: View {
             .padding(.top, 26)
             .frame(maxWidth: .infinity)
 
-            // Flexible middle: hint text vertically centered with bottom offset
-            // matching the design's padding-bottom: 132 (accounts for capture bar height)
             Spacer()
+
+            // Hint text sits just above the capture bar
             hintText
-            Spacer()
-            Color.clear.frame(height: 96) // visual offset toward capture bar
+                .padding(.bottom, 16)
 
             // Capture bar
             CaptureBar(
