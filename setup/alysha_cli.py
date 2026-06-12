@@ -8,6 +8,14 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+# ── iOS-safe Obsidian plugins ─────────────────────────────────────────────────
+# Only plugins listed here will be kept in community-plugins.json.
+# Desktop-only plugins (obsidian-importer, etc.) must NOT be added — they crash
+# Obsidian iOS/iPad when listed here because their JS files don't exist on mobile.
+MOBILE_SAFE_PLUGINS = {
+    "obsidian-local-rest-api",
+}
+
 # ── Paths ──────────────────────────────────────────────────────────────────────
 SCRIPT_DIR   = Path(__file__).resolve().parent
 REPO_DIR     = SCRIPT_DIR.parent
@@ -148,6 +156,9 @@ def cmd_update(_args):
     step("Re-copying CLI shim…")
     _install_shim()
 
+    step("Checking Obsidian plugins for iOS safety…")
+    cmd_fix_plugins(None)
+
     cmd_restart(None)
     ok("Update complete")
 
@@ -185,6 +196,33 @@ def cmd_qr(_args):
         "--host", ip, "--port", str(port), "--api-key", api_key,
         "--output", str(out_file), "--terminal"
     ], check=True)
+
+
+def cmd_fix_plugins(_args):
+    cfg = load_config()
+    vault_path = cfg.get("vault_path")
+    if not vault_path:
+        fail("Vault path not found in config — run setup/install.sh first")
+        sys.exit(1)
+
+    plugins_file = Path(vault_path) / ".obsidian/community-plugins.json"
+    if not plugins_file.exists():
+        info("No community-plugins.json found — nothing to do")
+        return
+
+    import json as _json
+    current = _json.loads(plugins_file.read_text())
+    safe = [p for p in current if p in MOBILE_SAFE_PLUGINS]
+    removed = [p for p in current if p not in MOBILE_SAFE_PLUGINS]
+
+    if not removed:
+        ok("community-plugins.json is already iOS-safe — no changes needed")
+        return
+
+    plugins_file.write_text(_json.dumps(safe, indent=2))
+    ok(f"Removed desktop-only plugin(s): {', '.join(removed)}")
+    info("Changes will sync to iPhone/iPad via iCloud automatically")
+    info(f"iOS-safe plugins kept: {', '.join(safe) or 'none'}")
 
 
 def cmd_import_notes(_args):
@@ -333,6 +371,7 @@ USAGE = f"""\
   {cyan('config')}        Open config.json in $EDITOR
   {cyan('uninstall')}     Run the uninstall script
   {cyan('qr')}            Regenerate the iPhone connection QR code
+  {cyan('fix-plugins')}   Strip desktop-only Obsidian plugins from community-plugins.json
   {cyan('import-notes')}  Open Obsidian and walk through Apple Notes import
   {cyan('notify')}        Queue a notification to your iPhone  (title body [type])
   {cyan('update-ios')}    Check for a new iOS app release and show install QR
@@ -353,6 +392,7 @@ COMMANDS = {
     "config":       cmd_config,
     "uninstall":    cmd_uninstall,
     "qr":           cmd_qr,
+    "fix-plugins":  cmd_fix_plugins,
     "import-notes": cmd_import_notes,
     "notify":       cmd_notify,
     "update-ios":   cmd_update_ios,
