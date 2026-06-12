@@ -322,13 +322,16 @@ if [[ "$apple_notes_choice" == "Yes, import now" ]]; then
     --padding "1 3" \
     "$(gum style --foreground 226 --bold "Action required in Obsidian:")
 
-$(gum style --foreground 255 "Step 1 ·") $(gum style --foreground 245 "Obsidian is opening — switch to it now.")
-$(gum style --foreground 255 "Step 2 ·") $(gum style --foreground 245 "Go to Settings → Community Plugins → find 'Importer' → Enable it.")
-$(gum style --foreground 255 "Step 3 ·") $(gum style --foreground 245 "Open the Importer plugin (ribbon icon or command palette).")
-$(gum style --foreground 255 "Step 4 ·") $(gum style --foreground 245 "Select 'Apple Notes' as the source → click Import.")
-$(gum style --foreground 255 "Step 5 ·") $(gum style --foreground 245 "Imported notes appear under Imported/Apple Notes/ in your vault.")
+$(gum style --foreground 255 "Step 1 ·") $(gum style --foreground 245 "macOS may ask for permission — if a dialog appears, go to:")
+            $(gum style --foreground 245 "System Settings → Privacy & Security → Full Disk Access → add Obsidian.")
+$(gum style --foreground 255 "Step 2 ·") $(gum style --foreground 245 "Obsidian is opening — switch to it now.")
+$(gum style --foreground 255 "Step 3 ·") $(gum style --foreground 245 "Go to Settings → Community Plugins → find 'Importer' → Enable it.")
+$(gum style --foreground 255 "Step 4 ·") $(gum style --foreground 245 "Open the Importer plugin (ribbon icon or command palette).")
+$(gum style --foreground 255 "Step 5 ·") $(gum style --foreground 245 "Select 'Apple Notes' as the source → click Import.")
+            $(gum style --foreground 245 "Note: sketches and some special notes may fail — this is a known")
+            $(gum style --foreground 245 "importer limitation. All other notes will import successfully.")
 $(gum style --foreground 245 "────────────────────────────────────────────────────────────")
-$(gum style --foreground 245 "To import from iPhone: open the Alysha app → Help → Apple Notes import.")"
+$(gum style --foreground 245 "Imported notes appear under Imported/Apple Notes/ in your vault.")"
 
   open -a Obsidian "$VAULT_PATH" 2>/dev/null || true
   echo ""

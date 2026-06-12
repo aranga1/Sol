@@ -15,6 +15,10 @@ struct HelpView: View {
     private let appleNotesItems: [(String, String)] = [
         ("How do I import my existing Apple Notes?",
          "On your Mac: open Obsidian → Settings → Community Plugins → search for \"Importer\" → install it → open the Importer plugin → choose Apple Notes as the source → import. Your notes will sync to your iPhone via iCloud automatically."),
+        ("macOS asked for permission during import — what do I allow?",
+         "The Importer needs Full Disk Access to read the Apple Notes database. Go to System Settings → Privacy & Security → Full Disk Access → click the + button → add Obsidian. Then re-run the import."),
+        ("Some notes failed with an error during import — is that normal?",
+         "Yes. The Importer plugin has a known limitation with certain note types — sketches, checklists, very short notes, and notes with special characters may fail with a 'ZIDENTIFIER' error. This is a bug in the Importer plugin itself, not in Alysha. The rest of your notes import fine. For notes that failed, copy them manually into a new note in Obsidian."),
         ("Can I import Apple Notes from my iPhone?",
          "Not directly — Apple Notes uses a private format that iOS apps can't read. The Mac import path (via the Obsidian Importer plugin) is the supported approach. Once imported on Mac, notes sync to your iPhone vault via iCloud."),
         ("Why doesn't the iOS Share Sheet work for Apple Notes?",
