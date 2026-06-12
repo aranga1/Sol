@@ -47,9 +47,9 @@ def build_index(vault_path: str, ollama_base_url: str, ollama_model: str) -> Vec
         filename_as_id=True,
     ).load_data()
 
-    # Strip file_path from text fed to LLM so the model can't leak absolute paths
+    # Show only content to the LLM — no file paths, filenames, or other metadata
     for doc in documents:
-        doc.excluded_llm_metadata_keys = list(doc.metadata.keys())
+        doc.text_template = "{content}"
 
     return VectorStoreIndex.from_documents(
         documents,
