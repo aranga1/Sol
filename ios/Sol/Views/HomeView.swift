@@ -46,9 +46,9 @@ struct HomeView: View {
                 ZStack {
                     DS.parchment.ignoresSafeArea()
                     BreathingBackground()
-                    mainContent
+                    if !showChat && !showComposer { mainContent }
 
-                    if popOpen {
+                    if popOpen && !showChat && !showComposer {
                         Color.clear
                             .contentShape(Rectangle())
                             .ignoresSafeArea()
