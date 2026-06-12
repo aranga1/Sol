@@ -1,94 +1,152 @@
 import SwiftUI
 
 private let vaultName = "Alysha"
+private let drawerFraction: CGFloat = 0.82
 
 struct HomeView: View {
     var onResetConnection: () -> Void = {}
 
+    // Navigation
     @State private var isConnected = false
-    @State private var showVoiceNote = false
-    @State private var showTextNote = false
     @State private var queryText = ""
     @State private var navigateToQuery = false
-    @State private var showSettings = false
+    @State private var sessionToOpen: ConversationSession? = nil
+    @State private var navigateToSession = false
+    @State private var showVoiceNote = false
+    @State private var showTextNote = false
     @State private var showObsidianAlert = false
-    @State private var showHistory = false
+
+    // Drawer + Settings
+    @State private var drawerOpen = false
+    @State private var showSettings = false
+
+    private var drawerWidth: CGFloat { UIScreen.main.bounds.width * drawerFraction }
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 32) {
-                Spacer()
+        ZStack(alignment: .leading) {
+            // ── Main stack ─────────────────────────────────────────────────────
+            NavigationStack {
+                mainContent
+                    .navigationTitle("Alysha")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar { toolbarItems }
+                    .navigationDestination(isPresented: $navigateToQuery) {
+                        QueryView(initialQuestion: queryText).onDisappear { queryText = "" }
+                    }
+                    .navigationDestination(isPresented: $navigateToSession) {
+                        if let s = sessionToOpen {
+                            QueryView(session: s).onDisappear { sessionToOpen = nil }
+                        }
+                    }
+            }
+            .offset(x: drawerOpen ? drawerWidth : 0)
+            .animation(.easeInOut(duration: 0.28), value: drawerOpen)
+            .allowsHitTesting(!drawerOpen)
 
-                HStack(spacing: 24) {
-                    CaptureButton(icon: "mic.fill", label: "Voice Note", isEnabled: isConnected) {
-                        showVoiceNote = true
-                    }
-                    CaptureButton(icon: "pencil", label: "Text Note", isEnabled: isConnected) {
-                        showTextNote = true
-                    }
+            // ── Dim overlay ───────────────────────────────────────────────────
+            if drawerOpen {
+                Color.black.opacity(0.35)
+                    .ignoresSafeArea()
+                    .onTapGesture { closeDrawer() }
+                    .transition(.opacity)
+                    .zIndex(1)
+                    .animation(.easeInOut(duration: 0.28), value: drawerOpen)
+            }
+
+            // ── Drawer ────────────────────────────────────────────────────────
+            DrawerView(
+                onSelectSession: { session in
+                    closeDrawer()
+                    sessionToOpen = session
+                    navigateToSession = true
+                },
+                onNewConversation: { closeDrawer() },
+                onOpenSettings: { closeDrawer(); showSettings = true }
+            )
+            .frame(width: drawerWidth)
+            .shadow(color: .black.opacity(0.15), radius: 12, x: 4)
+            .offset(x: drawerOpen ? 0 : -drawerWidth)
+            .animation(.easeInOut(duration: 0.28), value: drawerOpen)
+            .zIndex(2)
+        }
+        // Sheets
+        .sheet(isPresented: $showSettings) {
+            SettingsView(onResetConnection: onResetConnection)
+        }
+        .sheet(isPresented: $showVoiceNote) { VoiceNoteView() }
+        .sheet(isPresented: $showTextNote) { TextNoteView(onSuccess: {}) }
+        .alert("Obsidian Not Installed", isPresented: $showObsidianAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Obsidian is not installed — get it from the App Store.")
+        }
+        .task { await WhisperService.shared.downloadModelIfNeeded() }
+        // Swipe-right-from-edge to open drawer
+        .gesture(
+            DragGesture(minimumDistance: 20)
+                .onEnded { v in
+                    if v.translation.width > 60 && v.startLocation.x < 44 { openDrawer() }
+                    else if v.translation.width < -60 { closeDrawer() }
                 }
+        )
+    }
 
+    // ── Main content ───────────────────────────────────────────────────────────
+    private var mainContent: some View {
+        VStack(spacing: 32) {
+            Spacer()
+
+            HStack(spacing: 24) {
+                CaptureButton(icon: "mic.fill", label: "Voice Note", isEnabled: isConnected) {
+                    showVoiceNote = true
+                }
+                CaptureButton(icon: "pencil", label: "Text Note", isEnabled: isConnected) {
+                    showTextNote = true
+                }
+            }
+
+            Button { openObsidianVault() } label: {
+                Label("Open in Obsidian", systemImage: "book.closed")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            HStack {
+                TextField("Ask your vault a question…", text: $queryText)
+                    .textFieldStyle(.roundedBorder)
+                    .submitLabel(.search)
+                    .onSubmit { if !queryText.isEmpty { navigateToQuery = true } }
                 Button {
-                    openObsidianVault()
+                    if !queryText.isEmpty { navigateToQuery = true }
                 } label: {
-                    Label("Open in Obsidian", systemImage: "book.closed")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                    Image(systemName: "arrow.up.circle.fill").font(.title2)
                 }
-
-                Spacer()
-
-                HStack {
-                    TextField("Ask your vault a question…", text: $queryText)
-                        .textFieldStyle(.roundedBorder)
-                        .submitLabel(.search)
-                        .onSubmit { if !queryText.isEmpty { navigateToQuery = true } }
-                    Button {
-                        if !queryText.isEmpty { navigateToQuery = true }
-                    } label: {
-                        Image(systemName: "arrow.up.circle.fill").font(.title2)
-                    }
-                    .disabled(queryText.isEmpty || !isConnected)
-                }
-                .padding(.horizontal)
-                .padding(.bottom, 24)
+                .disabled(queryText.isEmpty || !isConnected)
             }
-            .navigationTitle("Alysha")
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button { showSettings = true } label: {
-                        Image(systemName: "gearshape").foregroundStyle(.secondary)
-                    }
-                }
-                ToolbarItem(placement: .topBarLeading) {
-                    Button { showHistory = true } label: {
-                        Image(systemName: "clock").foregroundStyle(.secondary)
-                    }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    // Owns its own VM — only this view re-renders on status changes
-                    DaemonStatusIndicator { isConnected = $0 }
-                }
-            }
-            .sheet(isPresented: $showSettings) {
-                SettingsView(onResetConnection: onResetConnection)
-            }
-            .navigationDestination(isPresented: $showHistory) {
-                HistoryView()
-            }
-            .sheet(isPresented: $showVoiceNote) { VoiceNoteView() }
-            .sheet(isPresented: $showTextNote) { TextNoteView(onSuccess: {}) }
-            .navigationDestination(isPresented: $navigateToQuery) {
-                QueryView(initialQuestion: queryText).onDisappear { queryText = "" }
-            }
-            .task { await WhisperService.shared.downloadModelIfNeeded() }
-            .alert("Obsidian Not Installed", isPresented: $showObsidianAlert) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text("Obsidian is not installed — get it from the App Store.")
-            }
+            .padding(.horizontal)
+            .padding(.bottom, 24)
         }
     }
+
+    // ── Toolbar ────────────────────────────────────────────────────────────────
+    @ToolbarContentBuilder
+    private var toolbarItems: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            Button { openDrawer() } label: {
+                Image(systemName: "line.3.horizontal")
+                    .foregroundStyle(.primary)
+            }
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+            DaemonStatusIndicator { isConnected = $0 }
+        }
+    }
+
+    // ── Helpers ────────────────────────────────────────────────────────────────
+    private func openDrawer() { withAnimation { drawerOpen = true } }
+    private func closeDrawer() { withAnimation { drawerOpen = false } }
 
     @MainActor
     private func openObsidianVault() {
@@ -102,10 +160,104 @@ struct HomeView: View {
     }
 }
 
-// Isolated status view — owns DaemonStatusViewModel so only this subtree re-renders on polls
+// ── Drawer ─────────────────────────────────────────────────────────────────────
+private struct DrawerView: View {
+    @ObservedObject private var store = HistoryStore.shared
+    let onSelectSession: (ConversationSession) -> Void
+    let onNewConversation: () -> Void
+    let onOpenSettings: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Header
+            HStack {
+                Text("Alysha")
+                    .font(.title2.bold())
+                Spacer()
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 64)
+            .padding(.bottom, 20)
+
+            // New conversation button
+            Button(action: onNewConversation) {
+                HStack(spacing: 10) {
+                    Image(systemName: "plus")
+                    Text("New conversation")
+                        .font(.subheadline)
+                }
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10))
+                .padding(.horizontal, 16)
+            }
+
+            Divider().padding(.vertical, 16)
+
+            // Recents
+            Text("Recents")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 8)
+
+            if store.sessions.isEmpty {
+                Text("No conversations yet")
+                    .font(.subheadline)
+                    .foregroundStyle(.tertiary)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 8)
+            } else {
+                List {
+                    ForEach(store.sessions) { session in
+                        Button {
+                            onSelectSession(session)
+                        } label: {
+                            Text(session.title)
+                                .lineLimit(1)
+                                .foregroundStyle(.primary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                store.delete(session)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
+                    }
+                }
+                .listStyle(.plain)
+            }
+
+            Spacer()
+
+            Divider()
+
+            // Settings
+            Button(action: onOpenSettings) {
+                HStack(spacing: 12) {
+                    Image(systemName: "gearshape")
+                        .frame(width: 20)
+                    Text("Settings")
+                        .font(.body)
+                }
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .background(Color(.systemBackground))
+        .ignoresSafeArea()
+    }
+}
+
+// ── Shared subviews ────────────────────────────────────────────────────────────
 private struct DaemonStatusIndicator: View {
     let onStatusChange: (Bool) -> Void
-
     @State private var vm = DaemonStatusViewModel()
     @Environment(\.scenePhase) private var scenePhase
 
@@ -113,12 +265,8 @@ private struct DaemonStatusIndicator: View {
         StatusDot(status: vm.status)
             .onAppear { vm.startPolling() }
             .onDisappear { vm.stopPolling() }
-            .onChange(of: vm.status) { _, newStatus in
-                onStatusChange(newStatus == .reachable)
-            }
-            .onChange(of: scenePhase) { _, phase in
-                if phase == .active { vm.checkNow() }
-            }
+            .onChange(of: vm.status) { _, s in onStatusChange(s == .reachable) }
+            .onChange(of: scenePhase) { _, p in if p == .active { vm.checkNow() } }
     }
 }
 
@@ -147,12 +295,8 @@ private struct StatusDot: View {
 
     var body: some View {
         HStack(spacing: 4) {
-            Circle()
-                .fill(dotColor)
-                .frame(width: 10, height: 10)
-            Text(label)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            Circle().fill(dotColor).frame(width: 10, height: 10)
+            Text(label).font(.caption).foregroundStyle(.secondary)
         }
     }
 
