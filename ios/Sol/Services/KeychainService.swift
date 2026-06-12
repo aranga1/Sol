@@ -2,7 +2,7 @@ import Foundation
 import Security
 
 enum KeychainService {
-    private static let service = "com.aakashranga.Alysha"
+    private static let service = "com.aakashranga.Sol"
     private static let account = "connection-config"
 
     static func save(_ config: ConnectionConfig) {

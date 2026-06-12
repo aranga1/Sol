@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct AlyshApp: App {
+struct SolApp: App {
     @State private var isOnboarded = KeychainService.load() != nil
     @Environment(\.scenePhase) private var scenePhase
     @State private var deepLinkTarget: DeepLinkTarget?
@@ -41,7 +41,7 @@ struct AlyshApp: App {
                 }
             }
             .onOpenURL { url in
-                guard url.scheme == "alysha" else { return }
+                guard url.scheme == "sol" else { return }
                 let target: DeepLinkTarget? = switch url.host {
                 case "voice": .voice
                 case "text": .text
@@ -57,7 +57,7 @@ struct AlyshApp: App {
     }
 }
 
-extension AlyshApp.DeepLinkTarget: Identifiable {
+extension SolApp.DeepLinkTarget: Identifiable {
     var id: String {
         switch self {
         case .voice: return "voice"

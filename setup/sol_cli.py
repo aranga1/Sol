@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""alysha — CLI utility for managing the Alysha daemon and iOS app."""
+"""sol — CLI utility for managing the Sol daemon and iOS app."""
 import json
 import os
 import subprocess
@@ -11,10 +11,10 @@ from pathlib import Path
 # ── Paths ──────────────────────────────────────────────────────────────────────
 SCRIPT_DIR   = Path(__file__).resolve().parent
 REPO_DIR     = SCRIPT_DIR.parent
-CONFIG_DIR   = Path.home() / ".alysha"
+CONFIG_DIR   = Path.home() / ".sol"
 CONFIG_FILE  = CONFIG_DIR / "config.json"
 LOG_FILE     = CONFIG_DIR / "daemon.log"
-PLIST        = Path.home() / "Library/LaunchAgents/com.alysha.daemon.plist"
+PLIST        = Path.home() / "Library/LaunchAgents/com.sol.daemon.plist"
 VENV_PYTHON  = CONFIG_DIR / "venv/bin/python"
 VERSION_FILE = REPO_DIR / "VERSION"
 
@@ -48,7 +48,7 @@ def load_config() -> dict:
 # ── Daemon control ─────────────────────────────────────────────────────────────
 def daemon_running() -> bool:
     result = subprocess.run(
-        ["launchctl", "list", "com.alysha.daemon"],
+        ["launchctl", "list", "com.sol.daemon"],
         capture_output=True, text=True
     )
     return result.returncode == 0
@@ -65,7 +65,7 @@ def cmd_status(_args):
     cfg = load_config()
 
     print()
-    print(bold("  Alysha status"))
+    print(bold("  Sol status"))
     print()
 
     # Daemon
@@ -178,7 +178,7 @@ def cmd_qr(_args):
     ip       = ts.stdout.strip()
     port     = cfg.get("daemon_port", 8765)
     api_key  = cfg.get("daemon_api_key", "")
-    out_file = CONFIG_DIR / "alysha-connect.png"
+    out_file = CONFIG_DIR / "sol-connect.png"
 
     subprocess.run([
         str(VENV_PYTHON), str(SCRIPT_DIR / "qr_generate.py"),
@@ -189,7 +189,7 @@ def cmd_qr(_args):
 
 def cmd_notify(args):
     if len(args) < 2:
-        fail("Usage: alysha notify <title> <body> [info|warning|update]")
+        fail("Usage: sol notify <title> <body> [info|warning|update]")
         sys.exit(1)
     title = args[0]
     body  = args[1]
@@ -226,8 +226,8 @@ def cmd_update_ios(_args):
 
     try:
         req = urllib.request.Request(
-            "https://api.github.com/repos/aranga1/Alysha/releases/latest",
-            headers={"Accept": "application/vnd.github+json", "User-Agent": "alysha-cli"}
+            "https://api.github.com/repos/aranga1/Sol/releases/latest",
+            headers={"Accept": "application/vnd.github+json", "User-Agent": "sol-cli"}
         )
         with urllib.request.urlopen(req, timeout=8) as resp:
             data = json.loads(resp.read())
@@ -258,11 +258,11 @@ def cmd_update_ios(_args):
         print()
 
         # Render terminal QR via qrcode if available in venv
-        out_file = CONFIG_DIR / "alysha-ios-update.png"
+        out_file = CONFIG_DIR / "sol-ios-update.png"
         result = subprocess.run([
             str(VENV_PYTHON), str(SCRIPT_DIR / "qr_generate.py"),
             "--url", ota_url,
-            "--label", f"Install Alysha {latest_tag} on iPhone",
+            "--label", f"Install Sol {latest_tag} on iPhone",
             "--output", str(out_file),
             "--terminal"
         ], check=False)
@@ -271,15 +271,15 @@ def cmd_update_ios(_args):
     else:
         info("No manifest.plist in this release — visit GitHub Releases to install manually")
 
-    print(f"  {dim('Releases page: https://github.com/aranga1/Alysha/releases/latest')}")
+    print(f"  {dim('Releases page: https://github.com/aranga1/Sol/releases/latest')}")
     print()
 
 
-# ── Shim installer (called by install.sh + alysha update) ──────────────────────
+# ── Shim installer (called by install.sh + sol update) ──────────────────────
 def _install_shim():
     shim_dir = Path.home() / ".local/bin"
     shim_dir.mkdir(parents=True, exist_ok=True)
-    shim = shim_dir / "alysha"
+    shim = shim_dir / "sol"
     shim.write_text(f"""#!/usr/bin/env bash
 exec "{VENV_PYTHON}" "{Path(__file__).resolve()}" "$@"
 """)
@@ -296,17 +296,17 @@ def cmd_install_shim(_args):
 
 # ── Help ───────────────────────────────────────────────────────────────────────
 USAGE = f"""\
-{bold('alysha')} — manage your Alysha second brain
+{bold('sol')} — manage your Sol second brain
 
 {bold('USAGE')}
-  alysha <command> [options]
+  sol <command> [options]
 
 {bold('COMMANDS')}
   {cyan('status')}        Show daemon, Ollama, Tailscale, and vault state
   {cyan('start')}         Start the daemon
   {cyan('stop')}          Stop the daemon
   {cyan('restart')}       Restart the daemon
-  {cyan('logs')}          Tail the daemon log  (~/.alysha/daemon.log)
+  {cyan('logs')}          Tail the daemon log  (~/.sol/daemon.log)
   {cyan('update')}        Pull latest code, update deps, restart daemon
   {cyan('config')}        Open config.json in $EDITOR
   {cyan('uninstall')}     Run the uninstall script
@@ -343,7 +343,7 @@ def main():
     cmd = args[0]
     if cmd not in COMMANDS:
         fail(f"Unknown command: {cmd}")
-        print(f"  Run {bold('alysha --help')} for usage.")
+        print(f"  Run {bold('sol --help')} for usage.")
         sys.exit(1)
     COMMANDS[cmd](args[1:])
 

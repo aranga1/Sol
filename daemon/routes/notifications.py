@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 router = APIRouter()
 
-_NOTIFICATIONS_FILE = Path.home() / ".alysha/notifications.json"
+_NOTIFICATIONS_FILE = Path.home() / ".sol/notifications.json"
 _lock = threading.Lock()
 
 

@@ -3,10 +3,10 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
-CONFIG_DIR="$HOME/.alysha"
-VAULT_PATH="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Alysha"
+CONFIG_DIR="$HOME/.sol"
+VAULT_PATH="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Sol"
 DAEMON_PORT=8765
-LAUNCHD_PLIST="$HOME/Library/LaunchAgents/com.alysha.daemon.plist"
+LAUNCHD_PLIST="$HOME/Library/LaunchAgents/com.sol.daemon.plist"
 VENV="$CONFIG_DIR/venv"
 
 # ── Bootstrap gum ─────────────────────────────────────────────────────────────
@@ -46,9 +46,9 @@ gum style \
   --bold \
   --padding "1 4" \
   --margin "1 0" \
-  "Alysha Setup"
+  "Sol Setup"
 
-[[ "$(uname)" == "Darwin" ]] || { gum style --foreground 196 "Alysha requires macOS."; exit 1; }
+[[ "$(uname)" == "Darwin" ]] || { gum style --foreground 196 "Sol requires macOS."; exit 1; }
 gum style --foreground 245 "  macOS $(sw_vers -productVersion)  ·  $(uname -m)"
 echo ""
 
@@ -180,9 +180,9 @@ sed \
   -e "s|DAEMON_VENV_PYTHON|$VENV/bin/python|g" \
   -e "s|DAEMON_MAIN_PY|$REPO_DIR/daemon/main.py|g" \
   -e "s|DAEMON_REPO_DIR|$REPO_DIR|g" \
-  -e "s|ALYSHA_CONFIG_PATH|$CONFIG_DIR/config.json|g" \
-  -e "s|ALYSHA_LOG_PATH|$CONFIG_DIR/daemon.log|g" \
-  "$REPO_DIR/daemon/com.alysha.daemon.plist" > "$LAUNCHD_PLIST"
+  -e "s|SOL_CONFIG_PATH|$CONFIG_DIR/config.json|g" \
+  -e "s|SOL_LOG_PATH|$CONFIG_DIR/daemon.log|g" \
+  "$REPO_DIR/daemon/com.sol.daemon.plist" > "$LAUNCHD_PLIST"
 
 launchctl unload "$LAUNCHD_PLIST" 2>/dev/null || true
 launchctl load "$LAUNCHD_PLIST"
@@ -245,7 +245,7 @@ gum style \
   --padding "1 3" \
   "$(gum style --foreground 226 --bold "Action required — Obsidian is opening now.")
 
-$(gum style --foreground 255 "Step 1 ·") $(gum style --foreground 245 "If prompted, open the Alysha vault from the vault switcher.")
+$(gum style --foreground 255 "Step 1 ·") $(gum style --foreground 245 "If prompted, open the Sol vault from the vault switcher.")
 
 $(gum style --foreground 255 "Step 2 ·") $(gum style --foreground 245 "Go to Settings (bottom-left cog) → Community Plugins.")
             $(gum style --foreground 245 "If you see a 'Turn on community plugins' button, click it.")
@@ -254,7 +254,7 @@ $(gum style --foreground 255 "Step 3 ·") $(gum style --foreground 245 "Click Br
             $(gum style --foreground 245 "Click Install, then toggle it on to Enable.")
 
 $(gum style --foreground 255 "Step 4 ·") $(gum style --foreground 245 "You may see a message about HTTPS certificates or browser trust — ignore it.")
-            $(gum style --foreground 245 "Alysha talks to the plugin directly and does not need that setup.")
+            $(gum style --foreground 245 "Sol talks to the plugin directly and does not need that setup.")
 
 $(gum style --foreground 255 "Step 5 ·") $(gum style --foreground 245 "Click the plugin's Options button (or Settings → Community Plugins → Local REST API).")
             $(gum style --foreground 245 "You will see an API Key field. Copy that key starting from 'Bearer <key>' — you will need it for the next step.")"
@@ -299,16 +299,16 @@ step "Generating connection QR code..."
   --host "$TAILSCALE_IP" \
   --port "$DAEMON_PORT" \
   --api-key "$DAEMON_API_KEY" \
-  --output "$CONFIG_DIR/alysha-connect.png" \
+  --output "$CONFIG_DIR/sol-connect.png" \
   --terminal
 
 
 # ── CLI shim ──────────────────────────────────────────────────────────────────
-section "CLI  alysha command"
+section "CLI  sol command"
 
-step "Installing alysha CLI shim..."
-"$VENV/bin/python" "$SCRIPT_DIR/alysha_cli.py" _install-shim
-ok "alysha CLI ready"
+step "Installing sol CLI shim..."
+"$VENV/bin/python" "$SCRIPT_DIR/sol_cli.py" _install-shim
+ok "sol CLI ready"
 
 # Add ~/.local/bin to PATH in shell rc files if not already present
 LOCAL_BIN="$HOME/.local/bin"
@@ -319,7 +319,7 @@ for rc in "$HOME/.zshrc" "$HOME/.bashrc" "$HOME/.bash_profile"; do
   [[ "$rc" == "$HOME/.zshrc" ]] && touch "$rc"
   if [[ -f "$rc" ]] && ! grep -q "\.local/bin" "$rc"; then
     echo "" >> "$rc"
-    echo "# Added by Alysha installer" >> "$rc"
+    echo "# Added by Sol installer" >> "$rc"
     echo "$PATH_LINE" >> "$rc"
     ok "Added ~/.local/bin to PATH in $(basename $rc)"
     RC_UPDATED="$rc"
@@ -335,25 +335,25 @@ gum style \
   --bold \
   --padding "1 4" \
   --margin "1 0" \
-  "Alysha is ready!"
+  "Sol is ready!"
 
 gum style "  Vault       $(gum style --foreground 245 "$VAULT_PATH")"
 gum style "  Daemon      $(gum style --foreground 245 "http://$TAILSCALE_IP:$DAEMON_PORT")"
 gum style "  Logs        $(gum style --foreground 245 "$CONFIG_DIR/daemon.log")"
-gum style "  Connect QR  $(gum style --foreground 245 "$CONFIG_DIR/alysha-connect.png")"
-gum style "  CLI         $(gum style --foreground 245 "$LOCAL_BIN/alysha --help")"
+gum style "  Connect QR  $(gum style --foreground 245 "$CONFIG_DIR/sol-connect.png")"
+gum style "  CLI         $(gum style --foreground 245 "$LOCAL_BIN/sol --help")"
 echo ""
 gum style --foreground 245 "  iPhone next steps:"
 gum style --foreground 245 "  1. Install Tailscale → sign in with the same account"
-gum style --foreground 245 "  2. Install Alysha (see GitHub Releases)"
+gum style --foreground 245 "  2. Install Sol (see GitHub Releases)"
 gum style --foreground 245 "  3. Scan the connection QR code printed above"
-gum style --foreground 245 "  4. Open Obsidian iOS → Open vault from iCloud → Alysha"
+gum style --foreground 245 "  4. Open Obsidian iOS → Open vault from iCloud → Sol"
 echo ""
 gum style \
   --border normal \
   --border-foreground 33 \
   --padding "0 2" \
-  "$(gum style --foreground 33 --bold "Activate the alysha command in this terminal:")
+  "$(gum style --foreground 33 --bold "Activate the sol command in this terminal:")
 
   $(gum style --foreground 255 "source ~/.zshrc")
 

@@ -9,15 +9,15 @@ struct HelpView: View {
     private let sections: [(String, [(String, String)])] = [
         ("Connecting", [
             ("What is the QR code?",
-             "The QR code encodes your Mac's Tailscale IP address. Scan it once during setup to connect your iPhone to the Alysha daemon running on your Mac. To re-scan, go to Settings → Reset Connection."),
+             "The QR code encodes your Mac's Tailscale IP address. Scan it once during setup to connect your iPhone to the Sol daemon running on your Mac. To re-scan, go to Settings → Reset Connection."),
             ("Why does the app show \"Unreachable\"?",
              "The most common reasons: your Mac is asleep (wake it up), NordVPN is running on your iPhone (disconnect it — NordVPN and Tailscale can't run together), or your phone has no internet connection."),
-            ("Can I use a VPN with Alysha?",
-             "Alysha uses Tailscale for the phone-to-Mac connection. Tailscale is itself a VPN, so you can't run another VPN (like NordVPN) at the same time. Disconnect any other VPN before using Alysha.")
+            ("Can I use a VPN with Sol?",
+             "Sol uses Tailscale for the phone-to-Mac connection. Tailscale is itself a VPN, so you can't run another VPN (like NordVPN) at the same time. Disconnect any other VPN before using Sol.")
         ]),
         ("Apple Notes Import", [
             ("Can I import my existing Apple Notes?",
-             "Apple Notes uses a private format that only macOS can read — there is no reliable automated import. To bring notes across, copy and paste them into new Alysha voice or text notes, or open Obsidian on Mac and create notes there directly. They will sync to your iPhone vault via iCloud.")
+             "Apple Notes uses a private format that only macOS can read — there is no reliable automated import. To bring notes across, copy and paste them into new Sol voice or text notes, or open Obsidian on Mac and create notes there directly. They will sync to your iPhone vault via iCloud.")
         ]),
         ("Voice Notes", [
             ("Why does the app need to download something on first use?",
@@ -29,11 +29,11 @@ struct HelpView: View {
         ]),
         ("Asking Questions", [
             ("What can I ask?",
-             "You can ask anything about notes you've captured in Alysha. The AI searches your vault and answers based on what it finds. It only knows what's in your vault — not general world knowledge."),
+             "You can ask anything about notes you've captured in Sol. The AI searches your vault and answers based on what it finds. It only knows what's in your vault — not general world knowledge."),
             ("Can I ask follow-up questions?",
              "Yes. Each follow-up shares the context of the previous answer, so you can have a multi-turn conversation about your notes."),
             ("Why does it take a few seconds to answer?",
-             "Alysha runs AI inference locally on your Mac using Ollama — no cloud, no API keys. Answers typically take 3–10 seconds depending on query complexity and Mac load.")
+             "Sol runs AI inference locally on your Mac using Ollama — no cloud, no API keys. Answers typically take 3–10 seconds depending on query complexity and Mac load.")
         ]),
         ("Privacy", [
             ("Does my data leave my devices?",

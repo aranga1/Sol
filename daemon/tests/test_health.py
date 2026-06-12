@@ -25,7 +25,7 @@ def config_file(tmp_path):
 
 @pytest.fixture
 def client(config_file, monkeypatch):
-    monkeypatch.setenv("ALYSHA_CONFIG", str(config_file))
+    monkeypatch.setenv("SOL_CONFIG", str(config_file))
     # Patch at the source so the reload picks up the mock
     with patch("daemon.obsidian_client.ObsidianClient") as MockClient:
         instance = MockClient.return_value
@@ -53,7 +53,7 @@ def test_health_no_auth_required(client):
 
 
 def test_health_degraded_when_obsidian_down(config_file, monkeypatch):
-    monkeypatch.setenv("ALYSHA_CONFIG", str(config_file))
+    monkeypatch.setenv("SOL_CONFIG", str(config_file))
     with patch("daemon.obsidian_client.ObsidianClient") as MockClient:
         instance = MockClient.return_value
         instance.health = AsyncMock(return_value=False)

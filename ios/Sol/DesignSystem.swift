@@ -1,6 +1,6 @@
 import SwiftUI
 
-// ── Alysha Design System ───────────────────────────────────────────────────────
+// ── Sol Design System ───────────────────────────────────────────────────────
 // Warm parchment + terracotta/amber palette. Newsreader for display, SF Pro body.
 
 enum DS {

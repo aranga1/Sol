@@ -38,7 +38,7 @@ _config_path: Path | None = None
 def get_config_path() -> Path:
     global _config_path
     if _config_path is None:
-        _config_path = Path(os.environ.get("ALYSHA_CONFIG", Path.home() / ".alysha" / "config.json"))
+        _config_path = Path(os.environ.get("SOL_CONFIG", Path.home() / ".sol" / "config.json"))
     return _config_path
 
 

@@ -94,7 +94,7 @@ async def create_tag(request: Request, body: CreateTagRequest) -> dict:
     tag_list = ", ".join(f'"{t}"' for t in sorted(existing))
     tags_file.write_text(
         f"---\ntags: [{tag_list}]\n---\n\n"
-        "This note stores app-created tags for the Alysha knowledge graph.\n",
+        "This note stores app-created tags for the Sol knowledge graph.\n",
         encoding="utf-8",
     )
 

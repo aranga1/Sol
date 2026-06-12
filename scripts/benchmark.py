@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Alysha daemon performance benchmark.
+Sol daemon performance benchmark.
 
 Measures:
   - Time-to-first-token (TTFT)
@@ -10,7 +10,7 @@ Measures:
   - Swap usage delta
 
 Usage:
-  source ~/.alysha/venv/bin/activate
+  source ~/.sol/venv/bin/activate
   python3 scripts/benchmark.py [--host http://localhost:8765] [--key <api_key>]
 
 Results written to scripts/benchmark_results_<timestamp>.json
@@ -151,13 +151,13 @@ def main():
     api_key = args.key
     if not api_key:
         try:
-            cfg_path = Path.home() / ".alysha" / "config.json"
+            cfg_path = Path.home() / ".sol" / "config.json"
             api_key = json.loads(cfg_path.read_text())["daemon_api_key"]
         except Exception:
-            print("Cannot load API key. Pass --key or ensure ~/.alysha/config.json exists.")
+            print("Cannot load API key. Pass --key or ensure ~/.sol/config.json exists.")
             sys.exit(1)
 
-    print(f"Benchmarking Alysha daemon at {args.host}")
+    print(f"Benchmarking Sol daemon at {args.host}")
     print("=" * 60)
 
     gpu_info = check_gpu(args.host, api_key)

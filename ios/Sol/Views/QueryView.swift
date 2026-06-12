@@ -40,7 +40,7 @@ private final class QueryViewModel {
                 QueryRequest(question: q, history: history.isEmpty ? nil : history)
             )
             guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
-                throw AlyshAPIError.httpError(
+                throw SolAPIError.httpError(
                     statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0
                 )
             }
@@ -219,7 +219,7 @@ struct QueryView: View {
                 queryInputBar
             }
         }
-        .navigationTitle("Ask Alysha")
+        .navigationTitle("Ask Sol")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(DS.parchment, for: .navigationBar)
         .toolbarColorScheme(.light, for: .navigationBar)
@@ -227,7 +227,7 @@ struct QueryView: View {
             // Principal title only — system back button handles navigation inside NavigationStack.
             // Overlay mode gets its own overlayTopBar with X + hamburger.
             ToolbarItem(placement: .principal) {
-                Text("Ask Alysha")
+                Text("Ask Sol")
                     .font(DS.newsreader(20, weight: .medium))
                     .foregroundStyle(DS.inkDark)
             }
@@ -272,7 +272,7 @@ struct QueryView: View {
 
             Spacer()
 
-            Text("Ask Alysha")
+            Text("Ask Sol")
                 .font(DS.newsreader(20, weight: .medium))
                 .foregroundStyle(DS.inkDark)
 
@@ -525,7 +525,7 @@ struct QueryView: View {
     @MainActor
     private func openInObsidian(_ source: SourceItem) {
         let encoded = source.file.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? source.file
-        guard let url = URL(string: "obsidian://open?vault=Alysha&file=\(encoded)") else { return }
+        guard let url = URL(string: "obsidian://open?vault=Sol&file=\(encoded)") else { return }
         if UIApplication.shared.canOpenURL(url) { UIApplication.shared.open(url) }
     }
 }

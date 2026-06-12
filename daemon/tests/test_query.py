@@ -18,7 +18,7 @@ VALID_CONFIG = {
 def client(tmp_path, monkeypatch):
     cfg = tmp_path / "config.json"
     cfg.write_text(json.dumps(VALID_CONFIG))
-    monkeypatch.setenv("ALYSHA_CONFIG", str(cfg))
+    monkeypatch.setenv("SOL_CONFIG", str(cfg))
     with patch("daemon.main.ObsidianClient") as MockObs, \
          patch("daemon.main.build_index") as mock_build, \
          patch("daemon.main.VaultWatcher") as MockWatcher:

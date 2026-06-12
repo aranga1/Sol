@@ -22,7 +22,7 @@ async def lifespan(app: FastAPI):
         base_url=f"https://localhost:{app.state.config.obsidian_port}",
         api_key=app.state.config.obsidian_api_key,
     )
-    print(f"Alysha daemon running on port {app.state.config.daemon_port}")
+    print(f"Sol daemon running on port {app.state.config.daemon_port}")
 
     vault_path = app.state.config.vault_path
     ollama_base = app.state.config.ollama_base_url

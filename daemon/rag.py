@@ -1,12 +1,12 @@
 """
-RAG engine for Alysha daemon.
+RAG engine for Sol daemon.
 
 Design decisions:
 - Semantic chunking: split on Obsidian headings/paragraphs (not fixed chars)
   so each chunk represents a coherent thought. Neighboring chunks share a
   3-sentence context window at each boundary, improving recall for queries
   that span section boundaries.
-- FAISS index persisted to ~/.alysha/index/ and loaded on startup; rebuilt
+- FAISS index persisted to ~/.sol/index/ and loaded on startup; rebuilt
   only when vault content changes (VaultWatcher compares mtime).
 - LLM streaming: query_stream_async() is an async generator that yields
   token events then a sources event, enabling low-latency first-byte delivery.
@@ -41,7 +41,7 @@ from daemon.config import DEFAULT_SYSTEM_PROMPT
 _EMBED_DIM = 768          # nomic-embed-text output dimension
 _CHUNK_MAX_CHARS = 1400   # soft cap per semantic chunk
 _OVERLAP_SENTENCES = 3    # sentences shared with neighbouring chunk
-_PERSIST_DIR = Path.home() / ".alysha" / "index"
+_PERSIST_DIR = Path.home() / ".sol" / "index"
 
 
 # ── Settings ──────────────────────────────────────────────────────────────────
@@ -150,7 +150,7 @@ def build_index(
     Build (or load from cache) a FAISS vector index for the vault.
 
     On first run the index is built from scratch and persisted to
-    ~/.alysha/index/. Subsequent startups load from cache (< 1s vs 30s+
+    ~/.sol/index/. Subsequent startups load from cache (< 1s vs 30s+
     for a full rebuild). force_rebuild=True skips the cache — used by
     VaultWatcher when vault content changes.
     """
@@ -221,7 +221,7 @@ async def _needs_vault_async(question: str) -> bool:
 
 # ── Prompt builders ───────────────────────────────────────────────────────────
 _DIRECT_SYSTEM = (
-    "You are Alysha, a personal second-brain assistant. "
+    "You are Sol, a personal second-brain assistant. "
     "Answer the user's question conversationally. "
     "Do not reference any notes or documents."
 )
@@ -232,12 +232,12 @@ def _build_direct_prompt(question: str, history: list[dict] | None) -> str:
     if history:
         history_text = (
             "\n".join(
-                f"{'User' if m['role'] == 'user' else 'Alysha'}: {m['content']}"
+                f"{'User' if m['role'] == 'user' else 'Sol'}: {m['content']}"
                 for m in history
             )
             + "\n\n"
         )
-    return f"{_DIRECT_SYSTEM}\n\n{history_text}User: {question}\nAlysha:"
+    return f"{_DIRECT_SYSTEM}\n\n{history_text}User: {question}\nSol:"
 
 
 def _build_rag_prompt(
@@ -250,7 +250,7 @@ def _build_rag_prompt(
     history_section = ""
     if history:
         history_text = "\n".join(
-            f"{'User' if m['role'] == 'user' else 'Alysha'}: {m['content']}"
+            f"{'User' if m['role'] == 'user' else 'Sol'}: {m['content']}"
             for m in history
         )
         history_section = (

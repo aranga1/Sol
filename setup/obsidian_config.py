@@ -34,24 +34,24 @@ def setup_vault(vault_path: str) -> None:
     }, indent=2))
 
     # Welcome note
-    welcome = vault / "Notes" / "Welcome to Alysha.md"
+    welcome = vault / "Notes" / "Welcome to Sol.md"
     if not welcome.exists():
         ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         welcome.write_text(f"""---
 created: {ts}
 tags:
-  - alysha
+  - sol
   - welcome
 ---
 
-# Welcome to Alysha
+# Welcome to Sol
 
 Your second brain vault is ready. Notes captured from your iPhone will appear here.
 
 **Next steps:**
 1. Enable the Local REST API community plugin in Obsidian settings
-2. Scan the QR code shown in your terminal from the Alysha iPhone app
-3. On iPhone: install Tailscale, install Alysha, open Obsidian iOS and sync this vault via iCloud
+2. Scan the QR code shown in your terminal from the Sol iPhone app
+3. On iPhone: install Tailscale, install Sol, open Obsidian iOS and sync this vault via iCloud
 """)
 
 if __name__ == "__main__":

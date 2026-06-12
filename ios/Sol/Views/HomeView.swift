@@ -1,6 +1,6 @@
 import SwiftUI
 
-private let vaultName = "Alysha"
+private let vaultName = "Sol"
 private let drawerFraction: CGFloat = 0.82
 
 // MARK: - Mode enum
@@ -851,7 +851,7 @@ private struct DrawerView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
-            Text("Alysha")
+            Text("Sol")
                 .font(DS.newsreader(34))
                 .foregroundStyle(Color(hex: "#F3ECDD"))
                 .padding(.horizontal, 22)

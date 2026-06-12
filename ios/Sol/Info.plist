@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Alysha</string>
+	<string>Sol</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -23,7 +23,7 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>alysha</string>
+				<string>sol</string>
 			</array>
 		</dict>
 	</array>
@@ -39,9 +39,9 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Alysha uses your camera to scan the QR code from your Mac setup.</string>
+	<string>Sol uses your camera to scan the QR code from your Mac setup.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Alysha uses your microphone to record voice notes.</string>
+	<string>Sol uses your microphone to record voice notes.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Newsreader.ttf</string>

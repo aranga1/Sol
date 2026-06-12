@@ -1,21 +1,21 @@
 import WidgetKit
 import SwiftUI
 
-struct AlyshWidget: Widget {
-    let kind = "AlyshWidget"
+struct SolWidget: Widget {
+    let kind = "SolWidget"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: AlyshWidgetProvider()) { _ in
-            AlyshWidgetEntryView()
+        StaticConfiguration(kind: kind, provider: SolWidgetProvider()) { _ in
+            SolWidgetEntryView()
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Alysha")
+        .configurationDisplayName("Sol")
         .description("Quick capture shortcuts for Voice and Text notes.")
         .supportedFamilies([.systemMedium])
     }
 }
 
-struct AlyshWidgetProvider: TimelineProvider {
+struct SolWidgetProvider: TimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry { SimpleEntry() }
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> Void) {
         completion(SimpleEntry())
@@ -29,11 +29,11 @@ struct SimpleEntry: TimelineEntry {
     let date = Date()
 }
 
-struct AlyshWidgetEntryView: View {
+struct SolWidgetEntryView: View {
     var body: some View {
         HStack(spacing: 0) {
             // Voice button — left half
-            Link(destination: URL(string: "alysha://voice")!) {
+            Link(destination: URL(string: "sol://voice")!) {
                 VStack(spacing: 8) {
                     Image(systemName: "mic.fill")
                         .font(.system(size: 32))
@@ -49,7 +49,7 @@ struct AlyshWidgetEntryView: View {
             Divider()
 
             // Text button — right half
-            Link(destination: URL(string: "alysha://text")!) {
+            Link(destination: URL(string: "sol://text")!) {
                 VStack(spacing: 8) {
                     Image(systemName: "pencil")
                         .font(.system(size: 32))

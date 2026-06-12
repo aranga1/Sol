@@ -30,7 +30,7 @@ jobs:
           APPLE_CERT_BASE64: ${{ secrets.APPLE_CERT_BASE64 }}
           APPLE_CERT_PASSWORD: ${{ secrets.APPLE_CERT_PASSWORD }}
         run: |
-          KEYCHAIN_PATH=$RUNNER_TEMP/alysha.keychain-db
+          KEYCHAIN_PATH=$RUNNER_TEMP/sol.keychain-db
           KEYCHAIN_PASSWORD=$(openssl rand -hex 16)
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
@@ -46,17 +46,17 @@ jobs:
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "$APPLE_PROVISIONING_PROFILE" | base64 --decode \
-            > ~/Library/MobileDevice/Provisioning\ Profiles/Alysha.mobileprovision
+            > ~/Library/MobileDevice/Provisioning\ Profiles/Sol.mobileprovision
 
       - name: Build archive
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           xcodebuild archive \
-            -project ios/Alysha.xcodeproj \
-            -scheme Alysha \
+            -project ios/Sol.xcodeproj \
+            -scheme Sol \
             -configuration Release \
-            -archivePath $RUNNER_TEMP/Alysha.xcarchive \
+            -archivePath $RUNNER_TEMP/Sol.xcarchive \
             -destination "generic/platform=iOS" \
             CODE_SIGN_STYLE=Manual \
             DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
@@ -79,7 +79,7 @@ jobs:
           </plist>
           EOF
           xcodebuild -exportArchive \
-            -archivePath $RUNNER_TEMP/Alysha.xcarchive \
+            -archivePath $RUNNER_TEMP/Sol.xcarchive \
             -exportPath $RUNNER_TEMP/export \
             -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist \
             | xcpretty || true
@@ -89,7 +89,7 @@ jobs:
           RUN_NUM=${{ github.run_number }}
           TAG="ios-build-${RUN_NUM}"
           REPO="${{ github.repository }}"
-          IPA_URL="https://github.com/${REPO}/releases/download/${TAG}/Alysha.ipa"
+          IPA_URL="https://github.com/${REPO}/releases/download/${TAG}/Sol.ipa"
 
           cat > $RUNNER_TEMP/manifest.plist << EOF
           <?xml version="1.0" encoding="UTF-8"?>
@@ -108,10 +108,10 @@ jobs:
                 </array>
                 <key>metadata</key>
                 <dict>
-                  <key>bundle-identifier</key><string>com.aakashranga.Alysha</string>
+                  <key>bundle-identifier</key><string>com.aakashranga.Sol</string>
                   <key>bundle-version</key><string>1.0.${RUN_NUM}</string>
                   <key>kind</key><string>software</string>
-                  <key>title</key><string>Alysha</string>
+                  <key>title</key><string>Sol</string>
                 </dict>
               </dict>
             </array>
@@ -126,7 +126,7 @@ jobs:
           <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>Install Alysha</title>
+            <title>Install Sol</title>
             <style>
               body { font-family: -apple-system; text-align: center; padding: 60px 20px; }
               a.btn { display: inline-block; background: #007AFF; color: white;
@@ -136,10 +136,10 @@ jobs:
             </style>
           </head>
           <body>
-            <h1>Alysha</h1>
+            <h1>Sol</h1>
             <p>Open this page in Safari on your iPhone, then tap Install.</p>
             <a class="btn" href="itms-services://?action=download-manifest&url=${MANIFEST_URL}">
-              Install Alysha
+              Install Sol
             </a>
             <p style="margin-top:32px;font-size:13px">
               After install: Settings → General → VPN &amp; Device Management → Trust the developer cert
@@ -154,8 +154,8 @@ jobs:
         run: |
           TAG="ios-build-${{ github.run_number }}"
           gh release create "$TAG" \
-            --title "Alysha iOS Build #${{ github.run_number }}" \
+            --title "Sol iOS Build #${{ github.run_number }}" \
             --notes "Ad-hoc iOS build. Open install.html in Safari on your iPhone to install." \
-            $RUNNER_TEMP/export/Alysha.ipa \
+            $RUNNER_TEMP/export/Sol.ipa \
             $RUNNER_TEMP/manifest.plist \
             $RUNNER_TEMP/install.html

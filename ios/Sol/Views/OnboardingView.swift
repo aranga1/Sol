@@ -35,7 +35,7 @@ struct OnboardingView: View {
                     .padding(.bottom, 40)
                 }
             }
-            .navigationTitle("Connect to Alysha")
+            .navigationTitle("Connect to Sol")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear { requestCameraPermission() }
         }

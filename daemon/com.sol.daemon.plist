@@ -2,7 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>Label</key><string>com.alysha.daemon</string>
+  <key>Label</key><string>com.sol.daemon</string>
   <key>ProgramArguments</key>
   <array>
     <string>DAEMON_VENV_PYTHON</string>
@@ -11,12 +11,12 @@
   </array>
   <key>EnvironmentVariables</key>
   <dict>
-    <key>ALYSHA_CONFIG</key><string>ALYSHA_CONFIG_PATH</string>
+    <key>SOL_CONFIG</key><string>SOL_CONFIG_PATH</string>
   </dict>
   <key>WorkingDirectory</key><string>DAEMON_REPO_DIR</string>
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key><true/>
-  <key>StandardOutPath</key><string>ALYSHA_LOG_PATH</string>
-  <key>StandardErrorPath</key><string>ALYSHA_LOG_PATH</string>
+  <key>StandardOutPath</key><string>SOL_LOG_PATH</string>
+  <key>StandardErrorPath</key><string>SOL_LOG_PATH</string>
 </dict>
 </plist>
