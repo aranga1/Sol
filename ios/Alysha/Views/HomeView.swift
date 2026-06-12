@@ -33,6 +33,8 @@ struct HomeView: View {
     // Capture bar
     @State private var barMode: CaptureMode = .ask
     @State private var popOpen = false
+    @State private var hoveredMode: CaptureMode? = nil
+    @State private var popupItemFrames: [CaptureMode: CGRect] = [:]
 
     // Background blobs
     @State private var blobPhase: Double = 0
@@ -61,10 +63,11 @@ struct HomeView: View {
                             .onTapGesture { withAnimation(.easeOut(duration: 0.18)) { popOpen = false } }
                             .zIndex(8)
 
-                        ModePopup(barMode: $barMode, popOpen: $popOpen)
+                        ModePopup(barMode: $barMode, popOpen: $popOpen, hoveredMode: $hoveredMode)
                             .zIndex(9)
                     }
                 }
+                .onPreferenceChange(ModeItemFrameKey.self) { popupItemFrames = $0 }
                 .navigationTitle("")
                 .navigationBarHidden(true)
                 .navigationDestination(isPresented: $navigateToQuery) {
@@ -267,6 +270,8 @@ struct HomeView: View {
             CaptureBar(
                 barMode: $barMode,
                 popOpen: $popOpen,
+                hoveredMode: $hoveredMode,
+                popupItemFrames: popupItemFrames,
                 queryText: $queryText,
                 navigateToQuery: $navigateToQuery,
                 showTextNote: $showTextNote,
@@ -407,11 +412,21 @@ private struct StatusPill: View {
     }
 }
 
+// MARK: - Mode item frame preference key
+
+private struct ModeItemFrameKey: PreferenceKey {
+    static let defaultValue: [CaptureMode: CGRect] = [:]
+    static func reduce(value: inout [CaptureMode: CGRect], nextValue: () -> [CaptureMode: CGRect]) {
+        value.merge(nextValue()) { $1 }
+    }
+}
+
 // MARK: - Mode Popup
 
 private struct ModePopup: View {
     @Binding var barMode: CaptureMode
     @Binding var popOpen: Bool
+    @Binding var hoveredMode: CaptureMode?
 
     @State private var appeared = false
 
@@ -422,15 +437,14 @@ private struct ModePopup: View {
     }
 
     private let options: [ModeOption] = [
-        ModeOption(mode: .ask, icon: "magnifyingglass", label: "Ask Vault"),
-        ModeOption(mode: .voice, icon: "mic.fill", label: "Voice Note"),
-        ModeOption(mode: .text, icon: "pencil", label: "Text Note"),
+        ModeOption(mode: .ask,   icon: "magnifyingglass", label: "Ask Vault"),
+        ModeOption(mode: .voice, icon: "mic.fill",         label: "Voice Note"),
+        ModeOption(mode: .text,  icon: "pencil",           label: "Text Note"),
     ]
 
     var body: some View {
-        GeometryReader { geo in
+        GeometryReader { _ in
             VStack(alignment: .leading, spacing: 8) {
-                // Bottom to top: Ask at top visually (we reverse)
                 ForEach(Array(options.reversed().enumerated()), id: \.offset) { idx, option in
                     modeRow(option: option, index: idx)
                 }
@@ -440,14 +454,15 @@ private struct ModePopup: View {
             .padding(.bottom, 110)
         }
         .onAppear {
-            withAnimation(.spring(response: 0.32, dampingFraction: 0.74)) {
-                appeared = true
-            }
+            withAnimation(.spring(response: 0.32, dampingFraction: 0.74)) { appeared = true }
         }
+        .onDisappear { hoveredMode = nil }
     }
 
     @ViewBuilder
     private func modeRow(option: ModeOption, index: Int) -> some View {
+        let isHovered = hoveredMode == option.mode
+
         Button {
             withAnimation(.easeOut(duration: 0.18)) { popOpen = false }
             barMode = option.mode
@@ -455,11 +470,11 @@ private struct ModePopup: View {
             HStack(spacing: 10) {
                 ZStack {
                     Circle()
-                        .fill(DS.terracottaFaint)
+                        .fill(isHovered ? DS.terracotta : DS.terracottaFaint)
                         .frame(width: 30, height: 30)
                     Image(systemName: option.icon)
                         .font(.system(size: 13))
-                        .foregroundStyle(DS.terracotta)
+                        .foregroundStyle(isHovered ? .white : DS.terracotta)
                 }
                 Text(option.label)
                     .font(.system(size: 14.5, weight: .semibold))
@@ -468,14 +483,30 @@ private struct ModePopup: View {
             .padding(.leading, 7)
             .padding(.trailing, 17)
             .padding(.vertical, 7)
-            .liquidGlass(shape: Capsule(), interactive: true)
+            .background {
+                if isHovered {
+                    // Brighter highlight when drag is over this item
+                    Capsule().fill(DS.terracotta.opacity(0.18))
+                }
+            }
+            .liquidGlass(shape: Capsule(), interactive: false)
+            .scaleEffect(isHovered ? 1.06 : 1.0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.6), value: isHovered)
         }
         .buttonStyle(.plain)
+        // Report this item's global frame so the drag gesture can hit-test it
+        .background(
+            GeometryReader { geo in
+                Color.clear.preference(
+                    key: ModeItemFrameKey.self,
+                    value: [option.mode: geo.frame(in: .global)]
+                )
+            }
+        )
         .scaleEffect(appeared ? 1.0 : 0.78)
         .offset(y: appeared ? 0 : 14)
         .animation(
-            .spring(response: 0.32, dampingFraction: 0.74)
-                .delay(Double(index) * 0.06),
+            .spring(response: 0.32, dampingFraction: 0.74).delay(Double(index) * 0.06),
             value: appeared
         )
     }
@@ -486,11 +517,17 @@ private struct ModePopup: View {
 struct CaptureBar: View {
     @Binding var barMode: CaptureMode
     @Binding var popOpen: Bool
+    @Binding var hoveredMode: CaptureMode?
+    var popupItemFrames: [CaptureMode: CGRect]
     @Binding var queryText: String
     @Binding var navigateToQuery: Bool
     @Binding var showTextNote: Bool
     @Binding var showVoiceNote: Bool
     @Binding var voiceTranscript: String
+
+    // Long-press-then-drag state for the mode button
+    @State private var pressTimer: Timer?
+    @State private var longPressActive = false
 
     @State private var recording = false
     @State private var recordSeconds = 0
@@ -519,38 +556,67 @@ struct CaptureBar: View {
     @ViewBuilder
     private var leftButton: some View {
         let isVoiceOrText = barMode == .voice || barMode == .text
-        Button {
-            // single tap no-op (long press is what matters)
-        } label: {
-            ZStack {
-                Circle()
-                    .fill(isVoiceOrText
-                          ? Color(hex: "#A23E2D").opacity(0.10)
-                          : Color(hex: "#2B2521").opacity(0.10))
-                    .frame(width: 40, height: 40)
-                    .overlay(
-                        Circle().strokeBorder(
-                            isVoiceOrText
-                                ? Color(hex: "#A23E2D").opacity(0.30)
-                                : Color.clear,
-                            lineWidth: 1
-                        )
+        ZStack {
+            Circle()
+                .fill(isVoiceOrText
+                      ? Color(hex: "#A23E2D").opacity(0.10)
+                      : Color(hex: "#2B2521").opacity(0.10))
+                .frame(width: 40, height: 40)
+                .overlay(
+                    Circle().strokeBorder(
+                        isVoiceOrText ? Color(hex: "#A23E2D").opacity(0.30) : Color.clear,
+                        lineWidth: 1
                     )
+                )
 
-                Image(systemName: barMode == .voice ? "mic.fill" : (barMode == .text ? "pencil" : "plus"))
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(isVoiceOrText ? DS.terracotta : DS.inkLight)
-            }
+            Image(systemName: barMode == .voice ? "mic.fill" : (barMode == .text ? "pencil" : "plus"))
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(isVoiceOrText ? DS.terracotta : DS.inkLight)
         }
-        .simultaneousGesture(
-            LongPressGesture(minimumDuration: 0.35)
-                .onEnded { _ in
-                    withAnimation(.spring(response: 0.32, dampingFraction: 0.74)) {
-                        popOpen = true
+        .frame(width: 40, height: 40)
+        .contentShape(Circle())
+        // Single continuous DragGesture handles long-press detection AND drag-to-select
+        .gesture(
+            DragGesture(minimumDistance: 0, coordinateSpace: .global)
+                .onChanged { value in
+                    // Phase 1: start the long-press timer on first touch
+                    if pressTimer == nil && !longPressActive {
+                        let haptic = UIImpactFeedbackGenerator(style: .medium)
+                        haptic.prepare()
+                        pressTimer = Timer.scheduledTimer(withTimeInterval: 0.45, repeats: false) { _ in
+                            haptic.impactOccurred()
+                            withAnimation(.spring(response: 0.32, dampingFraction: 0.74)) {
+                                popOpen = true
+                            }
+                            longPressActive = true
+                        }
+                    }
+                    // Phase 2: popup is open — update hover from drag position
+                    guard longPressActive else { return }
+                    let loc = value.location
+                    let newHover = popupItemFrames.first { $0.value.contains(loc) }?.key
+                    if newHover != hoveredMode {
+                        if newHover != nil {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        }
+                        hoveredMode = newHover
                     }
                 }
+                .onEnded { _ in
+                    pressTimer?.invalidate()
+                    pressTimer = nil
+                    guard longPressActive else { return }
+                    longPressActive = false
+                    if let chosen = hoveredMode {
+                        // Finger released over an item — select it
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        barMode = chosen
+                        hoveredMode = nil
+                        withAnimation(.easeOut(duration: 0.15)) { popOpen = false }
+                    }
+                    // No item hovered — leave popup open for a tap
+                }
         )
-        .buttonStyle(.plain)
     }
 
     // MARK: Middle section
