@@ -135,7 +135,9 @@ struct QueryView: View {
 
     var body: some View {
         ZStack {
-            DS.parchment.ignoresSafeArea()
+            // Breathing background shows through semi-transparent parchment
+            BreathingBackground()
+            DS.parchment.opacity(0.82).ignoresSafeArea()
 
             VStack(spacing: 0) {
                 // Overlay mode: show manual top bar (no NavigationStack wrapping us)
@@ -329,15 +331,12 @@ struct QueryView: View {
     private func assistantMessage(_ msg: ConversationMessage) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top, spacing: 10) {
-                // "A" avatar
-                ZStack {
-                    Circle()
-                        .fill(DS.terracottaGradient)
-                        .frame(width: 30, height: 30)
-                    Text("A")
-                        .font(DS.newsreader(16, weight: .semibold))
-                        .foregroundStyle(.white)
-                }
+                // Sol mark avatar
+                Image("SolMark")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 30, height: 30)
+                    .clipShape(Circle())
 
                 // Answer card
                 VStack(alignment: .leading, spacing: 0) {
@@ -394,9 +393,10 @@ struct QueryView: View {
                     ForEach(sources) { source in
                         Button { openInObsidian(source) } label: {
                             HStack(spacing: 10) {
-                                Image(systemName: "doc.fill")
-                                    .font(.system(size: 15))
-                                    .foregroundStyle(DS.terracotta)
+                                Image("SolTriad")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 20, height: 20)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(source.title)
                                         .font(.system(size: 13, weight: .medium))

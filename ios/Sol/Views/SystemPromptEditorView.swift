@@ -19,7 +19,7 @@ struct SystemPromptEditorView: View {
             VStack(spacing: 0) {
                 // Header — back chevron provided by NavigationStack; we add Save on the right
                 HStack {
-                    Button(action: onCancel) {
+                    Button { dismiss() } label: {
                         HStack(spacing: 4) {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 16, weight: .medium))

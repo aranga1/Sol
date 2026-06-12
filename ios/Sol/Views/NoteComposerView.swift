@@ -36,7 +36,8 @@ struct NoteComposerView: View {
 
     var body: some View {
         ZStack {
-            DS.parchmentMid.ignoresSafeArea()
+            BreathingBackground()
+            DS.parchmentMid.opacity(0.85).ignoresSafeArea()
 
             VStack(spacing: 0) {
                 header.padding(.top, 56)

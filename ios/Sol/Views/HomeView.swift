@@ -195,15 +195,12 @@ struct HomeView: View {
                 .padding(.top, 60)
                 .padding(.horizontal, 18)
 
-            // Sol mark + subtitle
-            VStack(spacing: 16) {
-                SolMarkView(size: 72)
-                Text("How can I help you today?")
-                    .font(DS.newsreader(19, weight: .regular, italic: true))
-                    .foregroundStyle(DS.inkDark.opacity(0.46))
-            }
-            .padding(.top, 26)
-            .frame(maxWidth: .infinity)
+            // Subtitle only — BreathingBackground renders the mark in center
+            Text("How can I help you today?")
+                .font(DS.newsreader(19, weight: .regular, italic: true))
+                .foregroundStyle(DS.inkDark.opacity(0.46))
+                .padding(.top, 14)
+                .frame(maxWidth: .infinity)
 
             Spacer()
 
