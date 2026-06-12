@@ -73,8 +73,12 @@ section "1 / 9  Dependencies"
 install_brew_pkg() {
   local pkg="$1" cask="${2:-}"
   local flags=(--quiet)
-  [[ -n "$cask" ]] && flags+=(--cask)
-  if brew list $cask "$pkg" &>/dev/null 2>&1; then
+  local list_flags=()
+  if [[ -n "$cask" ]]; then
+    flags+=(--cask)
+    list_flags+=(--cask)
+  fi
+  if brew list "${list_flags[@]}" "$pkg" &>/dev/null 2>&1; then
     skip "$pkg already installed"
   else
     spin "Installing $pkg..." brew install "${flags[@]}" "$pkg"
@@ -262,23 +266,10 @@ gum confirm \
 
 echo ""
 
-# Try to read the key from the plugin's data.json automatically
-OBSIDIAN_API_KEY_FROM_PLUGIN=""
-if [[ -f "$PLUGIN_DATA" ]]; then
-  OBSIDIAN_API_KEY_FROM_PLUGIN=$(python3 -c \
-    "import json; d=json.load(open('$PLUGIN_DATA')); print(d.get('apiKey',''))" 2>/dev/null || true)
-fi
-
-if [[ -n "$OBSIDIAN_API_KEY_FROM_PLUGIN" ]]; then
-  ok "API key read from plugin automatically — no action needed"
-else
-  gum style --foreground 226 "  Could not read the key automatically."
-  echo ""
-  gum style --foreground 245 "  In Obsidian: Settings → Community Plugins → Local REST API → Options"
-  gum style --foreground 245 "  Copy the value in the 'API Key' field and paste it below."
-  echo ""
-  OBSIDIAN_API_KEY_FROM_PLUGIN=$(gum input --placeholder "Paste the Obsidian Local REST API key here...")
-fi
+gum style --foreground 245 "  In Obsidian: Settings → Community Plugins → Local REST API → Options"
+gum style --foreground 245 "  Copy the value in the 'API Key' field and paste it below."
+echo ""
+OBSIDIAN_API_KEY_FROM_PLUGIN=$(gum input --placeholder "Paste the Obsidian Local REST API key here...")
 
 # Write the correct key into config.json
 step "Syncing Obsidian API key to config..."
@@ -360,15 +351,18 @@ ok "alysha CLI ready"
 # Add ~/.local/bin to PATH in shell rc files if not already present
 LOCAL_BIN="$HOME/.local/bin"
 PATH_LINE='export PATH="$HOME/.local/bin:$PATH"'
+RC_UPDATED=""
 for rc in "$HOME/.zshrc" "$HOME/.bashrc" "$HOME/.bash_profile"; do
+  # Create .zshrc if it doesn't exist (common on fresh macOS)
+  [[ "$rc" == "$HOME/.zshrc" ]] && touch "$rc"
   if [[ -f "$rc" ]] && ! grep -q "\.local/bin" "$rc"; then
     echo "" >> "$rc"
     echo "# Added by Alysha installer" >> "$rc"
     echo "$PATH_LINE" >> "$rc"
-    ok "Added ~/.local/bin to PATH in $rc"
+    ok "Added ~/.local/bin to PATH in $(basename $rc)"
+    RC_UPDATED="$rc"
   fi
 done
-export PATH="$LOCAL_BIN:$PATH"
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 echo ""
@@ -385,11 +379,21 @@ gum style "  Vault       $(gum style --foreground 245 "$VAULT_PATH")"
 gum style "  Daemon      $(gum style --foreground 245 "http://$TAILSCALE_IP:$DAEMON_PORT")"
 gum style "  Logs        $(gum style --foreground 245 "$CONFIG_DIR/daemon.log")"
 gum style "  Connect QR  $(gum style --foreground 245 "$CONFIG_DIR/alysha-connect.png")"
-gum style "  CLI         $(gum style --foreground 245 "alysha --help")"
+gum style "  CLI         $(gum style --foreground 245 "$LOCAL_BIN/alysha --help")"
 echo ""
 gum style --foreground 245 "  iPhone next steps:"
 gum style --foreground 245 "  1. Install Tailscale → sign in with the same account"
 gum style --foreground 245 "  2. Install Alysha (see GitHub Releases)"
 gum style --foreground 245 "  3. Scan the connection QR code printed above"
 gum style --foreground 245 "  4. Open Obsidian iOS → Open vault from iCloud → Alysha"
+echo ""
+gum style \
+  --border normal \
+  --border-foreground 33 \
+  --padding "0 2" \
+  "$(gum style --foreground 33 --bold "Activate the alysha command in this terminal:")
+
+  $(gum style --foreground 255 "source ~/.zshrc")
+
+  $(gum style --foreground 245 "Or open a new terminal — it will be available automatically from then on.")"
 echo ""
