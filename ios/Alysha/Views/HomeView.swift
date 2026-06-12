@@ -80,8 +80,10 @@ struct HomeView: View {
         }
     }
 
+    @MainActor
     private func openObsidianVault() {
-        guard let url = URL(string: "obsidian://open?vault=\(vaultName)"),
+        let encoded = vaultName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? vaultName
+        guard let url = URL(string: "obsidian://open?vault=\(encoded)"),
               UIApplication.shared.canOpenURL(url) else {
             showObsidianAlert = true
             return
