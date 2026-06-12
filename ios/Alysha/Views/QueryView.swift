@@ -64,20 +64,23 @@ struct QueryView: View {
     var initialQuestion: String = ""
     var existingSession: ConversationSession? = nil
     var onDismiss: (() -> Void)? = nil
+    var onOpenDrawer: (() -> Void)? = nil  // overlay mode: open home drawer
     @State private var vm: QueryViewModel
     @State private var scrollID: UUID?
     @State private var thinkPhase = false
     @Environment(\.dismiss) private var dismiss
 
-    init(initialQuestion: String = "", onDismiss: (() -> Void)? = nil) {
+    init(initialQuestion: String = "", onDismiss: (() -> Void)? = nil, onOpenDrawer: (() -> Void)? = nil) {
         self.initialQuestion = initialQuestion
         self.onDismiss = onDismiss
+        self.onOpenDrawer = onOpenDrawer
         _vm = State(initialValue: QueryViewModel())
     }
 
-    init(session: ConversationSession, onDismiss: (() -> Void)? = nil) {
+    init(session: ConversationSession, onDismiss: (() -> Void)? = nil, onOpenDrawer: (() -> Void)? = nil) {
         self.existingSession = session
         self.onDismiss = onDismiss
+        self.onOpenDrawer = onOpenDrawer
         _vm = State(initialValue: QueryViewModel())
     }
 
@@ -90,6 +93,8 @@ struct QueryView: View {
             DS.parchment.ignoresSafeArea()
 
             VStack(spacing: 0) {
+                // Overlay mode: show manual top bar (no NavigationStack wrapping us)
+                if onDismiss != nil { overlayTopBar }
                 ScrollViewReader { proxy in
                     ScrollView {
                         VStack(alignment: .leading, spacing: 0) {
@@ -188,6 +193,16 @@ struct QueryView: View {
             }
         }
         .navigationBarBackButtonHidden(onDismiss != nil)
+        // Swipe right from left 40% of screen → open drawer (overlay mode)
+        .gesture(
+            DragGesture(minimumDistance: 20)
+                .onEnded { v in
+                    let sw = UIScreen.main.bounds.width
+                    if v.translation.width > 60 && v.startLocation.x < sw * 0.4 {
+                        onOpenDrawer?()
+                    }
+                }
+        )
         .onAppear {
             if let session = existingSession {
                 vm.loadSession(session)
@@ -195,6 +210,49 @@ struct QueryView: View {
                 Task { await vm.ask(initialQuestion) }
             }
         }
+    }
+
+    // MARK: - Overlay top bar (shown when presented as full-screen overlay, not via NavigationLink)
+
+    private var overlayTopBar: some View {
+        HStack(spacing: 0) {
+            // Hamburger — opens home drawer while staying in chat
+            Button { onOpenDrawer?() } label: {
+                VStack(spacing: 4.5) {
+                    ForEach(0..<3, id: \.self) { _ in
+                        RoundedRectangle(cornerRadius: 1.5)
+                            .fill(DS.inkMid)
+                            .frame(width: 18, height: 1.8)
+                    }
+                }
+                .frame(width: 42, height: 42)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            Spacer()
+
+            Text("Ask Alysha")
+                .font(DS.newsreader(20, weight: .medium))
+                .foregroundStyle(DS.inkDark)
+
+            Spacer()
+
+            // X to dismiss chat
+            Button(action: goBack) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(DS.inkMid)
+                    .frame(width: 42, height: 42)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 12)
+        .padding(.top, 54)
+        .padding(.bottom, 10)
+        .background(DS.parchment)
+        .overlay(alignment: .bottom) { Divider() }
     }
 
     // MARK: - User bubble

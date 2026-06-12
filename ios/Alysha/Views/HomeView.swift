@@ -77,7 +77,7 @@ struct HomeView: View {
                     .ignoresSafeArea()
                     .onTapGesture { closeDrawer() }
                     .transition(.opacity)
-                    .zIndex(10)
+                    .zIndex(24)  // just below the drawer (25)
                     .animation(.easeInOut(duration: 0.28), value: drawerOpen)
             }
 
@@ -98,15 +98,15 @@ struct HomeView: View {
             .shadow(color: .black.opacity(0.18), radius: 16, x: 6)
             .offset(x: drawerOpen ? 0 : -drawerWidth)
             .animation(.easeInOut(duration: 0.28), value: drawerOpen)
-            .zIndex(11)
+            .zIndex(25)  // above chat (20) and composer (21) so drawer overlays everything
 
             // ── Chat overlay (slides up) ───────────────────────────────────
             if showChat {
                 Group {
                     if let session = chatSession {
-                        QueryView(session: session, onDismiss: dismissChat)
+                        QueryView(session: session, onDismiss: dismissChat, onOpenDrawer: openDrawer)
                     } else {
-                        QueryView(initialQuestion: chatQuestion, onDismiss: dismissChat)
+                        QueryView(initialQuestion: chatQuestion, onDismiss: dismissChat, onOpenDrawer: openDrawer)
                     }
                 }
                 .transition(.move(edge: .bottom))
@@ -138,7 +138,8 @@ struct HomeView: View {
             DragGesture(minimumDistance: 20)
                 .onEnded { v in
                     guard !showChat && !showComposer else { return }
-                    if v.translation.width > 60 && v.startLocation.x < 44 { openDrawer() }
+                    let sw = UIScreen.main.bounds.width
+                    if v.translation.width > 60 && v.startLocation.x < sw * 0.4 { openDrawer() }
                     else if v.translation.width < -60 { closeDrawer() }
                 }
         )
@@ -724,7 +725,7 @@ struct CaptureBar: View {
         switch barMode {
         case .ask:
             Button {
-                if !queryText.isEmpty { navigateToQuery = true }
+                if !queryText.isEmpty { let q = queryText; queryText = ""; onSendQuery(q) }
             } label: {
                 ZStack {
                     Circle()
@@ -741,7 +742,7 @@ struct CaptureBar: View {
 
         case .text:
             Button {
-                showTextNote = true
+                onOpenTextComposer()
             } label: {
                 ZStack {
                     Circle()
