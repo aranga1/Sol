@@ -99,6 +99,17 @@ final class APIClient: ObservableObject {
         catch { throw AlyshAPIError.decodingError(error) }
     }
 
+    func fetchNotifications() async throws -> [DaemonNotification] {
+        let req = try makeRequest("/api/notifications")
+        let (data, response) = try await session.data(for: req)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            throw AlyshAPIError.httpError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0)
+        }
+        struct Resp: Decodable { let notifications: [DaemonNotification] }
+        do { return try JSONDecoder().decode(Resp.self, from: data).notifications }
+        catch { throw AlyshAPIError.decodingError(error) }
+    }
+
     func query(_ q: QueryRequest) async throws -> QueryResponse {
         var req = try makeRequest("/api/query", method: "POST", body: q)
         req.timeoutInterval = 120  // LLM inference can take 30-60s

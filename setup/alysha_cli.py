@@ -209,6 +209,37 @@ def cmd_import_notes(_args):
         subprocess.run(["open", "-a", "Obsidian"], check=False)
 
 
+def cmd_notify(args):
+    if len(args) < 2:
+        fail("Usage: alysha notify <title> <body> [info|warning|update]")
+        sys.exit(1)
+    title = args[0]
+    body  = args[1]
+    kind  = args[2] if len(args) > 2 else "info"
+
+    cfg  = load_config()
+    port = cfg.get("daemon_port", 8765)
+    key  = cfg.get("daemon_api_key", "")
+
+    payload = json.dumps({"title": title, "body": body, "type": kind}).encode()
+    req = urllib.request.Request(
+        f"http://localhost:{port}/api/notify",
+        data=payload,
+        headers={"X-API-Key": key, "Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=5):
+            pass
+        ok(f"Notification queued — bring the app to foreground to receive it")
+        info(f"Title: {title}")
+        info(f"Body:  {body}")
+        info(f"Type:  {kind}")
+    except urllib.error.URLError as e:
+        fail(f"Could not reach daemon: {e}")
+        sys.exit(1)
+
+
 def cmd_update_ios(_args):
     print()
     step("Checking for iOS updates…")
@@ -303,6 +334,7 @@ USAGE = f"""\
   {cyan('uninstall')}     Run the uninstall script
   {cyan('qr')}            Regenerate the iPhone connection QR code
   {cyan('import-notes')}  Open Obsidian and walk through Apple Notes import
+  {cyan('notify')}        Queue a notification to your iPhone  (title body [type])
   {cyan('update-ios')}    Check for a new iOS app release and show install QR
 
 {bold('OPTIONS')}
@@ -322,6 +354,7 @@ COMMANDS = {
     "uninstall":    cmd_uninstall,
     "qr":           cmd_qr,
     "import-notes": cmd_import_notes,
+    "notify":       cmd_notify,
     "update-ios":   cmd_update_ios,
     "_install-shim": cmd_install_shim,  # called by install.sh
 }

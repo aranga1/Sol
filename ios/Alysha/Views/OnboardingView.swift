@@ -74,6 +74,7 @@ struct OnboardingView: View {
         }
         let config = ConnectionConfig(host: host, port: port, apiKey: apiKey)
         KeychainService.save(config)
+        NotificationService.shared.requestAuthorization()
         onConnected()
     }
 }

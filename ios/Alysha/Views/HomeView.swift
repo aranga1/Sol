@@ -12,6 +12,7 @@ struct HomeView: View {
     @State private var navigateToQuery = false
     @State private var showSettings = false
     @State private var showObsidianAlert = false
+    @State private var showHistory = false
 
     var body: some View {
         NavigationStack {
@@ -59,6 +60,11 @@ struct HomeView: View {
                         Image(systemName: "gearshape").foregroundStyle(.secondary)
                     }
                 }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button { showHistory = true } label: {
+                        Image(systemName: "clock").foregroundStyle(.secondary)
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     // Owns its own VM — only this view re-renders on status changes
                     DaemonStatusIndicator { isConnected = $0 }
@@ -66,6 +72,9 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showSettings) {
                 SettingsView(onResetConnection: onResetConnection)
+            }
+            .sheet(isPresented: $showHistory) {
+                HistoryView()
             }
             .sheet(isPresented: $showVoiceNote) { VoiceNoteView() }
             .sheet(isPresented: $showTextNote) { TextNoteView(onSuccess: {}) }

@@ -21,9 +21,16 @@ struct QueryResponse: Codable {
     let sources: [SourceItem]
 }
 
-struct ConversationMessage: Identifiable {
-    let id = UUID()
+struct ConversationMessage: Identifiable, Codable {
+    let id: UUID
     let question: String
     let answer: String
     let sources: [SourceItem]
+
+    init(question: String, answer: String, sources: [SourceItem]) {
+        self.id = UUID()
+        self.question = question
+        self.answer = answer
+        self.sources = sources
+    }
 }

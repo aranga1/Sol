@@ -3,6 +3,7 @@ import SwiftUI
 @main
 struct AlyshApp: App {
     @State private var isOnboarded = KeychainService.load() != nil
+    @Environment(\.scenePhase) private var scenePhase
     @State private var deepLinkTarget: DeepLinkTarget?
     @State private var pendingDeepLink: DeepLinkTarget?
 
@@ -32,6 +33,11 @@ struct AlyshApp: App {
                         }
                 } else {
                     OnboardingView(onConnected: { isOnboarded = true })
+                }
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active && isOnboarded {
+                    NotificationService.shared.fetchAndDeliver()
                 }
             }
             .onOpenURL { url in

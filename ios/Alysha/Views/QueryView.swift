@@ -9,6 +9,14 @@ private final class QueryViewModel {
     var errorMessage: String?
     var followUpText = ""
 
+    private var session: ConversationSession?
+
+    func loadHistory(_ history: [ConversationMessage]) {
+        messages = history
+        // Reconstruct session so continued conversations update the existing record
+        session = ConversationSession(id: UUID(), startedAt: Date(), messages: history)
+    }
+
     func ask(_ q: String) async {
         guard !q.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         isLoading = true
@@ -25,22 +33,35 @@ private final class QueryViewModel {
                 QueryRequest(question: q, history: history.isEmpty ? nil : history)
             )
             pendingQuestion = nil
-            messages.append(ConversationMessage(question: q, answer: resp.answer, sources: resp.sources))
+            let msg = ConversationMessage(question: q, answer: resp.answer, sources: resp.sources)
+            messages.append(msg)
+            persistSession()
         } catch {
             pendingQuestion = nil
             errorMessage = error.localizedDescription
         }
         isLoading = false
     }
+
+    private func persistSession() {
+        if session == nil {
+            session = ConversationSession(id: UUID(), startedAt: Date(), messages: messages)
+        } else {
+            session!.messages = messages
+        }
+        HistoryStore.shared.save(session!)
+    }
 }
 
 struct QueryView: View {
     var initialQuestion: String = ""
+    var initialHistory: [ConversationMessage] = []
     @State private var vm: QueryViewModel
     @State private var scrollID: UUID?
 
-    init(initialQuestion: String = "") {
+    init(initialQuestion: String = "", initialHistory: [ConversationMessage] = []) {
         self.initialQuestion = initialQuestion
+        self.initialHistory = initialHistory
         _vm = State(initialValue: QueryViewModel())
     }
 
@@ -152,7 +173,7 @@ struct QueryView: View {
                         .padding()
                     }
 
-                    // Empty state (no messages yet)
+                    // Empty state
                     if vm.messages.isEmpty && !vm.isLoading {
                         Text("Ask anything about your notes.")
                             .foregroundStyle(.tertiary)
@@ -160,7 +181,7 @@ struct QueryView: View {
                             .padding(.top, 60)
                     }
 
-                    Color.clear.frame(height: 80)  // space above input bar
+                    Color.clear.frame(height: 80)
                 }
                 .padding(.top)
             }
@@ -180,7 +201,9 @@ struct QueryView: View {
         .navigationTitle("Ask Alysha")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            if !initialQuestion.isEmpty && vm.messages.isEmpty && !vm.isLoading {
+            if !initialHistory.isEmpty {
+                vm.loadHistory(initialHistory)
+            } else if !initialQuestion.isEmpty && vm.messages.isEmpty && !vm.isLoading {
                 Task { await vm.ask(initialQuestion) }
             }
         }
@@ -210,6 +233,7 @@ struct QueryView: View {
         Task { await vm.ask(q) }
     }
 
+    @MainActor
     private func openInObsidian(_ source: SourceItem) {
         let encoded = source.file.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? source.file
         guard let url = URL(string: "obsidian://open?vault=Alysha&file=\(encoded)") else { return }
