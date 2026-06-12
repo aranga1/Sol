@@ -182,7 +182,7 @@ def cmd_qr(_args):
 
     subprocess.run([
         str(VENV_PYTHON), str(SCRIPT_DIR / "qr_generate.py"),
-        "--host", ip, "--port", str(port), "--api-key", api_key,
+        "--host", ip, "--port", str(port), f"--api-key={api_key}",
         "--output", str(out_file), "--terminal"
     ], check=True)
 

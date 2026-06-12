@@ -8,7 +8,7 @@ def main():
     # Connection QR mode
     parser.add_argument("--host")
     parser.add_argument("--port", type=int)
-    parser.add_argument("--api-key")
+    parser.add_argument("--api-key", default=None, metavar="KEY")
     # Generic URL QR mode (e.g. for shortcut install links)
     parser.add_argument("--url", help="Encode a raw URL instead of connection JSON")
     parser.add_argument("--label", default="Scan with Sol iOS app",

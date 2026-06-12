@@ -298,7 +298,7 @@ step "Generating connection QR code..."
 "$VENV/bin/python" "$SCRIPT_DIR/qr_generate.py" \
   --host "$TAILSCALE_IP" \
   --port "$DAEMON_PORT" \
-  --api-key "$DAEMON_API_KEY" \
+  --api-key="$DAEMON_API_KEY" \
   --output "$CONFIG_DIR/sol-connect.png" \
   --terminal
 
