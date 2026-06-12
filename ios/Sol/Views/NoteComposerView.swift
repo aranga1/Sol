@@ -18,6 +18,7 @@ struct NoteComposerView: View {
     @State private var selectedTags: [String] = []
     @State private var tagInput = ""
     @State private var showTagSuggestions = false
+    @FocusState private var tagFieldFocused: Bool
     @State private var isEditorFocused = false
     @State private var isSending = false
     @State private var errorMessage: String?
@@ -143,119 +144,160 @@ struct NoteComposerView: View {
         VStack(alignment: .leading, spacing: 0) {
             Divider()
 
-            // Chips + input row
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    // Tap tag icon to toggle suggestion dropdown
-                    Button {
-                        showTagSuggestions.toggle()
-                    } label: {
-                        Image(systemName: showTagSuggestions ? "tag.fill" : "tag")
-                            .font(.system(size: 14))
-                            .foregroundStyle(showTagSuggestions ? DS.terracotta : DS.inkFaint)
-                            .frame(width: 28, height: 28)
-                            .contentShape(Rectangle())
+            // ── Selected chips row ────────────────────────────────────────────
+            HStack(spacing: 0) {
+                // Tag button
+                Button {
+                    showTagSuggestions.toggle()
+                    if showTagSuggestions {
+                        tagFieldFocused = true
+                    } else {
+                        tagInput = ""
+                        tagFieldFocused = false
                     }
-                    .buttonStyle(.plain)
-
-                    ForEach(selectedTags, id: \.self) { tag in
-                        HStack(spacing: 4) {
-                            Text("#\(tag)")
-                                .font(.system(size: 13, weight: .medium))
-                                .foregroundStyle(DS.terracottaDark)
-                            Button {
-                                selectedTags.removeAll { $0 == tag }
-                            } label: {
-                                Image(systemName: "xmark")
-                                    .font(.system(size: 9, weight: .bold))
-                                    .foregroundStyle(DS.inkLight)
-                            }
-                        }
-                        .padding(.horizontal, 9)
-                        .padding(.vertical, 5)
-                        .background(DS.terracotta.opacity(0.08), in: Capsule())
-                        .overlay(Capsule().strokeBorder(DS.terracotta.opacity(0.22), lineWidth: 1))
-                    }
-
-                    TextField("Add tag…", text: $tagInput)
+                } label: {
+                    Image(systemName: showTagSuggestions ? "tag.fill" : "tag")
                         .font(.system(size: 14))
-                        .foregroundStyle(DS.inkDark)
-                        .frame(minWidth: 80)
-                        .submitLabel(.done)
-                        .onSubmit { commitTagInput() }
-                        .onChange(of: tagInput) { _, v in
-                            if !v.isEmpty { showTagSuggestions = true }
-                        }
+                        .foregroundStyle(showTagSuggestions ? DS.terracotta : DS.inkFaint)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-            }
+                .buttonStyle(.plain)
 
-            // Suggestion chips — shown when dropdown open
-            if showTagSuggestions {
-                let suggestions = tagStore.suggestions(for: tagInput, excluding: selectedTags)
-                if !suggestions.isEmpty || !tagInput.isEmpty {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 8) {
-                            // Vault suggestions
-                            ForEach(suggestions, id: \.self) { tag in
+                if selectedTags.isEmpty && !showTagSuggestions {
+                    Text("Add tags…")
+                        .font(.system(size: 14))
+                        .foregroundStyle(DS.inkFaint)
+                }
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(selectedTags, id: \.self) { tag in
+                            HStack(spacing: 4) {
+                                Text("#\(tag)")
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundStyle(DS.terracottaDark)
                                 Button {
+                                    selectedTags.removeAll { $0 == tag }
+                                } label: {
+                                    Image(systemName: "xmark")
+                                        .font(.system(size: 9, weight: .bold))
+                                        .foregroundStyle(DS.inkLight)
+                                }
+                            }
+                            .padding(.horizontal, 9)
+                            .padding(.vertical, 5)
+                            .background(DS.terracotta.opacity(0.08), in: Capsule())
+                            .overlay(Capsule().strokeBorder(DS.terracotta.opacity(0.22), lineWidth: 1))
+                        }
+                    }
+                    .padding(.trailing, 12)
+                }
+            }
+            .frame(height: 44)
+
+            // ── Search + create panel ─────────────────────────────────────────
+            if showTagSuggestions {
+                VStack(alignment: .leading, spacing: 0) {
+                    Divider()
+
+                    // Search / create input
+                    HStack(spacing: 10) {
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 14))
+                            .foregroundStyle(DS.inkFaint)
+                        TextField("Search or create tag…", text: $tagInput)
+                            .font(.system(size: 15))
+                            .foregroundStyle(DS.inkDark)
+                            .focused($tagFieldFocused)
+                            .submitLabel(.done)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                            .onSubmit { commitTagInput() }
+                        if !tagInput.isEmpty {
+                            Button { tagInput = "" } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundStyle(DS.inkFaint)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 11)
+
+                    Divider()
+
+                    // Results list (max 6 rows so it doesn't eat the screen)
+                    let trimmed = tagInput
+                        .trimmingCharacters(in: .whitespacesAndNewlines)
+                        .trimmingCharacters(in: CharacterSet(charactersIn: "#"))
+                    let suggestions = tagStore.suggestions(for: tagInput, excluding: selectedTags)
+
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 0) {
+                            // "Create new tag" row — always first when typed
+                            if !trimmed.isEmpty && !suggestions.contains(where: { $0.lowercased() == trimmed.lowercased() }) {
+                                tagRow(label: "Create \"\(trimmed)\"", icon: "plus.circle.fill", tinted: true) {
+                                    if !selectedTags.contains(trimmed) {
+                                        selectedTags.append(trimmed)
+                                        Task { await tagStore.createTag(trimmed) }
+                                    }
+                                    tagInput = ""
+                                    showTagSuggestions = false
+                                    tagFieldFocused = false
+                                }
+                                if !suggestions.isEmpty { Divider().padding(.leading, 16) }
+                            }
+
+                            // Vault matches
+                            ForEach(Array(suggestions.prefix(6).enumerated()), id: \.offset) { idx, tag in
+                                tagRow(label: "#\(tag)", icon: "tag", tinted: false) {
                                     selectedTags.append(tag)
                                     tagInput = ""
                                     showTagSuggestions = false
-                                } label: {
-                                    Text("#\(tag)")
-                                        .font(.system(size: 13))
-                                        .foregroundStyle(DS.inkMid)
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 6)
-                                        .background(DS.parchmentCard, in: Capsule())
-                                        .overlay(Capsule().strokeBorder(DS.inkDark.opacity(0.1), lineWidth: 1))
+                                    tagFieldFocused = false
                                 }
-                                .buttonStyle(.plain)
+                                if idx < min(suggestions.count, 6) - 1 {
+                                    Divider().padding(.leading, 16)
+                                }
                             }
 
-                            // "Create #newtag" button when input isn't in vault
-                            let trimmed = tagInput.trimmingCharacters(in: .whitespacesAndNewlines)
-                                .trimmingCharacters(in: CharacterSet(charactersIn: "#"))
-                            if !trimmed.isEmpty && !suggestions.contains(trimmed) {
-                                Button {
-                                    if !selectedTags.contains(trimmed) {
-                                        selectedTags.append(trimmed)
-                                        Task { await tagStore.createTag(trimmed) }  // persist to vault
-                                    }
-                                    tagInput = ""
-                                    showTagSuggestions = false
-                                } label: {
-                                    HStack(spacing: 5) {
-                                        Image(systemName: "plus")
-                                            .font(.system(size: 11, weight: .semibold))
-                                        Text("Create #\(trimmed)")
-                                            .font(.system(size: 13, weight: .medium))
-                                    }
-                                    .foregroundStyle(DS.terracotta)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 6)
-                                    .background(DS.terracotta.opacity(0.07), in: Capsule())
-                                    .overlay(Capsule().strokeBorder(DS.terracotta.opacity(0.2), lineWidth: 1))
-                                }
-                                .buttonStyle(.plain)
+                            if trimmed.isEmpty && suggestions.isEmpty {
+                                Text("Type a name to create your first tag")
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(DS.inkFaint)
+                                    .padding(16)
                             }
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 10)
                     }
-                } else {
-                    // No vault tags at all — show hint
-                    Text("Type a tag name to create one")
-                        .font(.system(size: 13))
-                        .foregroundStyle(DS.inkFaint)
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 10)
+                    .frame(maxHeight: 220)
                 }
+                .background(DS.parchmentCard)
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
         }
         .background(DS.parchmentMid)
+        .animation(.easeOut(duration: 0.18), value: showTagSuggestions)
+    }
+
+    @ViewBuilder
+    private func tagRow(label: String, icon: String, tinted: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 14))
+                    .foregroundStyle(tinted ? DS.terracotta : DS.inkFaint)
+                    .frame(width: 20)
+                Text(label)
+                    .font(.system(size: 15))
+                    .foregroundStyle(tinted ? DS.terracotta : DS.inkDark)
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     // ── Actions ───────────────────────────────────────────────────────────────
