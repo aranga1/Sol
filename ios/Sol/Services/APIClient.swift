@@ -20,9 +20,11 @@ enum SolAPIError: LocalizedError {
 struct HealthResponse: Decodable {
     let status: String
     let vaultNoteCount: Int
+    let vaultName: String?        // nil on older daemon versions
     enum CodingKeys: String, CodingKey {
         case status
         case vaultNoteCount = "vault_note_count"
+        case vaultName      = "vault_name"
     }
 }
 

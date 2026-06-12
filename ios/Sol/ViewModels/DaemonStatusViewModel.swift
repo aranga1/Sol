@@ -32,8 +32,14 @@ final class DaemonStatusViewModel {
 
     private func ping() async {
         do {
-            _ = try await client.health()
+            let response = try await client.health()
             if status != .reachable { status = .reachable }
+            // Persist vault name so the app can open the correct Obsidian vault
+            if let name = response.vaultName, !name.isEmpty,
+               var config = KeychainService.load(), config.vaultName != name {
+                config.vaultName = name
+                KeychainService.save(config)
+            }
         } catch {
             if status != .unreachable { status = .unreachable }
         }

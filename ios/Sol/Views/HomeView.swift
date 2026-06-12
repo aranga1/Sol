@@ -1,6 +1,6 @@
 import SwiftUI
 
-private let vaultName = "Sol"
+private var vaultName: String { KeychainService.load()?.vaultName ?? "Alysha" }
 private let drawerFraction: CGFloat = 0.82
 
 // MARK: - Mode enum
