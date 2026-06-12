@@ -3,7 +3,7 @@ import SwiftUI
 private func markdownText(_ raw: String) -> Text {
     if let attributed = try? AttributedString(
         markdown: raw,
-        options: .init(interpretedSyntax: .inlinesOnlyPreservingWhitespace)
+        options: .init(interpretedSyntax: .inlinesOnly)
     ) {
         return Text(attributed)
     }
