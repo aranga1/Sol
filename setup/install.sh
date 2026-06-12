@@ -350,6 +350,26 @@ else
   skip "Apple Notes import skipped — run setup again any time to import"
 fi
 
+# ── CLI shim ──────────────────────────────────────────────────────────────────
+section "CLI  alysha command"
+
+step "Installing alysha CLI shim..."
+"$VENV/bin/python" "$SCRIPT_DIR/alysha_cli.py" _install-shim
+ok "alysha CLI ready"
+
+# Add ~/.local/bin to PATH in shell rc files if not already present
+LOCAL_BIN="$HOME/.local/bin"
+PATH_LINE='export PATH="$HOME/.local/bin:$PATH"'
+for rc in "$HOME/.zshrc" "$HOME/.bashrc" "$HOME/.bash_profile"; do
+  if [[ -f "$rc" ]] && ! grep -q "\.local/bin" "$rc"; then
+    echo "" >> "$rc"
+    echo "# Added by Alysha installer" >> "$rc"
+    echo "$PATH_LINE" >> "$rc"
+    ok "Added ~/.local/bin to PATH in $rc"
+  fi
+done
+export PATH="$LOCAL_BIN:$PATH"
+
 # ── Summary ───────────────────────────────────────────────────────────────────
 echo ""
 gum style \
@@ -365,6 +385,7 @@ gum style "  Vault       $(gum style --foreground 245 "$VAULT_PATH")"
 gum style "  Daemon      $(gum style --foreground 245 "http://$TAILSCALE_IP:$DAEMON_PORT")"
 gum style "  Logs        $(gum style --foreground 245 "$CONFIG_DIR/daemon.log")"
 gum style "  Connect QR  $(gum style --foreground 245 "$CONFIG_DIR/alysha-connect.png")"
+gum style "  CLI         $(gum style --foreground 245 "alysha --help")"
 echo ""
 gum style --foreground 245 "  iPhone next steps:"
 gum style --foreground 245 "  1. Install Tailscale → sign in with the same account"
