@@ -3,63 +3,148 @@ import SwiftUI
 struct AllChatsView: View {
     @ObservedObject private var store = HistoryStore.shared
 
-    var body: some View {
-        List {
-            ForEach(store.sessions) { session in
-                NavigationLink {
-                    QueryView(session: session)
-                } label: {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(session.title)
-                            .font(.body)
-                            .foregroundStyle(.primary)
-                            .lineLimit(2)
-                        HStack {
-                            Text("\(session.messages.count) message\(session.messages.count == 1 ? "" : "s")")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            Spacer()
-                            Text(session.startedAt.formatted(date: .abbreviated, time: .shortened))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .padding(.vertical, 2)
-                }
-                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                    Button(role: .destructive) {
-                        store.delete(session)
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-                }
-                .contextMenu {
-                    Button(role: .destructive) {
-                        store.delete(session)
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-                } preview: {
-                    ConversationPreviewCard(session: session)
-                }
-            }
+    // MARK: - Grouping
+
+    private var today: [ConversationSession] {
+        let cal = Calendar.current
+        return store.sessions.filter { cal.isDateInToday($0.startedAt) }
+    }
+
+    private var thisWeek: [ConversationSession] {
+        let cal = Calendar.current
+        return store.sessions.filter {
+            !cal.isDateInToday($0.startedAt) && cal.isDate($0.startedAt, equalTo: Date(), toGranularity: .weekOfYear)
         }
-        .listStyle(.plain)
-        .navigationTitle("All Chats")
-        .navigationBarTitleDisplayMode(.inline)
-        .overlay {
+    }
+
+    private var earlier: [ConversationSession] {
+        let cal = Calendar.current
+        return store.sessions.filter {
+            !cal.isDate($0.startedAt, equalTo: Date(), toGranularity: .weekOfYear)
+        }
+    }
+
+    var body: some View {
+        ZStack {
+            DS.parchment.ignoresSafeArea()
+
             if store.sessions.isEmpty {
                 ContentUnavailableView(
                     "No conversations yet",
                     systemImage: "clock",
                     description: Text("Past conversations will appear here.")
                 )
+                .foregroundStyle(DS.inkFaint)
+            } else {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        if !today.isEmpty {
+                            sessionSection(title: "TODAY", sessions: today)
+                        }
+                        if !thisWeek.isEmpty {
+                            sessionSection(title: "THIS WEEK", sessions: thisWeek)
+                        }
+                        if !earlier.isEmpty {
+                            sessionSection(title: "EARLIER", sessions: earlier)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 20)
+                    .padding(.bottom, 40)
+                }
+            }
+        }
+        .navigationTitle("All Chats")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(DS.parchment, for: .navigationBar)
+        .toolbarColorScheme(.light, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("All Chats")
+                    .font(DS.newsreader(20, weight: .medium))
+                    .foregroundStyle(DS.inkDark)
             }
         }
     }
+
+    // MARK: - Section
+
+    @ViewBuilder
+    private func sessionSection(title: String, sessions: [ConversationSession]) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.system(size: 11, weight: .bold))
+                .foregroundStyle(DS.inkFaint)
+                .kerning(0.18 * 11)
+
+            VStack(spacing: 10) {
+                ForEach(sessions) { session in
+                    NavigationLink {
+                        QueryView(session: session)
+                    } label: {
+                        sessionCard(session)
+                    }
+                    .buttonStyle(.plain)
+                    .contextMenu {
+                        Button(role: .destructive) {
+                            store.delete(session)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    } preview: {
+                        ConversationPreviewCard(session: session)
+                    }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            store.delete(session)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Session card
+
+    private func sessionCard(_ session: ConversationSession) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(session.title)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(DS.inkDark)
+                .lineLimit(2)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            HStack {
+                let count = session.messages.count
+                Text("\(count) message\(count == 1 ? "" : "s")")
+                    .font(.system(size: 12))
+                    .foregroundStyle(DS.terracottaDark)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 3)
+                    .background(DS.terracotta.opacity(0.08), in: Capsule())
+
+                Spacer()
+
+                Text(session.startedAt.formatted(.dateTime.month(.abbreviated).day().hour().minute()))
+                    .font(.system(size: 12.5))
+                    .foregroundStyle(DS.inkFaint)
+            }
+            .padding(.top, 11)
+        }
+        .padding(16)
+        .background(DS.parchmentCard, in: RoundedRectangle(cornerRadius: DS.radiusCard))
+        .overlay(
+            RoundedRectangle(cornerRadius: DS.radiusCard)
+                .strokeBorder(DS.inkDark.opacity(0.07), lineWidth: 1)
+        )
+        .shadow(color: Color(hex: "#50321E").opacity(0.30), radius: 8, x: 0, y: 2)
+    }
 }
 
-// Shared preview card — same bubble style used in HistoryView
+// MARK: - Conversation preview card (context menu)
+
 struct ConversationPreviewCard: View {
     let session: ConversationSession
 
@@ -73,28 +158,29 @@ struct ConversationPreviewCard: View {
                             .font(.caption)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)
-                            .background(Color.indigo, in: RoundedRectangle(cornerRadius: 12))
-                            .foregroundStyle(.white)
+                            .background(DS.terracottaGradient, in: RoundedRectangle(cornerRadius: 12))
+                            .foregroundStyle(Color(hex: "#FDF3EE"))
                     }
                     HStack {
                         Text(msg.answer)
                             .font(.caption)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)
-                            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
+                            .background(DS.parchmentCard, in: RoundedRectangle(cornerRadius: 12))
+                            .foregroundStyle(DS.inkDark)
                         Spacer(minLength: 32)
                     }
                 }
             }
             if session.messages.count > 3 {
-                Text("+ \(session.messages.count - 3) more…")
+                Text("+ \(session.messages.count - 3) more\u{2026}")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(DS.inkFaint)
                     .frame(maxWidth: .infinity, alignment: .center)
             }
         }
         .padding(12)
         .frame(minWidth: 260, maxWidth: 340)
-        .background(Color(.systemBackground))
+        .background(DS.parchment)
     }
 }
