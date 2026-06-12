@@ -2,62 +2,54 @@ import SwiftUI
 
 struct HistoryView: View {
     @ObservedObject private var store = HistoryStore.shared
-    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if store.sessions.isEmpty {
-                    ContentUnavailableView(
-                        "No history yet",
-                        systemImage: "clock",
-                        description: Text("Past conversations will appear here.")
-                    )
-                } else {
-                    List {
-                        ForEach(store.sessions) { session in
-                            NavigationLink {
-                                QueryView(initialHistory: session.messages)
-                            } label: {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(session.title)
-                                        .font(.body)
-                                        .foregroundStyle(.primary)
-                                        .lineLimit(2)
-                                    HStack {
-                                        Text("\(session.messages.count) message\(session.messages.count == 1 ? "" : "s")")
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                        Spacer()
-                                        Text(session.startedAt.formatted(date: .abbreviated, time: .shortened))
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                    }
+        Group {
+            if store.sessions.isEmpty {
+                ContentUnavailableView(
+                    "No history yet",
+                    systemImage: "clock",
+                    description: Text("Past conversations will appear here.")
+                )
+            } else {
+                List {
+                    ForEach(store.sessions) { session in
+                        NavigationLink {
+                            QueryView(session: session)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(session.title)
+                                    .font(.body)
+                                    .foregroundStyle(.primary)
+                                    .lineLimit(2)
+                                HStack {
+                                    Text("\(session.messages.count) message\(session.messages.count == 1 ? "" : "s")")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    Spacer()
+                                    Text(session.startedAt.formatted(date: .abbreviated, time: .shortened))
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
                                 }
-                                .padding(.vertical, 2)
                             }
-                            .contextMenu {
-                                Button(role: .destructive) {
-                                    store.delete(session)
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                            } preview: {
-                                ConversationPreview(session: session)
-                            }
+                            .padding(.vertical, 2)
                         }
-                        .onDelete { store.delete(at: $0) }
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                store.delete(session)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        } preview: {
+                            ConversationPreview(session: session)
+                        }
                     }
-                }
-            }
-            .navigationTitle("History")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    .onDelete { store.delete(at: $0) }
                 }
             }
         }
+        .navigationTitle("History")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -83,7 +75,6 @@ private struct ConversationPreview: View {
                         HStack {
                             Text(msg.answer)
                                 .font(.subheadline)
-                                .lineLimit(4)
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 8)
                                 .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 14))
@@ -103,7 +94,6 @@ private struct ConversationPreview: View {
             .padding()
         }
         .frame(width: 320)
-        .frame(minHeight: 200)
         .background(Color(.systemBackground))
     }
 }

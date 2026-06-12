@@ -73,7 +73,7 @@ struct HomeView: View {
             .sheet(isPresented: $showSettings) {
                 SettingsView(onResetConnection: onResetConnection)
             }
-            .sheet(isPresented: $showHistory) {
+            .navigationDestination(isPresented: $showHistory) {
                 HistoryView()
             }
             .sheet(isPresented: $showVoiceNote) { VoiceNoteView() }

@@ -11,10 +11,9 @@ private final class QueryViewModel {
 
     private var session: ConversationSession?
 
-    func loadHistory(_ history: [ConversationMessage]) {
-        messages = history
-        // Reconstruct session so continued conversations update the existing record
-        session = ConversationSession(id: UUID(), startedAt: Date(), messages: history)
+    func loadSession(_ existing: ConversationSession) {
+        messages = existing.messages
+        session = existing  // preserve original id + startedAt — saves update in place
     }
 
     func ask(_ q: String) async {
@@ -55,13 +54,17 @@ private final class QueryViewModel {
 
 struct QueryView: View {
     var initialQuestion: String = ""
-    var initialHistory: [ConversationMessage] = []
+    var existingSession: ConversationSession? = nil
     @State private var vm: QueryViewModel
     @State private var scrollID: UUID?
 
-    init(initialQuestion: String = "", initialHistory: [ConversationMessage] = []) {
+    init(initialQuestion: String = "") {
         self.initialQuestion = initialQuestion
-        self.initialHistory = initialHistory
+        _vm = State(initialValue: QueryViewModel())
+    }
+
+    init(session: ConversationSession) {
+        self.existingSession = session
         _vm = State(initialValue: QueryViewModel())
     }
 
@@ -201,8 +204,8 @@ struct QueryView: View {
         .navigationTitle("Ask Alysha")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            if !initialHistory.isEmpty {
-                vm.loadHistory(initialHistory)
+            if let session = existingSession {
+                vm.loadSession(session)
             } else if !initialQuestion.isEmpty && vm.messages.isEmpty && !vm.isLoading {
                 Task { await vm.ask(initialQuestion) }
             }
