@@ -46,6 +46,7 @@ struct SettingsView: View {
     var onResetConnection: () -> Void
 
     @State private var vm = SettingsViewModel()
+    @State private var showHelp = false
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -76,6 +77,14 @@ struct SettingsView: View {
                 if let error = vm.errorMessage {
                     Section {
                         Text(error).foregroundStyle(.red).font(.caption)
+                    }
+                }
+
+                Section {
+                    Button {
+                        showHelp = true
+                    } label: {
+                        Label("Help", systemImage: "questionmark.circle")
                     }
                 }
 
@@ -123,6 +132,9 @@ struct SettingsView: View {
             }
             .animation(.easeInOut, value: vm.saveSuccess)
             .task { await vm.load() }
+            .sheet(isPresented: $showHelp) {
+                HelpView()
+            }
         }
     }
 }

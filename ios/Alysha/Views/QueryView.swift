@@ -4,6 +4,7 @@ import SwiftUI
 @MainActor
 private final class QueryViewModel {
     var messages: [ConversationMessage] = []
+    var pendingQuestion: String? = nil
     var isLoading = false
     var errorMessage: String?
     var followUpText = ""
@@ -12,6 +13,7 @@ private final class QueryViewModel {
         guard !q.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         isLoading = true
         errorMessage = nil
+        pendingQuestion = q
 
         let history = messages.flatMap { msg in [
             HistoryMessage(role: "user", content: msg.question),
@@ -22,8 +24,10 @@ private final class QueryViewModel {
             let resp = try await APIClient.shared.query(
                 QueryRequest(question: q, history: history.isEmpty ? nil : history)
             )
+            pendingQuestion = nil
             messages.append(ConversationMessage(question: q, answer: resp.answer, sources: resp.sources))
         } catch {
+            pendingQuestion = nil
             errorMessage = error.localizedDescription
         }
         isLoading = false
@@ -62,9 +66,16 @@ struct QueryView: View {
 
                             // Answer + sources
                             VStack(alignment: .leading, spacing: 8) {
-                                Text(msg.answer)
-                                    .textSelection(.enabled)
-                                    .padding(.horizontal)
+                                HStack {
+                                    Text(msg.answer)
+                                        .textSelection(.enabled)
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 10)
+                                        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
+                                        .padding(.trailing, 60)
+                                    Spacer()
+                                }
+                                .padding(.horizontal)
 
                                 if !msg.sources.isEmpty {
                                     VStack(alignment: .leading, spacing: 0) {
@@ -92,6 +103,21 @@ struct QueryView: View {
                         }
                         .padding(.vertical, 12)
                         .id(msg.id)
+                    }
+
+                    // Pending question bubble (shown immediately on submit)
+                    if let pending = vm.pendingQuestion {
+                        HStack {
+                            Spacer()
+                            Text(pending)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 10)
+                                .background(Color.indigo, in: RoundedRectangle(cornerRadius: 16))
+                                .foregroundStyle(.white)
+                                .padding(.leading, 60)
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 12)
                     }
 
                     // Loading indicator
@@ -143,6 +169,9 @@ struct QueryView: View {
             }
             .onChange(of: vm.isLoading) { _, loading in
                 if loading { withAnimation { proxy.scrollTo("loading", anchor: .bottom) } }
+            }
+            .onChange(of: vm.pendingQuestion) { _, q in
+                if q != nil { withAnimation { proxy.scrollTo("loading", anchor: .bottom) } }
             }
         }
         .safeAreaInset(edge: .bottom) {
