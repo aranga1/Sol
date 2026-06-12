@@ -220,6 +220,16 @@ def cmd_fix_plugins(_args):
         return
 
     plugins_file.write_text(_json.dumps(safe, indent=2))
+
+    # Also delete the plugin directories so iOS doesn't try to load them
+    import shutil
+    plugins_dir = Path(vault_path) / ".obsidian/plugins"
+    for plugin_id in removed:
+        plugin_path = plugins_dir / plugin_id
+        if plugin_path.exists():
+            shutil.rmtree(plugin_path)
+            info(f"Deleted plugin directory: .obsidian/plugins/{plugin_id}")
+
     ok(f"Removed desktop-only plugin(s): {', '.join(removed)}")
     info("Changes will sync to iPhone/iPad via iCloud automatically")
     info(f"iOS-safe plugins kept: {', '.join(safe) or 'none'}")
