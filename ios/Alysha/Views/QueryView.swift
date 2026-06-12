@@ -2,10 +2,7 @@ import SwiftUI
 
 // Renders markdown (bold, italic, code) from a plain string
 private func markdownText(_ raw: String) -> Text {
-    if let attributed = try? AttributedString(
-        markdown: raw,
-        options: .init(interpretedSyntax: .inlinesOnly)
-    ) {
+    if let attributed = try? AttributedString(markdown: raw) {
         return Text(attributed)
     }
     return Text(raw)
