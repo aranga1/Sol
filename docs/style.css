@@ -25,6 +25,10 @@
   --radius-sm:  8px;
   --radius-md:  12px;
   --radius-lg:  18px;
+
+  --success:     #6ee7b7;
+  --neutral:     #6b7280;
+  --terminal-bg: #0D1117;
 }
 
 /* ── Reset ──────────────────────────────────────────────────────────────── */
@@ -147,9 +151,21 @@ img, svg {
 }
 
 .copy-btn.copied {
-  color: #6ee7b7;
+  color: var(--success);
   border-color: rgba(110, 231, 183, 0.4);
   background: rgba(110, 231, 183, 0.08);
+}
+
+/* ── Focus visible ──────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 4px;
 }
 
 /* ── Reduced motion ─────────────────────────────────────────────────────── */

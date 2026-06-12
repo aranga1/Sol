@@ -37,12 +37,15 @@
         if (!codeEl) return;
 
         var text = codeEl.textContent.trim();
+        var originalLabel = btn.getAttribute('aria-label');
 
         navigator.clipboard.writeText(text).then(function () {
           btn.textContent = 'Copied!';
+          btn.setAttribute('aria-label', 'Copied to clipboard');
           btn.classList.add('copied');
           setTimeout(function () {
             btn.textContent = 'Copy';
+            btn.setAttribute('aria-label', originalLabel);
             btn.classList.remove('copied');
           }, 2000);
         }).catch(function () {
@@ -56,9 +59,11 @@
           try { document.execCommand('copy'); } catch (e) {}
           document.body.removeChild(ta);
           btn.textContent = 'Copied!';
+          btn.setAttribute('aria-label', 'Copied to clipboard');
           btn.classList.add('copied');
           setTimeout(function () {
             btn.textContent = 'Copy';
+            btn.setAttribute('aria-label', originalLabel);
             btn.classList.remove('copied');
           }, 2000);
         });

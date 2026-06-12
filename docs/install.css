@@ -128,7 +128,7 @@
 
 /* ── Step 1: Terminal animation ──────────────────────────────────────────── */
 .vis-terminal {
-  background: #0D1117;
+  background: var(--terminal-bg);
   padding: 1rem;
   height: 100%;
   font-family: var(--font-mono);
@@ -149,7 +149,7 @@
 }
 
 .term-ok {
-  color: #6ee7b7;
+  color: var(--success);
   opacity: 0;
 }
 
@@ -258,7 +258,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #6b7280;
+  background: var(--neutral);
   transition: background 0.5s;
   position: relative;
   z-index: 1;
@@ -291,9 +291,9 @@
 }
 
 @keyframes heartbeat-color {
-  0%, 30%  { background: #6b7280; }
-  50%, 80% { background: #6ee7b7; }
-  100%     { background: #6b7280; }
+  0%, 30%  { background: var(--neutral); }
+  50%, 80% { background: var(--success); }
+  100%     { background: var(--neutral); }
 }
 
 @keyframes heartbeat-ring {
@@ -304,7 +304,7 @@
 
 @keyframes daemon-status-appear {
   0%, 40%   { opacity: 0; }
-  55%, 90%  { opacity: 1; color: #6ee7b7; }
+  55%, 90%  { opacity: 1; color: var(--success); }
   100%      { opacity: 0; }
 }
 
@@ -365,7 +365,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #6ee7b7;
+  background: var(--success);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -410,6 +410,9 @@
   width: 32px;
   height: 32px;
   opacity: 0.4;
+}
+
+.step-visual.animate .query-mark {
   animation: query-mark-breathe 3s ease-in-out infinite alternate;
 }
 
