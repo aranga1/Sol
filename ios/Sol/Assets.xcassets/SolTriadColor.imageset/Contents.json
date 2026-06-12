@@ -1,0 +1,5 @@
+{
+  "images": [{ "idiom": "universal", "filename": "triad-color.png", "scale": "1x" }],
+  "info": { "author": "xcode", "version": 1 },
+  "properties": { "template-rendering-intent": "original" }
+}

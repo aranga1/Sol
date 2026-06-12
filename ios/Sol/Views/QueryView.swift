@@ -331,8 +331,8 @@ struct QueryView: View {
     private func assistantMessage(_ msg: ConversationMessage) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top, spacing: 10) {
-                // Sol mark avatar
-                Image("SolMark")
+                // Sol mark avatar — always color variant on parchment background
+                Image("SolMarkColor")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 30, height: 30)
@@ -393,7 +393,7 @@ struct QueryView: View {
                     ForEach(sources) { source in
                         Button { openInObsidian(source) } label: {
                             HStack(spacing: 10) {
-                                Image("SolTriad")
+                                Image("SolTriadColor")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 20, height: 20)
