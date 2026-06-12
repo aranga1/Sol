@@ -52,7 +52,7 @@
 		0D28268A8167025B88BECB36 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0F514DF6D482ADE02B9FB552 /* ConnectionConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionConfig.swift; sourceTree = "<group>"; };
 		10174D681C9749FC5C9F3D7C /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
-		12048DD4C44A4AC422790774 /* Sol.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Sol.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		12048DD4C44A4AC422790774 /* Sol.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sol.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DA69B30D4AD283DDA320EF7 /* TagStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagStore.swift; sourceTree = "<group>"; };
 		1F4C5D5909E42CE6C46E8081 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		1FDDD108104B852671CB4C73 /* NoteComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteComposerView.swift; sourceTree = "<group>"; };
@@ -66,7 +66,7 @@
 		49FE67FF6154832FC45DB127 /* ManualEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualEntryView.swift; sourceTree = "<group>"; };
 		4ADFE3DAD33FB8568630E622 /* DaemonStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaemonStatusViewModel.swift; sourceTree = "<group>"; };
 		4CBB9AA2E1CBC2EE0927B6A3 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
-		5CC310179CA903C007A3A301 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		5CC310179CA903C007A3A301 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		68E8960270D7B266E93CC387 /* SystemPromptEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemPromptEditorView.swift; sourceTree = "<group>"; };
 		6B1CDEA9768FAE42438C4F47 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		71EEA8920F4713174DEEFB6F /* QRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
@@ -268,6 +268,10 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
+					26576A1A9DA45F5F031C1E15 = {
+						DevelopmentTeam = W396434AGH;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 30592EE47B580729F61F4558 /* Build configuration list for PBXProject "Sol" */;
@@ -360,6 +364,8 @@
 		6DB50E7DB63B9EC0EA0BF8B2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = W396434AGH;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -496,7 +502,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = J6X383NXGF;
 				INFOPLIST_FILE = Sol/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -504,6 +512,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.aakashranga.Sol;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -513,6 +522,8 @@
 		E9CD10D7287CB334B2F2D344 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = W396434AGH;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -530,7 +541,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = J6X383NXGF;
 				INFOPLIST_FILE = Sol/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -538,6 +551,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.aakashranga.Sol;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
