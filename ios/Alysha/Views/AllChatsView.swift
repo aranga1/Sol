@@ -36,22 +36,19 @@ struct AllChatsView: View {
                 )
                 .foregroundStyle(DS.inkFaint)
             } else {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
-                        if !today.isEmpty {
-                            sessionSection(title: "TODAY", sessions: today)
-                        }
-                        if !thisWeek.isEmpty {
-                            sessionSection(title: "THIS WEEK", sessions: thisWeek)
-                        }
-                        if !earlier.isEmpty {
-                            sessionSection(title: "EARLIER", sessions: earlier)
-                        }
+                List {
+                    if !today.isEmpty {
+                        sessionSection(title: "TODAY", sessions: today)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 20)
-                    .padding(.bottom, 40)
+                    if !thisWeek.isEmpty {
+                        sessionSection(title: "THIS WEEK", sessions: thisWeek)
+                    }
+                    if !earlier.isEmpty {
+                        sessionSection(title: "EARLIER", sessions: earlier)
+                    }
                 }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
             }
         }
         .navigationTitle("All Chats")
@@ -71,38 +68,39 @@ struct AllChatsView: View {
 
     @ViewBuilder
     private func sessionSection(title: String, sessions: [ConversationSession]) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        Section {
+            ForEach(sessions) { session in
+                NavigationLink {
+                    QueryView(session: session)
+                } label: {
+                    sessionCard(session)
+                }
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    Button(role: .destructive) {
+                        store.delete(session)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
+                .contextMenu {
+                    Button(role: .destructive) {
+                        store.delete(session)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                } preview: {
+                    ConversationPreviewCard(session: session)
+                }
+            }
+        } header: {
             Text(title)
                 .font(.system(size: 11, weight: .bold))
                 .foregroundStyle(DS.inkFaint)
                 .kerning(0.18 * 11)
-
-            VStack(spacing: 10) {
-                ForEach(sessions) { session in
-                    NavigationLink {
-                        QueryView(session: session)
-                    } label: {
-                        sessionCard(session)
-                    }
-                    .buttonStyle(.plain)
-                    .contextMenu {
-                        Button(role: .destructive) {
-                            store.delete(session)
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
-                    } preview: {
-                        ConversationPreviewCard(session: session)
-                    }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        Button(role: .destructive) {
-                            store.delete(session)
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
-                    }
-                }
-            }
+                .listRowInsets(EdgeInsets(top: 20, leading: 16, bottom: 6, trailing: 16))
         }
     }
 
