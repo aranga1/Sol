@@ -72,18 +72,20 @@ section "1 / 9  Dependencies"
 
 install_brew_pkg() {
   local pkg="$1" cask="${2:-}"
-  local flags=(--quiet)
-  local list_flags=()
   if [[ -n "$cask" ]]; then
-    flags+=(--cask)
-    list_flags+=(--cask)
-  fi
-  if brew list "${list_flags[@]}" "$pkg" &>/dev/null 2>&1; then
-    skip "$pkg already installed"
+    if brew list --cask "$pkg" &>/dev/null 2>&1; then
+      skip "$pkg already installed"
+      return
+    fi
+    spin "Installing $pkg..." brew install --quiet --cask "$pkg"
   else
-    spin "Installing $pkg..." brew install "${flags[@]}" "$pkg"
-    ok "$pkg installed"
+    if brew list "$pkg" &>/dev/null 2>&1; then
+      skip "$pkg already installed"
+      return
+    fi
+    spin "Installing $pkg..." brew install --quiet "$pkg"
   fi
+  ok "$pkg installed"
 }
 
 install_brew_pkg python@3.12
