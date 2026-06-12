@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Install Sol — Set up in 5 steps</title>
+  <meta name="description" content="Install Sol in about 20 minutes. You'll need a Mac, an iPhone, and an Obsidian vault.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="install.css">
+</head>
+<body>
+
+  <!-- ── Nav ────────────────────────────────────────────────────────────── -->
+  <nav class="site-nav" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="nav-link" aria-label="Back to Sol home">← Sol</a>
+    <a
+      href="https://github.com/aranga1/Sol"
+      class="nav-link"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="View Sol on GitHub (opens in new tab)"
+    >View on GitHub ↗</a>
+  </nav>
+
+  <main class="install-main">
+
+    <!-- ── Header ─────────────────────────────────────────────────────────── -->
+    <header class="install-header">
+      <h1 class="install-heading">Set up Sol<br>in 5 steps.</h1>
+      <p class="install-subhead">Takes about 20 minutes. You'll need a Mac, an iPhone, and an Obsidian vault.</p>
+    </header>
+
+    <!-- ── Steps ──────────────────────────────────────────────────────────── -->
+    <div class="steps-container" role="list" aria-label="Installation steps">
+
+      <!-- Step 1 -->
+      <article class="step" role="listitem" aria-label="Step 1: Run the installer">
+        <div class="step-circle" aria-hidden="true">1</div>
+        <div class="step-body">
+          <h2 class="step-title">Run the installer</h2>
+          <p class="step-desc">One command clones the repo, creates the Python environment, and installs the macOS daemon. Estimated time: ~12 minutes including model download.</p>
+
+          <!-- Terminal animation -->
+          <div class="step-visual vis-terminal" aria-hidden="true">
+            <div class="term-prompt">$ curl -L https://raw.githubusercontent.com/aranga1/Sol/main/setup/install.sh | bash</div>
+            <div class="term-line">→ Checking dependencies…</div>
+            <div class="term-line">→ Pulling phi3.5 model (2.2 GB)…</div>
+            <div class="term-line">→ Installing daemon service…</div>
+            <div class="term-ok">✓ Sol installed successfully</div>
+          </div>
+
+          <!-- Code block -->
+          <div class="code-block" role="region" aria-label="Install command">
+            <button class="copy-btn" type="button" aria-label="Copy install command to clipboard">Copy</button>
+            <code>curl -L https://raw.githubusercontent.com/aranga1/Sol/main/setup/install.sh | bash</code>
+          </div>
+        </div>
+      </article>
+
+      <!-- Step 2 -->
+      <article class="step" role="listitem" aria-label="Step 2: Point Sol at your vault">
+        <div class="step-circle" aria-hidden="true">2</div>
+        <div class="step-body">
+          <h2 class="step-title">Point Sol at your vault</h2>
+          <p class="step-desc">The installer asks for your Obsidian vault path. It's the folder you see in iCloud Drive → Obsidian — usually named after your vault.</p>
+
+          <!-- Folder tree animation -->
+          <div class="step-visual vis-folder" aria-hidden="true">
+            <div class="folder-item">
+              <span class="folder-icon">▼</span>
+              <span>iCloud Drive</span>
+            </div>
+            <div class="folder-item" style="padding-left: 1.2rem;">
+              <span class="folder-icon">▼</span>
+              <span>Obsidian</span>
+            </div>
+            <div class="folder-item highlight" style="padding-left: 2.4rem;">
+              <span class="folder-icon">📂</span>
+              <span>Sol</span>
+            </div>
+            <div class="folder-path">~/Library/Mobile Documents/…/Sol</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Step 3 -->
+      <article class="step" role="listitem" aria-label="Step 3: Start the daemon">
+        <div class="step-circle" aria-hidden="true">3</div>
+        <div class="step-body">
+          <h2 class="step-title">Start the daemon</h2>
+          <p class="step-desc">The daemon runs in the background on your Mac. It indexes your vault, handles queries via Ollama, and auto-restarts after reboots.</p>
+
+          <!-- Daemon heartbeat animation -->
+          <div class="step-visual vis-daemon" aria-hidden="true">
+            <div class="daemon-node">
+              <div class="daemon-ring"></div>
+              <div class="daemon-dot"></div>
+            </div>
+            <div class="daemon-status">Listening on :8765</div>
+          </div>
+
+          <!-- Code block -->
+          <div class="code-block" role="region" aria-label="Start daemon command">
+            <button class="copy-btn" type="button" aria-label="Copy start command to clipboard">Copy</button>
+            <code>sol start</code>
+          </div>
+        </div>
+      </article>
+
+      <!-- Step 4 -->
+      <article class="step" role="listitem" aria-label="Step 4: Connect your iPhone">
+        <div class="step-circle" aria-hidden="true">4</div>
+        <div class="step-body">
+          <h2 class="step-title">Connect your iPhone</h2>
+          <p class="step-desc">The installer prints a QR code containing your Mac's Tailscale IP and API key. Open Sol on your iPhone and tap <em>Scan</em> to connect over your local network — no typing required.</p>
+
+          <!-- QR scan animation -->
+          <div class="step-visual vis-qr" aria-hidden="true">
+            <div class="qr-grid" style="position:relative;">
+              <!-- Row 1 -->
+              <div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell amber"></div><div class="qr-cell dark"></div>
+              <!-- Row 2 -->
+              <div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell light"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div>
+              <!-- Row 3 -->
+              <div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell amber"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div><div class="qr-cell amber"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div>
+              <!-- Row 4 -->
+              <div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell light"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell amber"></div><div class="qr-cell dark"></div>
+              <!-- Row 5 -->
+              <div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div>
+              <!-- Row 6 -->
+              <div class="qr-cell amber"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell amber"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div>
+              <!-- Row 7 -->
+              <div class="qr-cell dark"></div><div class="qr-cell amber"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell amber"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div>
+              <!-- Row 8 -->
+              <div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell amber"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div>
+              <!-- Scanline overlays the grid -->
+              <div class="qr-scanline" style="position:absolute; left:0; right:0; top:0;"></div>
+            </div>
+            <div class="qr-check">
+              <div class="qr-check-circle">✓</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Step 5 -->
+      <article class="step" role="listitem" aria-label="Step 5: Ask your first question">
+        <div class="step-circle" aria-hidden="true">5</div>
+        <div class="step-body">
+          <h2 class="step-title">Ask your first question</h2>
+          <p class="step-desc">Type or speak. Sol searches your vault with semantic search powered by Ollama and answers in plain language — with links back to the source notes.</p>
+
+          <!-- Query animation -->
+          <div class="step-visual vis-query" aria-hidden="true">
+            <!-- Small node-sun mark -->
+            <svg
+              class="query-mark"
+              viewBox="-45 -45 90 90"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <line x1="0" y1="0" x2="0"   y2="-28"  stroke="#B5701F" stroke-width="2" stroke-linecap="round"/>
+              <line x1="0" y1="0" x2="24"  y2="-14"  stroke="#B5701F" stroke-width="2" stroke-linecap="round"/>
+              <line x1="0" y1="0" x2="24"  y2="14"   stroke="#B5701F" stroke-width="2" stroke-linecap="round"/>
+              <line x1="0" y1="0" x2="0"   y2="28"   stroke="#B5701F" stroke-width="2" stroke-linecap="round"/>
+              <line x1="0" y1="0" x2="-24" y2="14"   stroke="#B5701F" stroke-width="2" stroke-linecap="round"/>
+              <line x1="0" y1="0" x2="-24" y2="-14"  stroke="#B5701F" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="0"   cy="-28" r="5" fill="none" stroke="#A23E2D" stroke-width="1.5"/>
+              <circle cx="24"  cy="-14" r="5" fill="none" stroke="#A23E2D" stroke-width="1.5"/>
+              <circle cx="24"  cy="14"  r="5" fill="none" stroke="#A23E2D" stroke-width="1.5"/>
+              <circle cx="0"   cy="28"  r="5" fill="none" stroke="#A23E2D" stroke-width="1.5"/>
+              <circle cx="-24" cy="14"  r="5" fill="none" stroke="#A23E2D" stroke-width="1.5"/>
+              <circle cx="-24" cy="-14" r="5" fill="none" stroke="#A23E2D" stroke-width="1.5"/>
+              <circle cx="0" cy="0" r="13" fill="#B05428"/>
+            </svg>
+
+            <div class="query-bubbles">
+              <div class="query-bubble query-q">What do I know about deep work?</div>
+              <div class="query-bubble query-a">From your notes: Cal Newport defines deep work as…</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </div><!-- /steps-container -->
+
+    <!-- ── Done card ──────────────────────────────────────────────────────── -->
+    <div class="done-card" role="region" aria-label="Setup complete">
+      <h2 class="done-heading">You're set.</h2>
+      <p class="done-desc">Sol is running. Open the app on your iPhone and ask anything — your vault is ready to answer.</p>
+      <a href="sol://" class="btn-open-sol" aria-label="Open Sol app (requires Sol app installed)">Open Sol →</a>
+    </div>
+
+  </main>
+
+  <script src="main.js"></script>
+</body>
+</html>

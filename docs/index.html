@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sol — Your Obsidian vault, on your phone.</title>
+  <meta name="description" content="Ask questions. Capture thoughts. Fully local — your Mac, your data, your rules.">
+  <meta property="og:title" content="Sol — Your Obsidian vault, on your phone.">
+  <meta property="og:description" content="Ask questions. Capture thoughts. Fully local — your Mac, your data, your rules.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://aranga1.github.io/Sol/">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="landing.css">
+</head>
+<body>
+
+  <!-- ── Nav ────────────────────────────────────────────────────────────── -->
+  <nav class="site-nav" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="nav-wordmark" aria-label="Sol home">Sol.</a>
+    <a
+      href="https://github.com/aranga1/Sol"
+      class="nav-link"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="View Sol on GitHub (opens in new tab)"
+    >GitHub ↗</a>
+  </nav>
+
+  <main>
+
+    <!-- ── Hero ───────────────────────────────────────────────────────────── -->
+    <section class="hero" aria-label="Hero">
+
+      <!-- Breathing node-sun background -->
+      <div class="node-sun-bg" aria-hidden="true">
+        <div class="ns-glow"></div>
+        <div class="ns-ring ns-ring-a"></div>
+        <div class="ns-ring ns-ring-b"></div>
+        <div class="ns-ring ns-ring-c"></div>
+        <!-- Node-sun SVG mark -->
+        <svg
+          class="ns-mark"
+          viewBox="-90 -90 180 180"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <!-- 6 rays at 60° intervals -->
+          <line x1="0" y1="0" x2="0"   y2="-55"  stroke="#B5701F" stroke-width="3" stroke-linecap="round"/>
+          <line x1="0" y1="0" x2="47"  y2="-27"  stroke="#B5701F" stroke-width="3" stroke-linecap="round"/>
+          <line x1="0" y1="0" x2="47"  y2="27"   stroke="#B5701F" stroke-width="3" stroke-linecap="round"/>
+          <line x1="0" y1="0" x2="0"   y2="55"   stroke="#B5701F" stroke-width="3" stroke-linecap="round"/>
+          <line x1="0" y1="0" x2="-47" y2="27"   stroke="#B5701F" stroke-width="3" stroke-linecap="round"/>
+          <line x1="0" y1="0" x2="-47" y2="-27"  stroke="#B5701F" stroke-width="3" stroke-linecap="round"/>
+          <!-- 6 outer ring dots at ray tips -->
+          <circle cx="0"   cy="-55" r="10" fill="none" stroke="#A23E2D" stroke-width="2"/>
+          <circle cx="47"  cy="-27" r="10" fill="none" stroke="#A23E2D" stroke-width="2"/>
+          <circle cx="47"  cy="27"  r="10" fill="none" stroke="#A23E2D" stroke-width="2"/>
+          <circle cx="0"   cy="55"  r="10" fill="none" stroke="#A23E2D" stroke-width="2"/>
+          <circle cx="-47" cy="27"  r="10" fill="none" stroke="#A23E2D" stroke-width="2"/>
+          <circle cx="-47" cy="-27" r="10" fill="none" stroke="#A23E2D" stroke-width="2"/>
+          <!-- Center circle -->
+          <circle cx="0" cy="0" r="28" fill="#B05428"/>
+        </svg>
+      </div>
+
+      <div class="hero-content">
+        <h1 class="hero-headline">Your Obsidian vault,<br>on your phone.</h1>
+        <p class="hero-subhead">
+          Ask questions. Capture thoughts. Fully local —<br>
+          your Mac, your data, your rules.
+        </p>
+        <a href="install.html" class="btn-primary">Get started →</a>
+      </div>
+    </section>
+
+    <!-- ── Features ───────────────────────────────────────────────────────── -->
+    <section class="features" aria-label="Features">
+      <h2 class="features-heading">Everything your vault knows,<br>in your pocket.</h2>
+
+      <div class="features-grid" role="list">
+
+        <!-- Card 1: Ask your vault -->
+        <article class="feature-card" role="listitem">
+          <div class="feature-visual vis-chat" aria-hidden="true">
+            <div class="chat-bubble chat-user">What's my pomegranate note?</div>
+            <div class="chat-bubble chat-sol">Your favorite fruit is pomegranates.</div>
+          </div>
+          <h3 class="feature-name">Ask your vault</h3>
+          <p class="feature-desc">Natural language questions over everything you've captured. Sol finds the answer and links back to the source.</p>
+        </article>
+
+        <!-- Card 2: Voice notes -->
+        <article class="feature-card" role="listitem">
+          <div class="feature-visual" aria-hidden="true">
+            <div class="vis-voice">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <div class="vis-doc">
+              <div class="doc-icon"></div>
+            </div>
+          </div>
+          <h3 class="feature-name">Voice notes</h3>
+          <p class="feature-desc">Tap, speak, done. Transcription happens on-device and the note lands in your vault in under 15 seconds.</p>
+        </article>
+
+        <!-- Card 3: Text notes -->
+        <article class="feature-card" role="listitem">
+          <div class="feature-visual vis-text" aria-hidden="true">
+            <div class="text-field-mock">
+              <span>Tried the new coffee spot<span class="text-cursor"></span></span>
+            </div>
+            <div class="tag-chip">#coffee &nbsp;#places</div>
+          </div>
+          <h3 class="feature-name">Text notes</h3>
+          <p class="feature-desc">Quick markdown capture with automatic tag suggestions based on your vault's existing taxonomy.</p>
+        </article>
+
+        <!-- Card 4: Conversation history -->
+        <article class="feature-card" role="listitem">
+          <div class="feature-visual vis-history" aria-hidden="true">
+            <div class="sidebar-panel">
+              <div class="sidebar-item">Pomegranate notes</div>
+              <div class="sidebar-item">Morning routine review</div>
+              <div class="sidebar-item">Book highlights — Piranesi</div>
+              <div class="sidebar-item">Coffee spots in SF</div>
+            </div>
+          </div>
+          <h3 class="feature-name">Conversation history</h3>
+          <p class="feature-desc">Every query session is saved. Pick up any thread from any time — your conversations are part of the vault.</p>
+        </article>
+
+        <!-- Card 5: Notifications -->
+        <article class="feature-card" role="listitem">
+          <div class="feature-visual vis-notif" aria-hidden="true">
+            <div class="notif-banner">
+              <div class="notif-dot"></div>
+              <div class="notif-text">
+                <strong>Sol · Reminder</strong>
+                Review morning notes
+              </div>
+            </div>
+          </div>
+          <h3 class="feature-name">Notifications</h3>
+          <p class="feature-desc">The daemon sends timely nudges from your own notes — review reminders, daily digests, whatever you configure.</p>
+        </article>
+
+        <!-- Card 6: Fully local -->
+        <article class="feature-card" role="listitem">
+          <div class="feature-visual vis-local" aria-hidden="true">
+            <div class="local-network">
+              <div class="local-line local-line-a"></div>
+              <div class="local-line local-line-b"></div>
+              <div class="local-line local-line-c"></div>
+              <div class="local-center"></div>
+              <div class="local-orbit local-orbit-a"></div>
+              <div class="local-orbit local-orbit-b"></div>
+              <div class="local-orbit local-orbit-c"></div>
+            </div>
+          </div>
+          <h3 class="feature-name">Fully local</h3>
+          <p class="feature-desc">Everything runs on your Mac. No cloud API keys, no subscriptions, no data leaving your network.</p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ── CTA band ────────────────────────────────────────────────────────── -->
+    <section class="cta-band" aria-label="Get started">
+      <h2 class="cta-band-heading">Ready to connect your vault?</h2>
+      <a href="install.html" class="btn-secondary">Get started →</a>
+      <p class="cta-note">Requires macOS + iPhone. Free and open source.</p>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────────── -->
+  <footer class="site-footer" role="contentinfo">
+    <p class="footer-text">Sol &middot; Open source</p>
+    <a
+      href="https://github.com/aranga1/Sol"
+      class="footer-link"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="View aranga1/Sol on GitHub (opens in new tab)"
+    >aranga1/Sol ↗</a>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
