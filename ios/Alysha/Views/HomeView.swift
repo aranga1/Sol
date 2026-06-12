@@ -81,6 +81,7 @@ struct HomeView: View {
             .navigationDestination(isPresented: $navigateToQuery) {
                 QueryView(initialQuestion: queryText).onDisappear { queryText = "" }
             }
+            .task { await WhisperService.shared.downloadModelIfNeeded() }
             .alert("Obsidian Not Installed", isPresented: $showObsidianAlert) {
                 Button("OK", role: .cancel) {}
             } message: {
