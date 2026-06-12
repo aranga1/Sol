@@ -97,29 +97,59 @@ def query(
     if not answer or answer.strip() in ("", "Empty Response", "None"):
         return "I don't have notes about that yet.", []
 
-    sources = []
-    for node in (response.source_nodes or []):
-        file_path = node.metadata.get("file_path", "") or node.metadata.get("file_name", "")
-        # Make path relative to vault
-        if file_path:
-            try:
-                rel = Path(file_path).name
-            except Exception:
-                rel = file_path
-            # Derive title from first H1 or filename
-            title = rel.replace(".md", "").replace("-", " ").replace("_", " ")
-            # Try to get actual H1
-            try:
-                text = node.get_content()
-                for line in text.split("\n"):
-                    if line.startswith("# "):
-                        title = line[2:].strip()
-                        break
-            except Exception:
-                pass
-            sources.append({"file": f"Notes/{rel}", "title": title})
-
+    sources = _extract_relevant_sources(response.source_nodes or [])
     return answer, sources
+
+
+def _extract_relevant_sources(nodes: list, max_sources: int = 5) -> list[dict]:
+    """
+    Return only the most relevant source files from retrieved nodes.
+    - Deduplicates by file path (keeps lowest-distance chunk per file)
+    - Filters to nodes within 0.25 L2 distance of the best match
+    - Caps at max_sources
+    FAISS L2 scores are raw distances: lower = more relevant.
+    """
+    if not nodes:
+        return []
+
+    # Deduplicate: keep lowest-score (most relevant) node per unique filename
+    best_per_file: dict[str, tuple] = {}
+    for node in nodes:
+        file_path = node.metadata.get("file_path", "") or node.metadata.get("file_name", "")
+        if not file_path:
+            continue
+        rel = Path(file_path).name
+        score = node.score if node.score is not None else 999.0
+        if rel not in best_per_file or score < best_per_file[rel][1]:
+            best_per_file[rel] = (node, score)
+
+    if not best_per_file:
+        return []
+
+    # Sort ascending (lowest distance = most relevant first)
+    ranked = sorted(best_per_file.values(), key=lambda x: x[1])
+
+    # Keep nodes within 0.25 of the best (closest) score.
+    # e.g. best=0.72 → keep ≤ 0.97; drops anything at 0.98+
+    best_score = ranked[0][1]
+    threshold = best_score + 0.25
+    relevant = [(node, score) for node, score in ranked if score <= threshold][:max_sources]
+
+    sources = []
+    for node, _ in relevant:
+        file_path = node.metadata.get("file_path", "") or node.metadata.get("file_name", "")
+        rel = Path(file_path).name
+        title = rel.replace(".md", "").replace("-", " ").replace("_", " ")
+        try:
+            for line in node.get_content().split("\n"):
+                if line.startswith("# "):
+                    title = line[2:].strip()
+                    break
+        except Exception:
+            pass
+        sources.append({"file": f"Notes/{rel}", "title": title})
+
+    return sources
 
 
 class VaultWatcher:
