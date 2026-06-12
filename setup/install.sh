@@ -342,8 +342,14 @@ $(gum style --foreground 245 "Imported notes appear under Imported/Apple Notes/ 
 
   ok "Apple Notes import complete"
 
+  # Remove the Importer plugin immediately — it is desktop-only and will crash
+  # Obsidian on iPhone/iPad if left in the vault (iCloud syncs the plugin files).
+  step "Removing Importer plugin to protect iOS/iPad Obsidian..."
+  "$VENV/bin/python" "$SCRIPT_DIR/alysha_cli.py" fix-plugins
+  ok "Plugin removed — your iPhone/iPad Obsidian is safe"
+
 else
-  skip "Apple Notes import skipped — run setup again any time to import"
+  skip "Apple Notes import skipped — run alysha import-notes any time to import"
 fi
 
 # ── CLI shim ──────────────────────────────────────────────────────────────────

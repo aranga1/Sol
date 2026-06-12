@@ -256,6 +256,13 @@ def cmd_import_notes(_args):
     else:
         subprocess.run(["open", "-a", "Obsidian"], check=False)
 
+    print()
+    input(f"  {dim('Press Enter when the import is complete…')}")
+    print()
+    step("Removing Importer plugin to protect iOS/iPad Obsidian…")
+    cmd_fix_plugins(None)
+    ok("Plugin removed — your iPhone/iPad Obsidian is safe")
+
 
 def cmd_notify(args):
     if len(args) < 2:
