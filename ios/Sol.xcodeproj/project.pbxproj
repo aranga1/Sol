@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0380CB6EB82EB31C066F55FB /* InAppNotificationBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F65F34FE06AA02BEFA49763 /* InAppNotificationBanner.swift */; };
 		06D978A769DC1C35AE0771A5 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E22711CC4EA5A88833898CE8 /* NotificationService.swift */; };
 		09B493E788ACB79861E22CA9 /* QueryResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7234FCACFC1F7924A21FF224 /* QueryResponse.swift */; };
 		14A830D8D0F52F55E51DA925 /* Newsreader.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B68D1B648FC1177733924726 /* Newsreader.ttf */; };
@@ -59,6 +60,7 @@
 		31287DDB302C963B7E2AF002 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		38358FEC4BCA209328EE3D0A /* AllChatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllChatsView.swift; sourceTree = "<group>"; };
 		3EC29BEB51B22345243B5D41 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
+		3F65F34FE06AA02BEFA49763 /* InAppNotificationBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppNotificationBanner.swift; sourceTree = "<group>"; };
 		4075C452ECF4EBE74177F209 /* BreathingBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathingBackground.swift; sourceTree = "<group>"; };
 		4460F7B444409B5A81A7B654 /* TextNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextNoteView.swift; sourceTree = "<group>"; };
 		452FE6CDB9179A1DCE564E33 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 				3EC29BEB51B22345243B5D41 /* HelpView.swift */,
 				E4D636FB5C3E9FE738D13280 /* HistoryView.swift */,
 				F054FEA6F26B5A7196F679FB /* HomeView.swift */,
+				3F65F34FE06AA02BEFA49763 /* InAppNotificationBanner.swift */,
 				49FE67FF6154832FC45DB127 /* ManualEntryView.swift */,
 				E466C941B84FC46FB9463714 /* MarkdownEditor.swift */,
 				1FDDD108104B852671CB4C73 /* NoteComposerView.swift */,
@@ -319,6 +322,7 @@
 				7CA171B9A1380E35D163BE50 /* HistoryStore.swift in Sources */,
 				9B4C32AEBCF0949924EF07D7 /* HistoryView.swift in Sources */,
 				3E668C2A44BCA4C9A7585C41 /* HomeView.swift in Sources */,
+				0380CB6EB82EB31C066F55FB /* InAppNotificationBanner.swift in Sources */,
 				AB007F063F789B07ECDD15CC /* KeychainService.swift in Sources */,
 				F101F75B9D6C75A4F37E814B /* ManualEntryView.swift in Sources */,
 				D1CDC42E1B8C30B7D4E533A2 /* MarkdownEditor.swift in Sources */,

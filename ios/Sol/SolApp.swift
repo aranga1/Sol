@@ -36,8 +36,11 @@ struct SolApp: App {
                 }
             }
             .onChange(of: scenePhase) { _, phase in
-                if phase == .active && isOnboarded {
-                    NotificationService.shared.fetchAndDeliver()
+                guard isOnboarded else { return }
+                if phase == .active {
+                    NotificationService.shared.startPolling()
+                } else {
+                    NotificationService.shared.stopPolling()
                 }
             }
             .onOpenURL { url in
