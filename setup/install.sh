@@ -257,7 +257,7 @@ $(gum style --foreground 255 "Step 4 ·") $(gum style --foreground 245 "You may 
             $(gum style --foreground 245 "Alysha talks to the plugin directly and does not need that setup.")
 
 $(gum style --foreground 255 "Step 5 ·") $(gum style --foreground 245 "Click the plugin's Options button (or Settings → Community Plugins → Local REST API).")
-            $(gum style --foreground 245 "You will see an API Key field. Copy that key — you may need it in a moment.")"
+            $(gum style --foreground 245 "You will see an API Key field. Copy that key starting from 'Bearer <key>' — you will need it for the next step.")"
 
 open -a Obsidian "$VAULT_PATH" 2>/dev/null || true
 echo ""
