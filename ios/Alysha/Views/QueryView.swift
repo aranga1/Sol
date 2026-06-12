@@ -224,13 +224,8 @@ struct QueryView: View {
         .toolbarBackground(DS.parchment, for: .navigationBar)
         .toolbarColorScheme(.light, for: .navigationBar)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button(action: goBack) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(DS.inkMid)
-                }
-            }
+            // Principal title only — system back button handles navigation inside NavigationStack.
+            // Overlay mode gets its own overlayTopBar with X + hamburger.
             ToolbarItem(placement: .principal) {
                 Text("Ask Alysha")
                     .font(DS.newsreader(20, weight: .medium))

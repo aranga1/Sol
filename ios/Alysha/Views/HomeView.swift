@@ -15,6 +15,7 @@ struct HomeView: View {
     // Navigation
     @State private var queryText = ""
     @State private var navigateToAllChats = false
+    @State private var pendingAllChats = false  // set when overlay must dismiss first
 
     // Sheets
     @State private var showSettings = false
@@ -91,7 +92,17 @@ struct HomeView: View {
                 },
                 onNewConversation: { closeDrawer() },
                 onOpenSettings: { closeDrawer(); showSettings = true },
-                onOpenAllChats: { closeDrawer(); navigateToAllChats = true },
+                onOpenAllChats: {
+                    closeDrawer()
+                    if showChat || showComposer {
+                        // Dismiss overlay first; onChange fires navigation once gone
+                        pendingAllChats = true
+                        dismissChat()
+                        withAnimation(.spring(response: 0.38, dampingFraction: 0.88)) { showComposer = false }
+                    } else {
+                        navigateToAllChats = true
+                    }
+                },
                 onOpenObsidian: { closeDrawer(); openObsidianVault() }
             )
             .frame(width: drawerWidth)
@@ -145,6 +156,13 @@ struct HomeView: View {
         )
         .animation(.spring(response: 0.42, dampingFraction: 0.88), value: showChat)
         .animation(.spring(response: 0.38, dampingFraction: 0.88), value: showComposer)
+        // After an overlay dismisses, fire any pending deferred navigation
+        .onChange(of: showChat) { _, showing in
+            if !showing && pendingAllChats { pendingAllChats = false; navigateToAllChats = true }
+        }
+        .onChange(of: showComposer) { _, showing in
+            if !showing && pendingAllChats { pendingAllChats = false; navigateToAllChats = true }
+        }
         .onAppear {
             Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { _ in
                 blobPhase += 0.016
