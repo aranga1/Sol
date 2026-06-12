@@ -1,5 +1,7 @@
 import SwiftUI
 
+private let vaultName = "Alysha"
+
 struct HomeView: View {
     var onResetConnection: () -> Void = {}
 
@@ -9,6 +11,7 @@ struct HomeView: View {
     @State private var queryText = ""
     @State private var navigateToQuery = false
     @State private var showSettings = false
+    @State private var showObsidianAlert = false
 
     var body: some View {
         NavigationStack {
@@ -22,6 +25,14 @@ struct HomeView: View {
                     CaptureButton(icon: "pencil", label: "Text Note", isEnabled: isConnected) {
                         showTextNote = true
                     }
+                }
+
+                Button {
+                    openObsidianVault()
+                } label: {
+                    Label("Open in Obsidian", systemImage: "book.closed")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
 
                 Spacer()
@@ -61,7 +72,23 @@ struct HomeView: View {
             .navigationDestination(isPresented: $navigateToQuery) {
                 QueryView(initialQuestion: queryText).onDisappear { queryText = "" }
             }
+            .alert("Obsidian Not Installed", isPresented: $showObsidianAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Obsidian is not installed — get it from the App Store.")
+            }
         }
+    }
+
+    @MainActor
+    private func openObsidianVault() {
+        let encoded = vaultName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? vaultName
+        guard let url = URL(string: "obsidian://open?vault=\(encoded)"),
+              UIApplication.shared.canOpenURL(url) else {
+            showObsidianAlert = true
+            return
+        }
+        UIApplication.shared.open(url)
     }
 }
 
