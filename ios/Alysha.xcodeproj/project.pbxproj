@@ -14,6 +14,7 @@
 		21A3A674AC2D64B116661B50 /* ConnectionConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D102D5DB1FDDB84CA1589D37 /* ConnectionConfig.swift */; };
 		22D045E01A8078CCE173540E /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56C1208253AD24CB4BA475E2 /* Note.swift */; };
 		3A22591163114D2FC50BAD1A /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C9DFD194C1CC056D73FE43A /* HelpView.swift */; };
+		3C1CBEF6015B20D3B43C3858 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C92D1110006FEEA7F7F01799 /* DesignSystem.swift */; };
 		3DDE99FCD541ED46C5B7B31A /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA9E64E90AFAEB11C59553C4 /* HistoryView.swift */; };
 		3F492F7E575808998B10B1A2 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06BAB5B588583DC1C941710A /* HomeView.swift */; };
 		3FC49D9FDE4C6F946A642216 /* QueryResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEE59A9C1C0C4EDDBAA0265D /* QueryResponse.swift */; };
@@ -52,16 +53,17 @@
 		56C1208253AD24CB4BA475E2 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		7AEABFF52CAA2EB00BE2CF06 /* AllChatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllChatsView.swift; sourceTree = "<group>"; };
 		88E91726CDF932E2083F1167 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
-		8A6C459B5C6843A97F7EB96C /* Alysha.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Alysha.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8A6C459B5C6843A97F7EB96C /* Alysha.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Alysha.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D95A2E0715ECC2A1AB2BE69 /* HistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
 		97A5F18839F6A0878F0B5E4D /* VoiceNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceNoteView.swift; sourceTree = "<group>"; };
 		9C411458A74D1BF80098D5DE /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		AC4CB24441BAD07613C1C7C1 /* QRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
 		BC65E0F4E8221FBD615A1A16 /* AlyshWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlyshWidget.swift; sourceTree = "<group>"; };
+		C92D1110006FEEA7F7F01799 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		CBC3BCE011EF1D2935BBBC9D /* QueryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryView.swift; sourceTree = "<group>"; };
 		D102D5DB1FDDB84CA1589D37 /* ConnectionConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionConfig.swift; sourceTree = "<group>"; };
 		D75BD56D56732237F162D91C /* DaemonStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaemonStatusViewModel.swift; sourceTree = "<group>"; };
-		E525768EDEFA9D1FBA71B752 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		E525768EDEFA9D1FBA71B752 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		EA9E64E90AFAEB11C59553C4 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		F7B14B126C5667997970B8DB /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		FEE59A9C1C0C4EDDBAA0265D /* QueryResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryResponse.swift; sourceTree = "<group>"; };
@@ -102,6 +104,7 @@
 			isa = PBXGroup;
 			children = (
 				4FCF7F200FA674F7C1B5C832 /* AlyshApp.swift */,
+				C92D1110006FEEA7F7F01799 /* DesignSystem.swift */,
 				53BD7526735F7DF0D2872797 /* Info.plist */,
 				D466457B0B5A7594973BA18C /* Models */,
 				A021D309B52EDF3CAD70C5CE /* Services */,
@@ -217,6 +220,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = 45BC4AB7443BBCD1344B8094 /* Build configuration list for PBXProject "Alysha" */;
 			developmentRegion = en;
@@ -261,6 +266,7 @@
 				21A3A674AC2D64B116661B50 /* ConnectionConfig.swift in Sources */,
 				4551F88B1E454CDA8A0E1C1D /* ConversationSession.swift in Sources */,
 				C95141A2C02355EE9E3658A6 /* DaemonStatusViewModel.swift in Sources */,
+				3C1CBEF6015B20D3B43C3858 /* DesignSystem.swift in Sources */,
 				3A22591163114D2FC50BAD1A /* HelpView.swift in Sources */,
 				CBB664A45EEAA65AC2B5128D /* HistoryStore.swift in Sources */,
 				3DDE99FCD541ED46C5B7B31A /* HistoryView.swift in Sources */,
@@ -423,7 +429,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = J6X383NXGF;
 				INFOPLIST_FILE = Alysha/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -442,7 +447,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = J6X383NXGF;
 				INFOPLIST_FILE = Alysha/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
