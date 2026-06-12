@@ -8,14 +8,6 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-# ── iOS-safe Obsidian plugins ─────────────────────────────────────────────────
-# Only plugins listed here will be kept in community-plugins.json.
-# Desktop-only plugins (obsidian-importer, etc.) must NOT be added — they crash
-# Obsidian iOS/iPad when listed here because their JS files don't exist on mobile.
-MOBILE_SAFE_PLUGINS = {
-    "obsidian-local-rest-api",
-}
-
 # ── Paths ──────────────────────────────────────────────────────────────────────
 SCRIPT_DIR   = Path(__file__).resolve().parent
 REPO_DIR     = SCRIPT_DIR.parent
@@ -156,9 +148,6 @@ def cmd_update(_args):
     step("Re-copying CLI shim…")
     _install_shim()
 
-    step("Checking Obsidian plugins for iOS safety…")
-    cmd_fix_plugins(None)
-
     cmd_restart(None)
     ok("Update complete")
 
@@ -196,72 +185,6 @@ def cmd_qr(_args):
         "--host", ip, "--port", str(port), "--api-key", api_key,
         "--output", str(out_file), "--terminal"
     ], check=True)
-
-
-def cmd_fix_plugins(_args):
-    cfg = load_config()
-    vault_path = cfg.get("vault_path")
-    if not vault_path:
-        fail("Vault path not found in config — run setup/install.sh first")
-        sys.exit(1)
-
-    plugins_file = Path(vault_path) / ".obsidian/community-plugins.json"
-    if not plugins_file.exists():
-        info("No community-plugins.json found — nothing to do")
-        return
-
-    import json as _json
-    current = _json.loads(plugins_file.read_text())
-    safe = [p for p in current if p in MOBILE_SAFE_PLUGINS]
-    removed = [p for p in current if p not in MOBILE_SAFE_PLUGINS]
-
-    if not removed:
-        ok("community-plugins.json is already iOS-safe — no changes needed")
-        return
-
-    plugins_file.write_text(_json.dumps(safe, indent=2))
-
-    # Also delete the plugin directories so iOS doesn't try to load them
-    import shutil
-    plugins_dir = Path(vault_path) / ".obsidian/plugins"
-    for plugin_id in removed:
-        plugin_path = plugins_dir / plugin_id
-        if plugin_path.exists():
-            shutil.rmtree(plugin_path)
-            info(f"Deleted plugin directory: .obsidian/plugins/{plugin_id}")
-
-    ok(f"Removed desktop-only plugin(s): {', '.join(removed)}")
-    info("Changes will sync to iPhone/iPad via iCloud automatically")
-    info(f"iOS-safe plugins kept: {', '.join(safe) or 'none'}")
-
-
-def cmd_import_notes(_args):
-    cfg = load_config()
-    vault_path = cfg.get("vault_path", "")
-
-    print()
-    print(bold("  Apple Notes import"))
-    print()
-    print(f"  Opening Obsidian vault: {dim(vault_path)}")
-    print()
-    print(f"  {bold('Step 1')}  {dim('Obsidian is opening — switch to it.')}")
-    print(f"  {bold('Step 2')}  {dim('Settings → Community Plugins → find Importer → Enable it.')}")
-    print(f"  {bold('Step 3')}  {dim('Open the Importer plugin (ribbon icon or command palette).')}")
-    print(f"  {bold('Step 4')}  {dim('Select Apple Notes as the source → click Import.')}")
-    print(f"  {bold('Step 5')}  {dim('Imported notes appear under Imported/Apple Notes/ in your vault.')}")
-    print()
-
-    if vault_path:
-        subprocess.run(["open", "-a", "Obsidian", vault_path], check=False)
-    else:
-        subprocess.run(["open", "-a", "Obsidian"], check=False)
-
-    print()
-    input(f"  {dim('Press Enter when the import is complete…')}")
-    print()
-    step("Removing Importer plugin to protect iOS/iPad Obsidian…")
-    cmd_fix_plugins(None)
-    ok("Plugin removed — your iPhone/iPad Obsidian is safe")
 
 
 def cmd_notify(args):
@@ -388,8 +311,6 @@ USAGE = f"""\
   {cyan('config')}        Open config.json in $EDITOR
   {cyan('uninstall')}     Run the uninstall script
   {cyan('qr')}            Regenerate the iPhone connection QR code
-  {cyan('fix-plugins')}   Strip desktop-only Obsidian plugins from community-plugins.json
-  {cyan('import-notes')}  Open Obsidian and walk through Apple Notes import
   {cyan('notify')}        Queue a notification to your iPhone  (title body [type])
   {cyan('update-ios')}    Check for a new iOS app release and show install QR
 
@@ -409,8 +330,6 @@ COMMANDS = {
     "config":       cmd_config,
     "uninstall":    cmd_uninstall,
     "qr":           cmd_qr,
-    "fix-plugins":  cmd_fix_plugins,
-    "import-notes": cmd_import_notes,
     "notify":       cmd_notify,
     "update-ios":   cmd_update_ios,
     "_install-shim": cmd_install_shim,  # called by install.sh

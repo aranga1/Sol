@@ -64,11 +64,11 @@ gum style \
   $(gum style --foreground 82 "~1 min")   Python environment + daemon setup
   $(gum style --foreground 82 "~2 min")   Tailscale auth + Obsidian plugin setup
   $(gum style --foreground 245 "─────────────────────────────────────────────")
-  $(gum style --foreground 212 --bold "~12 min")   Total (may vary — model download dominates)"
+  $(gum style --foreground 212 --bold "~10 min")   Total (may vary — model download dominates)"
 echo ""
 
 # ── 1. Dependencies ───────────────────────────────────────────────────────────
-section "1 / 9  Dependencies"
+section "1 / 8  Dependencies"
 
 install_brew_pkg() {
   local pkg="$1" cask="${2:-}"
@@ -94,7 +94,7 @@ install_brew_pkg ollama
 install_brew_pkg obsidian cask
 
 # ── 2. Ollama model ───────────────────────────────────────────────────────────
-section "2 / 9  Ollama model (qwen2.5:7b)"
+section "2 / 8  Ollama model (qwen2.5:7b)"
 
 spin "Starting Ollama service..." brew services start ollama
 sleep 2
@@ -115,7 +115,7 @@ else
 fi
 
 # ── 3. Obsidian vault ─────────────────────────────────────────────────────────
-section "3 / 9  Obsidian vault"
+section "3 / 8  Obsidian vault"
 
 if [[ -d "$VAULT_PATH/.obsidian" ]]; then
   skip "Vault already exists at $VAULT_PATH"
@@ -126,7 +126,7 @@ else
 fi
 
 # ── 4. Daemon config ──────────────────────────────────────────────────────────
-section "4 / 9  Daemon config"
+section "4 / 8  Daemon config"
 
 mkdir -p "$CONFIG_DIR"
 
@@ -158,7 +158,7 @@ fi
 DAEMON_API_KEY=$(python3 -c "import json; d=json.load(open('$CONFIG_DIR/config.json')); print(d['daemon_api_key'])")
 
 # ── 5. Python venv ────────────────────────────────────────────────────────────
-section "5 / 9  Python environment"
+section "5 / 8  Python environment"
 
 if [[ -f "$VENV/bin/pip" ]]; then
   step "Venv exists — updating dependencies..."
@@ -173,7 +173,7 @@ else
 fi
 
 # ── 6. Daemon service ─────────────────────────────────────────────────────────
-section "6 / 9  Daemon service"
+section "6 / 8  Daemon service"
 
 step "Installing launchd service..."
 sed \
@@ -189,7 +189,7 @@ launchctl load "$LAUNCHD_PLIST"
 ok "Daemon service running"
 
 # ── 7. Tailscale ──────────────────────────────────────────────────────────────
-section "7 / 9  Tailscale"
+section "7 / 8  Tailscale"
 
 # Ensure tailscaled is running before any tailscale commands
 if ! brew services list | grep -q "tailscale.*started"; then
@@ -234,7 +234,7 @@ fi
 ok "Tailscale IP: $TAILSCALE_IP"
 
 # ── 8. Obsidian plugin ────────────────────────────────────────────────────────
-section "8 / 9  Obsidian Local REST API plugin"
+section "8 / 8  Obsidian Local REST API plugin"
 
 PLUGIN_DATA="$VAULT_PATH/.obsidian/plugins/obsidian-local-rest-api/data.json"
 
@@ -302,55 +302,6 @@ step "Generating connection QR code..."
   --output "$CONFIG_DIR/alysha-connect.png" \
   --terminal
 
-# ── 9. Apple Notes integration (optional) ────────────────────────────────────
-section "9 / 9  Apple Notes integration  (optional)"
-
-echo ""
-gum style --foreground 245 "  Import your existing Apple Notes into the Alysha vault using the"
-gum style --foreground 245 "  Obsidian Importer plugin. Notes will be searchable via Alysha immediately."
-echo ""
-
-apple_notes_choice=$(ask "Import Apple Notes into your vault now?" \
-  "Yes, import now" \
-  "Skip for now")
-
-if [[ "$apple_notes_choice" == "Yes, import now" ]]; then
-
-  gum style \
-    --border normal \
-    --border-foreground 226 \
-    --padding "1 3" \
-    "$(gum style --foreground 226 --bold "Action required in Obsidian:")
-
-$(gum style --foreground 255 "Step 1 ·") $(gum style --foreground 245 "macOS may ask for permission — if a dialog appears, go to:")
-            $(gum style --foreground 245 "System Settings → Privacy & Security → Full Disk Access → add Obsidian.")
-$(gum style --foreground 255 "Step 2 ·") $(gum style --foreground 245 "Obsidian is opening — switch to it now.")
-$(gum style --foreground 255 "Step 3 ·") $(gum style --foreground 245 "Go to Settings → Community Plugins → find 'Importer' → Enable it.")
-$(gum style --foreground 255 "Step 4 ·") $(gum style --foreground 245 "Open the Importer plugin (ribbon icon or command palette).")
-$(gum style --foreground 255 "Step 5 ·") $(gum style --foreground 245 "Select 'Apple Notes' as the source → click Import.")
-            $(gum style --foreground 245 "Note: sketches and some special notes may fail — this is a known")
-            $(gum style --foreground 245 "importer limitation. All other notes will import successfully.")
-$(gum style --foreground 245 "────────────────────────────────────────────────────────────")
-$(gum style --foreground 245 "Imported notes appear under Imported/Apple Notes/ in your vault.")"
-
-  open -a Obsidian "$VAULT_PATH" 2>/dev/null || true
-  echo ""
-  gum confirm \
-    --affirmative "Done — notes imported" \
-    --negative "Skip import" \
-    "Confirm when the import is complete (or skip to do it later)." || true
-
-  ok "Apple Notes import complete"
-
-  # Remove the Importer plugin immediately — it is desktop-only and will crash
-  # Obsidian on iPhone/iPad if left in the vault (iCloud syncs the plugin files).
-  step "Removing Importer plugin to protect iOS/iPad Obsidian..."
-  "$VENV/bin/python" "$SCRIPT_DIR/alysha_cli.py" fix-plugins
-  ok "Plugin removed — your iPhone/iPad Obsidian is safe"
-
-else
-  skip "Apple Notes import skipped — run alysha import-notes any time to import"
-fi
 
 # ── CLI shim ──────────────────────────────────────────────────────────────────
 section "CLI  alysha command"
