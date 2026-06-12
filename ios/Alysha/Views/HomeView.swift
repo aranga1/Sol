@@ -66,7 +66,8 @@ struct HomeView: View {
                 },
                 onNewConversation: { closeDrawer() },
                 onOpenSettings: { closeDrawer(); showSettings = true },
-                onOpenAllChats: { closeDrawer(); navigateToAllChats = true }
+                onOpenAllChats: { closeDrawer(); navigateToAllChats = true },
+                onOpenObsidian: { closeDrawer(); openObsidianVault() }
             )
             .frame(width: drawerWidth)
             .shadow(color: .black.opacity(0.15), radius: 12, x: 4)
@@ -108,12 +109,6 @@ struct HomeView: View {
                 CaptureButton(icon: "pencil", label: "Text Note", isEnabled: isConnected) {
                     showTextNote = true
                 }
-            }
-
-            Button { openObsidianVault() } label: {
-                Label("Open in Obsidian", systemImage: "book.closed")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
             }
 
             Spacer()
@@ -172,6 +167,7 @@ private struct DrawerView: View {
     let onNewConversation: () -> Void
     let onOpenSettings: () -> Void
     let onOpenAllChats: () -> Void
+    let onOpenObsidian: () -> Void
 
     private let rowHeight: CGFloat = 46
 
@@ -264,6 +260,18 @@ private struct DrawerView: View {
 
             Divider()
 
+            // Open in Obsidian
+            Button(action: onOpenObsidian) {
+                HStack(spacing: 12) {
+                    Image(systemName: "book.closed").frame(width: 20)
+                    Text("Open in Obsidian").font(.body)
+                }
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 14)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
             // Settings
             Button(action: onOpenSettings) {
                 HStack(spacing: 12) {
@@ -272,7 +280,7 @@ private struct DrawerView: View {
                 }
                 .foregroundStyle(.primary)
                 .padding(.horizontal, 20)
-                .padding(.vertical, 16)
+                .padding(.vertical, 14)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
