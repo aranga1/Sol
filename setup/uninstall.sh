@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CONFIG_DIR="$HOME/.alysha"
-VAULT_PATH="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Alysha"
-LAUNCHD_PLIST="$HOME/Library/LaunchAgents/com.alysha.daemon.plist"
+CONFIG_DIR="$HOME/.sol"
+VAULT_PATH="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Sol"
+LAUNCHD_PLIST="$HOME/Library/LaunchAgents/com.sol.daemon.plist"
 
 # ── gum (TUI) ────────────────────────────────────────────────────────────────
 if ! command -v gum &>/dev/null; then
@@ -19,9 +19,9 @@ gum style \
   --bold \
   --padding "1 4" \
   --margin "1 0" \
-  "Alysha Uninstaller"
+  "Sol Uninstaller"
 
-gum style --foreground 245 "This will remove the Alysha daemon, config, and any tools you choose below."
+gum style --foreground 245 "This will remove the Sol daemon, config, and any tools you choose below."
 echo ""
 
 # ── Confirm ──────────────────────────────────────────────────────────────────
@@ -48,14 +48,14 @@ skip() { gum style --foreground 245 "  – $*"; }
 
 # ── 1. Daemon service ─────────────────────────────────────────────────────────
 gum style --bold "Daemon & Config"
-step "Stopping Alysha daemon..."
+step "Stopping Sol daemon..."
 launchctl unload "$LAUNCHD_PLIST" 2>/dev/null || true
 rm -f "$LAUNCHD_PLIST"
 ok "Daemon service removed"
 
-step "Removing ~/.alysha/ (config, venv, logs)..."
+step "Removing ~/.sol/ (config, venv, logs)..."
 rm -rf "$CONFIG_DIR"
-ok "~/.alysha/ removed"
+ok "~/.sol/ removed"
 echo ""
 
 # ── 2. Vault ──────────────────────────────────────────────────────────────────
@@ -108,7 +108,7 @@ echo ""
 
 # ── 5. Obsidian ───────────────────────────────────────────────────────────────
 gum style --bold "Obsidian"
-obs_choice=$(ask "Remove Obsidian app? (say no if you use it outside of Alysha)" \
+obs_choice=$(ask "Remove Obsidian app? (say no if you use it outside of Sol)" \
   "Yes, uninstall Obsidian" \
   "No, keep Obsidian")
 if [[ "$obs_choice" == "Yes, uninstall Obsidian" ]]; then
@@ -127,7 +127,7 @@ gum style \
   --bold \
   --padding "1 4" \
   --margin "1 0" \
-  "Alysha uninstalled."
+  "Sol uninstalled."
 
 gum style --foreground 245 "To reinstall: bash setup/install.sh"
 echo ""

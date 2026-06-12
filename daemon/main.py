@@ -11,6 +11,8 @@ from daemon.routes import health as health_router
 from daemon.routes import notes as notes_router
 from daemon.routes import query as query_router
 from daemon.routes import config as config_router
+from daemon.routes import notifications as notifications_router
+from daemon.routes import tags as tags_router
 
 
 @asynccontextmanager
@@ -20,7 +22,7 @@ async def lifespan(app: FastAPI):
         base_url=f"https://localhost:{app.state.config.obsidian_port}",
         api_key=app.state.config.obsidian_api_key,
     )
-    print(f"Alysha daemon running on port {app.state.config.daemon_port}")
+    print(f"Sol daemon running on port {app.state.config.daemon_port}")
 
     vault_path = app.state.config.vault_path
     ollama_base = app.state.config.ollama_base_url
@@ -75,6 +77,8 @@ app.include_router(health_router.router)
 app.include_router(notes_router.router)
 app.include_router(query_router.router)
 app.include_router(config_router.router)
+app.include_router(notifications_router.router)
+app.include_router(tags_router.router)
 
 
 if __name__ == "__main__":

@@ -24,7 +24,7 @@ def config_file(tmp_path):
 
 @pytest.fixture
 def client(config_file, monkeypatch):
-    monkeypatch.setenv("ALYSHA_CONFIG", str(config_file))
+    monkeypatch.setenv("SOL_CONFIG", str(config_file))
     from daemon.main import app
     with TestClient(app) as c:
         yield c

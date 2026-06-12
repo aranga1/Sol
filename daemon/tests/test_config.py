@@ -21,7 +21,7 @@ def test_load_config_all_fields(tmp_path, monkeypatch):
     config_file = tmp_path / "config.json"
     config_file.write_text(json.dumps(VALID_CONFIG))
 
-    monkeypatch.setenv("ALYSHA_CONFIG", str(config_file))
+    monkeypatch.setenv("SOL_CONFIG", str(config_file))
 
     cfg = load_config()
 
@@ -38,7 +38,7 @@ def test_load_config_all_fields(tmp_path, monkeypatch):
 def test_load_config_missing_file(tmp_path, monkeypatch):
     """load_config raises SystemExit when the config file does not exist."""
     missing = tmp_path / "nonexistent.json"
-    monkeypatch.setenv("ALYSHA_CONFIG", str(missing))
+    monkeypatch.setenv("SOL_CONFIG", str(missing))
 
     with pytest.raises(SystemExit) as exc_info:
         load_config()
@@ -52,7 +52,7 @@ def test_load_config_invalid_fields(tmp_path, monkeypatch):
     config_file = tmp_path / "config.json"
     config_file.write_text(json.dumps(bad_config))
 
-    monkeypatch.setenv("ALYSHA_CONFIG", str(config_file))
+    monkeypatch.setenv("SOL_CONFIG", str(config_file))
 
     with pytest.raises(SystemExit) as exc_info:
         load_config()

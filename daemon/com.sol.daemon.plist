@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.sol.daemon</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>DAEMON_VENV_PYTHON</string>
+    <string>-m</string>
+    <string>daemon.main</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>SOL_CONFIG</key><string>SOL_CONFIG_PATH</string>
+  </dict>
+  <key>WorkingDirectory</key><string>DAEMON_REPO_DIR</string>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>StandardOutPath</key><string>SOL_LOG_PATH</string>
+  <key>StandardErrorPath</key><string>SOL_LOG_PATH</string>
+</dict>
+</plist>

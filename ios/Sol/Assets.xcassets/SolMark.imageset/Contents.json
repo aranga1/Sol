@@ -1,0 +1,19 @@
+{
+  "images": [
+    {
+      "idiom": "universal",
+      "filename": "mark-color.png",
+      "scale": "1x"
+    },
+    {
+      "idiom": "universal",
+      "filename": "mark-cream.png",
+      "scale": "1x",
+      "appearances": [
+        { "appearance": "luminosity", "value": "dark" }
+      ]
+    }
+  ],
+  "info": { "author": "xcode", "version": 1 },
+  "properties": { "template-rendering-intent": "original" }
+}

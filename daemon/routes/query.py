@@ -1,15 +1,18 @@
+import json
+
 from fastapi import APIRouter, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, field_validator
 
-from daemon.rag import query as rag_query
+from daemon import rag
 
 router = APIRouter()
 
 
 class HistoryMessage(BaseModel):
-    role: str   # "user" | "assistant"
+    role: str
     content: str
+
 
 class QueryRequest(BaseModel):
     question: str
@@ -23,36 +26,49 @@ class QueryRequest(BaseModel):
         return v
 
 
-class SourceItem(BaseModel):
-    file: str
-    title: str
-
-
-class QueryResponse(BaseModel):
-    answer: str
-    sources: list[SourceItem]
-
-
-@router.post("/api/query", response_model=QueryResponse)
+@router.post("/api/query")
 async def query_vault(request: Request, body: QueryRequest):
+    """
+    Stream query response as Server-Sent Events.
+
+    Event format (one per line, blank line separator):
+      data: {"type": "token",   "content": "<string>"}
+      data: {"type": "sources", "sources": [{"file": "...", "title": "..."}]}
+      data: {"type": "done"}
+      data: {"type": "error",   "content": "<message>"}
+
+    Clients should treat the connection as done when they receive type=done
+    or type=error. The stream ends after that event.
+    """
     index = getattr(request.app.state, "vault_index", None)
     if index is None:
         return JSONResponse(status_code=503, content={"detail": "Index not ready yet"})
 
-    try:
-        history = [{"role": m.role, "content": m.content} for m in (body.history or [])]
-        system_prompt = getattr(request.app.state.config, "system_prompt", None)
-        answer, sources = rag_query(index, body.question, history=history, system_prompt=system_prompt)
-    except Exception as e:
-        err = str(e)
-        if "timeout" in err.lower() or "timed out" in err.lower():
-            return JSONResponse(
-                status_code=504,
-                content={"detail": "LLM timed out — try a shorter question or try again"},
-            )
-        return JSONResponse(status_code=500, content={"detail": err})
+    history = [{"role": m.role, "content": m.content} for m in (body.history or [])]
+    system_prompt = getattr(request.app.state.config, "system_prompt", None)
 
-    return QueryResponse(
-        answer=answer,
-        sources=[SourceItem(file=s["file"], title=s["title"]) for s in sources],
+    async def generate():
+        try:
+            async for event in rag.query_stream_async(
+                index,
+                body.question,
+                history=history,
+                system_prompt=system_prompt,
+            ):
+                yield f"data: {json.dumps(event)}\n\n"
+        except Exception as e:
+            err = str(e)
+            if "timeout" in err.lower() or "timed out" in err.lower():
+                msg = "LLM timed out — try a shorter question or try again"
+            else:
+                msg = err
+            yield f"data: {json.dumps({'type': 'error', 'content': msg})}\n\n"
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",  # disable nginx buffering if proxied
+        },
     )

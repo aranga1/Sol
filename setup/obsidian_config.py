@@ -20,9 +20,8 @@ def setup_vault(vault_path: str) -> None:
         "attachmentFolderPath": "Attachments"
     }, indent=2))
 
-    # Enable community plugins
     (obsidian / "community-plugins.json").write_text(
-        json.dumps(["obsidian-local-rest-api", "obsidian-importer"])
+        json.dumps(["obsidian-local-rest-api"])
     )
 
     # Local REST API plugin config (API key set by install.sh via config.json)
@@ -34,28 +33,25 @@ def setup_vault(vault_path: str) -> None:
         "apiKey": ""  # will be set when user enables plugin in Obsidian
     }, indent=2))
 
-    # Obsidian Importer plugin directory (Obsidian downloads the actual files on first open)
-    (obsidian / "plugins" / "obsidian-importer").mkdir(parents=True, exist_ok=True)
-
     # Welcome note
-    welcome = vault / "Notes" / "Welcome to Alysha.md"
+    welcome = vault / "Notes" / "Welcome to Sol.md"
     if not welcome.exists():
         ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         welcome.write_text(f"""---
 created: {ts}
 tags:
-  - alysha
+  - sol
   - welcome
 ---
 
-# Welcome to Alysha
+# Welcome to Sol
 
 Your second brain vault is ready. Notes captured from your iPhone will appear here.
 
 **Next steps:**
 1. Enable the Local REST API community plugin in Obsidian settings
-2. Scan the QR code shown in your terminal from the Alysha iPhone app
-3. On iPhone: install Tailscale, install Alysha, open Obsidian iOS and sync this vault via iCloud
+2. Scan the QR code shown in your terminal from the Sol iPhone app
+3. On iPhone: install Tailscale, install Sol, open Obsidian iOS and sync this vault via iCloud
 """)
 
 if __name__ == "__main__":

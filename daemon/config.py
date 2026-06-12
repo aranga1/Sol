@@ -8,9 +8,13 @@ DEFAULT_SYSTEM_PROMPT = (
     "---------------------\n"
     "{context_str}\n"
     "---------------------\n"
-    "Answer the question using ONLY the information in the notes above. "
-    "Be thorough — mention EVERY relevant fact across ALL the notes provided, even minor details. "
-    "Do not omit anything relevant. Do not invent facts not in the notes.\n"
+    "Rules:\n"
+    "1. Answer using ONLY the note excerpts above.\n"
+    "2. Read every excerpt carefully. If a name, word, or topic appears anywhere — even once — report it with the exact quote.\n"
+    "3. Do NOT say a topic is absent if it appears in any excerpt.\n"
+    "4. Do NOT include file paths, filenames, or technical identifiers in your answer.\n"
+    "5. If the excerpts genuinely contain nothing relevant, say so briefly.\n"
+    "6. Do not invent facts.\n"
     "Question: {query_str}\n"
     "Answer:"
 )
@@ -34,7 +38,7 @@ _config_path: Path | None = None
 def get_config_path() -> Path:
     global _config_path
     if _config_path is None:
-        _config_path = Path(os.environ.get("ALYSHA_CONFIG", Path.home() / ".alysha" / "config.json"))
+        _config_path = Path(os.environ.get("SOL_CONFIG", Path.home() / ".sol" / "config.json"))
     return _config_path
 
 

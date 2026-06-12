@@ -1,4 +1,4 @@
-# Alysha — Product Requirements Document
+# Sol — Product Requirements Document
 
 **Version:** 1.1  
 **Date:** 2026-06-11  
@@ -59,8 +59,8 @@ Ideas and thoughts are scattered across multiple apps (Apple Notes, Notion, emai
 **Acceptance Criteria:**
 - QR code encodes JSON: `{"host": "<tailscale-ip>", "port": 8765, "apiKey": "<daemon-key>"}`
 - QR is printed as ASCII art in the terminal
-- QR is also saved as `~/.alysha/alysha-connect.png`
-- Scanning the QR in the Alysha iOS app completes the connection setup
+- QR is also saved as `~/.sol/sol-connect.png`
+- Scanning the QR in the Sol iOS app completes the connection setup
 
 ---
 
@@ -108,7 +108,7 @@ Ideas and thoughts are scattered across multiple apps (Apple Notes, Notion, emai
 
 ---
 
-### 3.3 iOS App — Alysha
+### 3.3 iOS App — Sol
 
 **US-08 — Onboarding via QR scan**
 > As a first-time user, I want to connect the app to my Mac by scanning the QR code.
@@ -158,7 +158,7 @@ Ideas and thoughts are scattered across multiple apps (Apple Notes, Notion, emai
 - Search/query bar on HomeView opens QueryView on submit
 - QueryView shows the question at top, synthesized answer below, source list at bottom
 - Each source row shows the note title and is tappable
-- Tapping a source opens `obsidian://open?vault=Alysha&file=<encoded_path>` (opens Obsidian iOS)
+- Tapping a source opens `obsidian://open?vault=Sol&file=<encoded_path>` (opens Obsidian iOS)
 - Loading spinner shown while awaiting response
 - Error state shown if request fails
 
@@ -175,8 +175,8 @@ Ideas and thoughts are scattered across multiple apps (Apple Notes, Notion, emai
 
 **Acceptance Criteria:**
 - Medium-size WidgetKit widget with two tappable areas: "Voice" and "Text"
-- Tapping "Voice" deep-links to `alysha://voice` (opens app directly in VoiceNoteView)
-- Tapping "Text" deep-links to `alysha://text` (opens app directly in TextNoteView)
+- Tapping "Voice" deep-links to `sol://voice` (opens app directly in VoiceNoteView)
+- Tapping "Text" deep-links to `sol://text` (opens app directly in TextNoteView)
 - Widget contains no dynamic data and makes no network requests (pure launch shortcut)
 - Widget is available for the user to add from the iOS widget gallery
 
@@ -185,10 +185,10 @@ Ideas and thoughts are scattered across multiple apps (Apple Notes, Notion, emai
 ### 3.4 Vault Sync (iCloud)
 
 **US-15 — iCloud vault sync to Obsidian iOS**
-> As a user, I want notes I send from the Alysha app to also appear in Obsidian on my iPhone.
+> As a user, I want notes I send from the Sol app to also appear in Obsidian on my iPhone.
 
 **Acceptance Criteria:**
-- Vault is created at `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Alysha/` by the install script
+- Vault is created at `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Sol/` by the install script
 - Obsidian iOS detects the vault via "Open vault from iCloud"
 - Notes synced to iCloud appear in Obsidian iOS within ~30 seconds on WiFi
 - Source note deep links from QueryView open the correct note in Obsidian iOS
@@ -217,7 +217,7 @@ Ideas and thoughts are scattered across multiple apps (Apple Notes, Notion, emai
 - All data stays on-device or on the user's own hardware; no third-party cloud services receive note content
 - Tailscale P2P encrypted tunnel; daemon API key required for all write/query endpoints
 - API key stored in iOS Keychain (not UserDefaults)
-- Daemon config file (`~/.alysha/config.json`) has mode 600 (owner-read-only)
+- Daemon config file (`~/.sol/config.json`) has mode 600 (owner-read-only)
 - No analytics, crash reporting, or telemetry in the daemon or iOS app
 
 ### Performance
@@ -267,8 +267,8 @@ Ideas and thoughts are scattered across multiple apps (Apple Notes, Notion, emai
 
 - **Source connectors** — Apple Notes, Notion, and email sync are explicitly deferred
 - **Multi-user or multi-vault support** — single user, single vault only
-- **Note editing in Alysha iOS** — the app is capture-only; editing happens in Obsidian
-- **Note browsing/search in Alysha iOS** — browsing is deferred to Obsidian iOS via iCloud
+- **Note editing in Sol iOS** — the app is capture-only; editing happens in Obsidian
+- **Note browsing/search in Sol iOS** — browsing is deferred to Obsidian iOS via iCloud
 - **Android app** — iOS only
 - **Web interface** — no browser UI for the daemon
 - **Obsidian plugin development** — uses existing community plugin; no custom plugin built

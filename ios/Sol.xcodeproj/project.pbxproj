@@ -1,0 +1,613 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		06D978A769DC1C35AE0771A5 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E22711CC4EA5A88833898CE8 /* NotificationService.swift */; };
+		09B493E788ACB79861E22CA9 /* QueryResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7234FCACFC1F7924A21FF224 /* QueryResponse.swift */; };
+		14A830D8D0F52F55E51DA925 /* Newsreader.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B68D1B648FC1177733924726 /* Newsreader.ttf */; };
+		36FEA7DF1A4AD4708E020134 /* SolApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76D87B6509DAB2C17F2E87A5 /* SolApp.swift */; };
+		3E668C2A44BCA4C9A7585C41 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F054FEA6F26B5A7196F679FB /* HomeView.swift */; };
+		42760164C2B51D207E365511 /* QueryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A293A6186A131A8136E4DD18 /* QueryView.swift */; };
+		55C21E6AA64DBC2042918C6E /* DaemonStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ADFE3DAD33FB8568630E622 /* DaemonStatusViewModel.swift */; };
+		6CEFD4D29507A74099CEE72A /* SolWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3EB1C2F2E30F67C9E973AF3 /* SolWidget.swift */; };
+		785428A87598D3756B69C84D /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71EEA8920F4713174DEEFB6F /* QRScannerView.swift */; };
+		7900DE872A4F1391AA9B8309 /* WhisperService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD5DA0CD0F7301F36D00E441 /* WhisperService.swift */; };
+		7CA171B9A1380E35D163BE50 /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06DCA450FCA101B732AC5766 /* HistoryStore.swift */; };
+		8A75F173527CA378DF4A4E2F /* TagStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA69B30D4AD283DDA320EF7 /* TagStore.swift */; };
+		8E2085060802A4AB4CF8770B /* AllChatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38358FEC4BCA209328EE3D0A /* AllChatsView.swift */; };
+		8F34F69E45EDFCB5AA0B9E04 /* ConnectionConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F514DF6D482ADE02B9FB552 /* ConnectionConfig.swift */; };
+		8FED257FA4BDEEDCFAE4072E /* BreathingBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4075C452ECF4EBE74177F209 /* BreathingBackground.swift */; };
+		9B4C32AEBCF0949924EF07D7 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D636FB5C3E9FE738D13280 /* HistoryView.swift */; };
+		9C610A72D41B41E9764FF251 /* Newsreader-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEC3E2A52C50314B388FF01 /* Newsreader-Italic.ttf */; };
+		AB007F063F789B07ECDD15CC /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10174D681C9749FC5C9F3D7C /* KeychainService.swift */; };
+		B2ACF847CC28B8FFC9AEE20B /* SolWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F895625B3F0F02442EABA0 /* SolWidgetBundle.swift */; };
+		B738C2A4E140CF433699D779 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B1CDEA9768FAE42438C4F47 /* DesignSystem.swift */; };
+		B99646E735654664CD1B52F6 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 006805B7AFA09E6024C2BFEF /* Note.swift */; };
+		BC38490E3A6A97E9BB2A0720 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC29BEB51B22345243B5D41 /* HelpView.swift */; };
+		BF8A1D295BA7C9A7070F139E /* VoiceNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A7BCE38A3449815104DB2B1 /* VoiceNoteView.swift */; };
+		C3E6AC28C86094F6E7D9D126 /* NoteComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FDDD108104B852671CB4C73 /* NoteComposerView.swift */; };
+		C7ECABDF3EB1B26BAAD28071 /* TextNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4460F7B444409B5A81A7B654 /* TextNoteView.swift */; };
+		CA05C24530DEEAA186DD0D06 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 452FE6CDB9179A1DCE564E33 /* Assets.xcassets */; };
+		D1A98C4951484D077C820F36 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F4C5D5909E42CE6C46E8081 /* SettingsView.swift */; };
+		D1CDC42E1B8C30B7D4E533A2 /* MarkdownEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E466C941B84FC46FB9463714 /* MarkdownEditor.swift */; };
+		DE0880242328A5D75C8C9807 /* SystemPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A3073D14A9D604F13ED168 /* SystemPrompt.swift */; };
+		DF48CB3200F553D9E29DBC2F /* SystemPromptEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68E8960270D7B266E93CC387 /* SystemPromptEditorView.swift */; };
+		E1DD56B41C51691FB3B231E5 /* SolMarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECDCBD5E48632668D824AAA4 /* SolMarkView.swift */; };
+		EE44D8D7DB9FD1DA3BA3CC4D /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CBB9AA2E1CBC2EE0927B6A3 /* APIClient.swift */; };
+		EE619684EE8ACE8CA4A0768D /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = D2CDE0D8D1ADA486797901F7 /* WhisperKit */; };
+		EFC02193C983BB03DE7D6C09 /* ConversationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED45EC41EF9E848BA58F6591 /* ConversationSession.swift */; };
+		F101F75B9D6C75A4F37E814B /* ManualEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FE67FF6154832FC45DB127 /* ManualEntryView.swift */; };
+		FC74327D57E0D1F1050E1DB6 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31287DDB302C963B7E2AF002 /* OnboardingView.swift */; };
+		FD6C80BF3088049E9F14FC02 /* SolAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA85A75E093A4CE68C2CE8C8 /* SolAppDelegate.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		006805B7AFA09E6024C2BFEF /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		06DCA450FCA101B732AC5766 /* HistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
+		0D28268A8167025B88BECB36 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		0F514DF6D482ADE02B9FB552 /* ConnectionConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionConfig.swift; sourceTree = "<group>"; };
+		10174D681C9749FC5C9F3D7C /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		12048DD4C44A4AC422790774 /* Sol.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sol.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DA69B30D4AD283DDA320EF7 /* TagStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagStore.swift; sourceTree = "<group>"; };
+		1F4C5D5909E42CE6C46E8081 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		1FDDD108104B852671CB4C73 /* NoteComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteComposerView.swift; sourceTree = "<group>"; };
+		2A7BCE38A3449815104DB2B1 /* VoiceNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceNoteView.swift; sourceTree = "<group>"; };
+		31287DDB302C963B7E2AF002 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		38358FEC4BCA209328EE3D0A /* AllChatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllChatsView.swift; sourceTree = "<group>"; };
+		3EC29BEB51B22345243B5D41 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
+		4075C452ECF4EBE74177F209 /* BreathingBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathingBackground.swift; sourceTree = "<group>"; };
+		4460F7B444409B5A81A7B654 /* TextNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextNoteView.swift; sourceTree = "<group>"; };
+		452FE6CDB9179A1DCE564E33 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		49FE67FF6154832FC45DB127 /* ManualEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualEntryView.swift; sourceTree = "<group>"; };
+		4ADFE3DAD33FB8568630E622 /* DaemonStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaemonStatusViewModel.swift; sourceTree = "<group>"; };
+		4CBB9AA2E1CBC2EE0927B6A3 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		5CC310179CA903C007A3A301 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		68E8960270D7B266E93CC387 /* SystemPromptEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemPromptEditorView.swift; sourceTree = "<group>"; };
+		6B1CDEA9768FAE42438C4F47 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
+		71EEA8920F4713174DEEFB6F /* QRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
+		7234FCACFC1F7924A21FF224 /* QueryResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryResponse.swift; sourceTree = "<group>"; };
+		76D87B6509DAB2C17F2E87A5 /* SolApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolApp.swift; sourceTree = "<group>"; };
+		88A3073D14A9D604F13ED168 /* SystemPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemPrompt.swift; sourceTree = "<group>"; };
+		8AEC3E2A52C50314B388FF01 /* Newsreader-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Newsreader-Italic.ttf"; sourceTree = "<group>"; };
+		A293A6186A131A8136E4DD18 /* QueryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryView.swift; sourceTree = "<group>"; };
+		B68D1B648FC1177733924726 /* Newsreader.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Newsreader.ttf; sourceTree = "<group>"; };
+		CD5DA0CD0F7301F36D00E441 /* WhisperService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperService.swift; sourceTree = "<group>"; };
+		DA85A75E093A4CE68C2CE8C8 /* SolAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolAppDelegate.swift; sourceTree = "<group>"; };
+		DD9AB5B0AB4FB24534B32E96 /* SolWidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = SolWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E22711CC4EA5A88833898CE8 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		E466C941B84FC46FB9463714 /* MarkdownEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownEditor.swift; sourceTree = "<group>"; };
+		E4D636FB5C3E9FE738D13280 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		E4F895625B3F0F02442EABA0 /* SolWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolWidgetBundle.swift; sourceTree = "<group>"; };
+		ECDCBD5E48632668D824AAA4 /* SolMarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolMarkView.swift; sourceTree = "<group>"; };
+		ED45EC41EF9E848BA58F6591 /* ConversationSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationSession.swift; sourceTree = "<group>"; };
+		F054FEA6F26B5A7196F679FB /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		F3EB1C2F2E30F67C9E973AF3 /* SolWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolWidget.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		245349072A6FA4C443F164DB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EE619684EE8ACE8CA4A0768D /* WhisperKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1888F8EF073AF1AB5E1D363F = {
+			isa = PBXGroup;
+			children = (
+				CF9DE1F116E2F69D4A0C40D4 /* Sol */,
+				881552C38FD5DB89F3B4A188 /* SolWidgetExtension */,
+				C1BD183D86CFA55EA61F9B3B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4DB443660B018343827FBC72 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				0F514DF6D482ADE02B9FB552 /* ConnectionConfig.swift */,
+				ED45EC41EF9E848BA58F6591 /* ConversationSession.swift */,
+				006805B7AFA09E6024C2BFEF /* Note.swift */,
+				7234FCACFC1F7924A21FF224 /* QueryResponse.swift */,
+				88A3073D14A9D604F13ED168 /* SystemPrompt.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		5F95CBE31862E067D1BFE44E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				38358FEC4BCA209328EE3D0A /* AllChatsView.swift */,
+				4075C452ECF4EBE74177F209 /* BreathingBackground.swift */,
+				3EC29BEB51B22345243B5D41 /* HelpView.swift */,
+				E4D636FB5C3E9FE738D13280 /* HistoryView.swift */,
+				F054FEA6F26B5A7196F679FB /* HomeView.swift */,
+				49FE67FF6154832FC45DB127 /* ManualEntryView.swift */,
+				E466C941B84FC46FB9463714 /* MarkdownEditor.swift */,
+				1FDDD108104B852671CB4C73 /* NoteComposerView.swift */,
+				31287DDB302C963B7E2AF002 /* OnboardingView.swift */,
+				71EEA8920F4713174DEEFB6F /* QRScannerView.swift */,
+				A293A6186A131A8136E4DD18 /* QueryView.swift */,
+				1F4C5D5909E42CE6C46E8081 /* SettingsView.swift */,
+				ECDCBD5E48632668D824AAA4 /* SolMarkView.swift */,
+				68E8960270D7B266E93CC387 /* SystemPromptEditorView.swift */,
+				4460F7B444409B5A81A7B654 /* TextNoteView.swift */,
+				2A7BCE38A3449815104DB2B1 /* VoiceNoteView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		6FC9BDDF5F863CBE9D9700E3 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				4CBB9AA2E1CBC2EE0927B6A3 /* APIClient.swift */,
+				06DCA450FCA101B732AC5766 /* HistoryStore.swift */,
+				10174D681C9749FC5C9F3D7C /* KeychainService.swift */,
+				E22711CC4EA5A88833898CE8 /* NotificationService.swift */,
+				1DA69B30D4AD283DDA320EF7 /* TagStore.swift */,
+				CD5DA0CD0F7301F36D00E441 /* WhisperService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		881552C38FD5DB89F3B4A188 /* SolWidgetExtension */ = {
+			isa = PBXGroup;
+			children = (
+				5CC310179CA903C007A3A301 /* .gitkeep */,
+				F3EB1C2F2E30F67C9E973AF3 /* SolWidget.swift */,
+				E4F895625B3F0F02442EABA0 /* SolWidgetBundle.swift */,
+			);
+			path = SolWidgetExtension;
+			sourceTree = "<group>";
+		};
+		A5E966B465B5ED76F844514E /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				4ADFE3DAD33FB8568630E622 /* DaemonStatusViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		B864E9B729E820CBFC812A97 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				8AEC3E2A52C50314B388FF01 /* Newsreader-Italic.ttf */,
+				B68D1B648FC1177733924726 /* Newsreader.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		C1BD183D86CFA55EA61F9B3B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				12048DD4C44A4AC422790774 /* Sol.app */,
+				DD9AB5B0AB4FB24534B32E96 /* SolWidgetExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CF9DE1F116E2F69D4A0C40D4 /* Sol */ = {
+			isa = PBXGroup;
+			children = (
+				452FE6CDB9179A1DCE564E33 /* Assets.xcassets */,
+				6B1CDEA9768FAE42438C4F47 /* DesignSystem.swift */,
+				0D28268A8167025B88BECB36 /* Info.plist */,
+				76D87B6509DAB2C17F2E87A5 /* SolApp.swift */,
+				DA85A75E093A4CE68C2CE8C8 /* SolAppDelegate.swift */,
+				4DB443660B018343827FBC72 /* Models */,
+				D2DB0303235C67DAA3FA1538 /* Resources */,
+				6FC9BDDF5F863CBE9D9700E3 /* Services */,
+				A5E966B465B5ED76F844514E /* ViewModels */,
+				5F95CBE31862E067D1BFE44E /* Views */,
+			);
+			path = Sol;
+			sourceTree = "<group>";
+		};
+		D2DB0303235C67DAA3FA1538 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				B864E9B729E820CBFC812A97 /* Fonts */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		26576A1A9DA45F5F031C1E15 /* SolWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 22B840EA027828FA7B8BD353 /* Build configuration list for PBXNativeTarget "SolWidgetExtension" */;
+			buildPhases = (
+				E7DDD552C114A9636A55E178 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SolWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = SolWidgetExtension;
+			productReference = DD9AB5B0AB4FB24534B32E96 /* SolWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		4C5415BCC71C82E085184A54 /* Sol */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6AA741372028B8A51AE40FAB /* Build configuration list for PBXNativeTarget "Sol" */;
+			buildPhases = (
+				29A0337D912A5EAC2B02B03C /* Sources */,
+				540C3797BEB88B4B83845FF0 /* Resources */,
+				245349072A6FA4C443F164DB /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Sol;
+			packageProductDependencies = (
+				D2CDE0D8D1ADA486797901F7 /* WhisperKit */,
+			);
+			productName = Sol;
+			productReference = 12048DD4C44A4AC422790774 /* Sol.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		09E1527457CD5DD309EC955F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					26576A1A9DA45F5F031C1E15 = {
+						DevelopmentTeam = W396434AGH;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 30592EE47B580729F61F4558 /* Build configuration list for PBXProject "Sol" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 1888F8EF073AF1AB5E1D363F;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				62BD01202B3B6BDD87D3DF8F /* XCRemoteSwiftPackageReference "WhisperKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = C1BD183D86CFA55EA61F9B3B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4C5415BCC71C82E085184A54 /* Sol */,
+				26576A1A9DA45F5F031C1E15 /* SolWidgetExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		540C3797BEB88B4B83845FF0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA05C24530DEEAA186DD0D06 /* Assets.xcassets in Resources */,
+				9C610A72D41B41E9764FF251 /* Newsreader-Italic.ttf in Resources */,
+				14A830D8D0F52F55E51DA925 /* Newsreader.ttf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		29A0337D912A5EAC2B02B03C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EE44D8D7DB9FD1DA3BA3CC4D /* APIClient.swift in Sources */,
+				8E2085060802A4AB4CF8770B /* AllChatsView.swift in Sources */,
+				8FED257FA4BDEEDCFAE4072E /* BreathingBackground.swift in Sources */,
+				8F34F69E45EDFCB5AA0B9E04 /* ConnectionConfig.swift in Sources */,
+				EFC02193C983BB03DE7D6C09 /* ConversationSession.swift in Sources */,
+				55C21E6AA64DBC2042918C6E /* DaemonStatusViewModel.swift in Sources */,
+				B738C2A4E140CF433699D779 /* DesignSystem.swift in Sources */,
+				BC38490E3A6A97E9BB2A0720 /* HelpView.swift in Sources */,
+				7CA171B9A1380E35D163BE50 /* HistoryStore.swift in Sources */,
+				9B4C32AEBCF0949924EF07D7 /* HistoryView.swift in Sources */,
+				3E668C2A44BCA4C9A7585C41 /* HomeView.swift in Sources */,
+				AB007F063F789B07ECDD15CC /* KeychainService.swift in Sources */,
+				F101F75B9D6C75A4F37E814B /* ManualEntryView.swift in Sources */,
+				D1CDC42E1B8C30B7D4E533A2 /* MarkdownEditor.swift in Sources */,
+				B99646E735654664CD1B52F6 /* Note.swift in Sources */,
+				C3E6AC28C86094F6E7D9D126 /* NoteComposerView.swift in Sources */,
+				06D978A769DC1C35AE0771A5 /* NotificationService.swift in Sources */,
+				FC74327D57E0D1F1050E1DB6 /* OnboardingView.swift in Sources */,
+				785428A87598D3756B69C84D /* QRScannerView.swift in Sources */,
+				09B493E788ACB79861E22CA9 /* QueryResponse.swift in Sources */,
+				42760164C2B51D207E365511 /* QueryView.swift in Sources */,
+				D1A98C4951484D077C820F36 /* SettingsView.swift in Sources */,
+				36FEA7DF1A4AD4708E020134 /* SolApp.swift in Sources */,
+				FD6C80BF3088049E9F14FC02 /* SolAppDelegate.swift in Sources */,
+				E1DD56B41C51691FB3B231E5 /* SolMarkView.swift in Sources */,
+				DE0880242328A5D75C8C9807 /* SystemPrompt.swift in Sources */,
+				DF48CB3200F553D9E29DBC2F /* SystemPromptEditorView.swift in Sources */,
+				8A75F173527CA378DF4A4E2F /* TagStore.swift in Sources */,
+				C7ECABDF3EB1B26BAAD28071 /* TextNoteView.swift in Sources */,
+				BF8A1D295BA7C9A7070F139E /* VoiceNoteView.swift in Sources */,
+				7900DE872A4F1391AA9B8309 /* WhisperService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E7DDD552C114A9636A55E178 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6CEFD4D29507A74099CEE72A /* SolWidget.swift in Sources */,
+				B2ACF847CC28B8FFC9AEE20B /* SolWidgetBundle.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		6DB50E7DB63B9EC0EA0BF8B2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = W396434AGH;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aakashranga.Sol.widget;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8AE596E8FDD275445CC2CC3B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		9B745451E8C27CB22EEC7901 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		DF300DC3840474470240432C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = J6X383NXGF;
+				INFOPLIST_FILE = Sol/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aakashranga.Sol;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		E9CD10D7287CB334B2F2D344 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = W396434AGH;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aakashranga.Sol.widget;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		FC0F8808D9A1FE5F0A37FA9D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = J6X383NXGF;
+				INFOPLIST_FILE = Sol/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aakashranga.Sol;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		22B840EA027828FA7B8BD353 /* Build configuration list for PBXNativeTarget "SolWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6DB50E7DB63B9EC0EA0BF8B2 /* Debug */,
+				E9CD10D7287CB334B2F2D344 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		30592EE47B580729F61F4558 /* Build configuration list for PBXProject "Sol" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B745451E8C27CB22EEC7901 /* Debug */,
+				8AE596E8FDD275445CC2CC3B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		6AA741372028B8A51AE40FAB /* Build configuration list for PBXNativeTarget "Sol" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FC0F8808D9A1FE5F0A37FA9D /* Debug */,
+				DF300DC3840474470240432C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		62BD01202B3B6BDD87D3DF8F /* XCRemoteSwiftPackageReference "WhisperKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/argmaxinc/WhisperKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D2CDE0D8D1ADA486797901F7 /* WhisperKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 62BD01202B3B6BDD87D3DF8F /* XCRemoteSwiftPackageReference "WhisperKit" */;
+			productName = WhisperKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 09E1527457CD5DD309EC955F /* Project object */;
+}
