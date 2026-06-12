@@ -34,6 +34,13 @@ struct HistoryView: View {
                             }
                             .padding(.vertical, 2)
                         }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                store.delete(session)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
                         .contextMenu {
                             Button(role: .destructive) {
                                 store.delete(session)
@@ -44,7 +51,6 @@ struct HistoryView: View {
                             ConversationPreview(session: session)
                         }
                     }
-                    .onDelete { store.delete(at: $0) }
                 }
             }
         }
