@@ -21,7 +21,7 @@ private final class QueryViewModel {
 
     func loadSession(_ existing: ConversationSession) {
         messages = existing.messages
-        session = existing  // preserve original id + startedAt — saves update in place
+        session = existing
     }
 
     func ask(_ q: String) async {
@@ -65,6 +65,7 @@ struct QueryView: View {
     var existingSession: ConversationSession? = nil
     @State private var vm: QueryViewModel
     @State private var scrollID: UUID?
+    @State private var thinkPhase = false
 
     init(initialQuestion: String = "") {
         self.initialQuestion = initialQuestion
@@ -77,140 +78,100 @@ struct QueryView: View {
     }
 
     var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
+        ZStack {
+            DS.parchment.ignoresSafeArea()
 
-                    // Conversation thread
-                    ForEach(vm.messages) { msg in
-                        VStack(alignment: .leading, spacing: 12) {
-                            // Question bubble
-                            HStack {
-                                Spacer()
-                                Text(msg.question)
-                                    .padding(.horizontal, 14)
-                                    .padding(.vertical, 10)
-                                    .background(Color.indigo, in: RoundedRectangle(cornerRadius: 16))
-                                    .foregroundStyle(.white)
-                                    .padding(.leading, 60)
-                            }
-                            .padding(.horizontal)
+            VStack(spacing: 0) {
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 0) {
 
-                            // Answer + sources
-                            VStack(alignment: .leading, spacing: 8) {
-                                HStack {
-                                    markdownText(msg.answer)
-                                        .textSelection(.enabled)
-                                        .padding(.horizontal, 14)
-                                        .padding(.vertical, 10)
-                                        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
-                                        .padding(.trailing, 60)
-                                    Spacer()
+                            // Conversation thread
+                            ForEach(vm.messages) { msg in
+                                VStack(alignment: .leading, spacing: 0) {
+                                    // User bubble
+                                    userBubble(msg.question)
+                                        .padding(.bottom, 14)
+
+                                    // Assistant message
+                                    assistantMessage(msg)
                                 }
-                                .padding(.horizontal)
+                                .padding(.vertical, 12)
+                                .id(msg.id)
+                            }
 
-                                if !msg.sources.isEmpty {
-                                    VStack(alignment: .leading, spacing: 0) {
-                                        ForEach(msg.sources) { source in
-                                            Button { openInObsidian(source) } label: {
-                                                HStack {
-                                                    Image(systemName: "doc.text")
-                                                        .foregroundStyle(.secondary)
-                                                        .font(.caption)
-                                                    Text(source.title)
-                                                        .font(.caption)
-                                                        .foregroundStyle(.secondary)
-                                                    Spacer()
-                                                    Image(systemName: "arrow.up.right")
-                                                        .foregroundStyle(.tertiary)
-                                                        .font(.caption2)
-                                                }
-                                                .padding(.horizontal)
-                                                .padding(.vertical, 6)
-                                            }
+                            // Pending question bubble
+                            if let pending = vm.pendingQuestion {
+                                userBubble(pending)
+                                    .padding(.vertical, 12)
+                            }
+
+                            // Thinking indicator
+                            if vm.isLoading {
+                                thinkingIndicator
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 16)
+                                    .id("loading")
+                            }
+
+                            // Error
+                            if let error = vm.errorMessage {
+                                VStack(spacing: 8) {
+                                    Text(error)
+                                        .foregroundStyle(DS.terracotta)
+                                        .font(.caption)
+                                        .padding(.horizontal, 20)
+                                    Button("Retry") {
+                                        if let last = vm.messages.last {
+                                            Task { await vm.ask(last.question) }
                                         }
                                     }
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundStyle(DS.terracottaDark)
                                 }
+                                .padding(.vertical, 12)
                             }
-                        }
-                        .padding(.vertical, 12)
-                        .id(msg.id)
-                    }
 
-                    // Pending question bubble (shown immediately on submit)
-                    if let pending = vm.pendingQuestion {
-                        HStack {
-                            Spacer()
-                            Text(pending)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 10)
-                                .background(Color.indigo, in: RoundedRectangle(cornerRadius: 16))
-                                .foregroundStyle(.white)
-                                .padding(.leading, 60)
-                        }
-                        .padding(.horizontal)
-                        .padding(.vertical, 12)
-                    }
-
-                    // Loading indicator
-                    if vm.isLoading {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                ProgressView()
-                                Text("Thinking…")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                Text("30–60 seconds")
-                                    .font(.caption2)
-                                    .foregroundStyle(.tertiary)
+                            // Empty state
+                            if vm.messages.isEmpty && !vm.isLoading && vm.pendingQuestion == nil {
+                                Text("Ask anything about your notes.")
+                                    .foregroundStyle(DS.inkFaint)
+                                    .font(.system(size: 16))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.top, 60)
                             }
-                            .padding(.horizontal)
-                            .padding(.vertical, 12)
-                            Spacer()
+
+                            Color.clear.frame(height: 20)
                         }
-                        .id("loading")
+                        .padding(.top, 16)
+                        .padding(.horizontal, 16)
                     }
-
-                    // Error
-                    if let error = vm.errorMessage {
-                        VStack(spacing: 8) {
-                            Text(error).foregroundStyle(.red).font(.caption).padding(.horizontal)
-                            Button("Retry") {
-                                if let last = vm.messages.last {
-                                    Task { await vm.ask(last.question) }
-                                }
-                            }
-                        }
-                        .padding()
+                    .onChange(of: vm.messages.count) { _, _ in
+                        withAnimation { proxy.scrollTo("loading", anchor: .bottom) }
                     }
-
-                    // Empty state
-                    if vm.messages.isEmpty && !vm.isLoading {
-                        Text("Ask anything about your notes.")
-                            .foregroundStyle(.tertiary)
-                            .frame(maxWidth: .infinity)
-                            .padding(.top, 60)
+                    .onChange(of: vm.isLoading) { _, loading in
+                        if loading { withAnimation { proxy.scrollTo("loading", anchor: .bottom) } }
                     }
-
-                    Color.clear.frame(height: 80)
+                    .onChange(of: vm.pendingQuestion) { _, q in
+                        if q != nil { withAnimation { proxy.scrollTo("loading", anchor: .bottom) } }
+                    }
                 }
-                .padding(.top)
+
+                // Bottom input bar
+                queryInputBar
             }
-            .onChange(of: vm.messages.count) { _, _ in
-                withAnimation { proxy.scrollTo("loading", anchor: .bottom) }
-            }
-            .onChange(of: vm.isLoading) { _, loading in
-                if loading { withAnimation { proxy.scrollTo("loading", anchor: .bottom) } }
-            }
-            .onChange(of: vm.pendingQuestion) { _, q in
-                if q != nil { withAnimation { proxy.scrollTo("loading", anchor: .bottom) } }
-            }
-        }
-        .safeAreaInset(edge: .bottom) {
-            inputBar
         }
         .navigationTitle("Ask Alysha")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(DS.parchment, for: .navigationBar)
+        .toolbarColorScheme(.light, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Ask Alysha")
+                    .font(DS.newsreader(20, weight: .medium))
+                    .foregroundStyle(DS.inkDark)
+            }
+        }
         .onAppear {
             if let session = existingSession {
                 vm.loadSession(session)
@@ -220,22 +181,204 @@ struct QueryView: View {
         }
     }
 
-    private var inputBar: some View {
-        HStack(spacing: 8) {
-            TextField(vm.messages.isEmpty ? "Ask your vault…" : "Follow up…", text: $vm.followUpText)
-                .textFieldStyle(.roundedBorder)
+    // MARK: - User bubble
+
+    private func userBubble(_ text: String) -> some View {
+        HStack {
+            Spacer(minLength: 60)
+            Text(text)
+                .font(.system(size: 16))
+                .foregroundStyle(Color(hex: "#FDF3EE"))
+                .lineSpacing(0.52 * 16 * 0.4)
+                .padding(.vertical, 11)
+                .padding(.horizontal, 16)
+                .background(
+                    DS.terracottaGradient,
+                    in: UnevenRoundedRectangle(
+                        topLeadingRadius: 21,
+                        bottomLeadingRadius: 21,
+                        bottomTrailingRadius: 7,
+                        topTrailingRadius: 21
+                    )
+                )
+                .shadow(
+                    color: Color(hex: "#78281C").opacity(0.30),
+                    radius: 5,
+                    x: 0,
+                    y: 2
+                )
+        }
+    }
+
+    // MARK: - Assistant message
+
+    private func assistantMessage(_ msg: ConversationMessage) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 10) {
+                // "A" avatar
+                ZStack {
+                    Circle()
+                        .fill(DS.terracottaGradient)
+                        .frame(width: 30, height: 30)
+                    Text("A")
+                        .font(DS.newsreader(16, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+
+                // Answer card
+                VStack(alignment: .leading, spacing: 0) {
+                    markdownText(msg.answer)
+                        .font(.system(size: 16))
+                        .foregroundStyle(DS.inkDark)
+                        .lineSpacing(16 * 0.52 * 0.4)
+                        .textSelection(.enabled)
+                        .padding(.vertical, 13)
+                        .padding(.horizontal, 16)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .background(
+                    DS.parchmentCard,
+                    in: UnevenRoundedRectangle(
+                        topLeadingRadius: 7,
+                        bottomLeadingRadius: 21,
+                        bottomTrailingRadius: 21,
+                        topTrailingRadius: 21
+                    )
+                )
+                .overlay(
+                    UnevenRoundedRectangle(
+                        topLeadingRadius: 7,
+                        bottomLeadingRadius: 21,
+                        bottomTrailingRadius: 21,
+                        topTrailingRadius: 21
+                    )
+                    .strokeBorder(DS.inkDark.opacity(0.07), lineWidth: 1)
+                )
+
+                Spacer(minLength: 40)
+            }
+
+            // Source chips
+            if !msg.sources.isEmpty {
+                sourceChips(msg.sources)
+                    .padding(.leading, 40)
+            }
+        }
+    }
+
+    // MARK: - Source chips
+
+    private func sourceChips(_ sources: [SourceItem]) -> some View {
+        FlowLayout(spacing: 7) {
+            ForEach(sources) { source in
+                Button { openInObsidian(source) } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "doc")
+                            .font(.system(size: 11))
+                            .foregroundStyle(DS.terracottaDark)
+                        Text(source.title)
+                            .font(.system(size: 12.5))
+                            .foregroundStyle(DS.terracottaDark)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(DS.terracotta.opacity(0.045), in: Capsule())
+                    .overlay(Capsule().strokeBorder(DS.terracottaDark.opacity(0.32), lineWidth: 1))
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    // MARK: - Thinking indicator
+
+    private var thinkingIndicator: some View {
+        HStack(alignment: .top, spacing: 10) {
+            ZStack {
+                Circle()
+                    .fill(DS.terracottaGradient)
+                    .frame(width: 30, height: 30)
+                Text("A")
+                    .font(DS.newsreader(16, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
+
+            HStack(spacing: 6) {
+                ForEach(0..<3, id: \.self) { i in
+                    Circle()
+                        .fill(Color(hex: "#B08968"))
+                        .frame(width: 7, height: 7)
+                        .opacity(thinkPhase ? 0.3 : 1.0)
+                        .animation(
+                            .easeInOut(duration: 0.6)
+                                .repeatForever()
+                                .delay(Double(i) * 0.2),
+                            value: thinkPhase
+                        )
+                }
+            }
+            .padding(.vertical, 13)
+            .padding(.horizontal, 16)
+            .background(
+                DS.parchmentCard,
+                in: UnevenRoundedRectangle(
+                    topLeadingRadius: 7,
+                    bottomLeadingRadius: 21,
+                    bottomTrailingRadius: 21,
+                    topTrailingRadius: 21
+                )
+            )
+            .overlay(
+                UnevenRoundedRectangle(
+                    topLeadingRadius: 7,
+                    bottomLeadingRadius: 21,
+                    bottomTrailingRadius: 21,
+                    topTrailingRadius: 21
+                )
+                .strokeBorder(DS.inkDark.opacity(0.07), lineWidth: 1)
+            )
+            .onAppear { thinkPhase = true }
+
+            Spacer()
+        }
+    }
+
+    // MARK: - Bottom input bar
+
+    private var queryInputBar: some View {
+        HStack(spacing: 9) {
+            TextField("Ask a follow-up\u{2026}", text: $vm.followUpText)
+                .font(.system(size: 16))
+                .foregroundStyle(DS.inkDark)
+                .tint(DS.terracotta)
                 .submitLabel(.send)
                 .onSubmit { submit() }
+                .padding(.leading, 17)
+                .padding(.trailing, 4)
+
             Button(action: submit) {
-                Image(systemName: "arrow.up.circle.fill")
-                    .font(.title2)
-                    .foregroundStyle(vm.followUpText.isEmpty || vm.isLoading ? Color.secondary : Color.indigo)
+                ZStack {
+                    Circle()
+                        .fill(DS.terracottaGradient)
+                        .frame(width: 40, height: 40)
+                    Image(systemName: "arrow.up")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
             }
+            .buttonStyle(.plain)
             .disabled(vm.followUpText.isEmpty || vm.isLoading)
+            .opacity(vm.followUpText.isEmpty || vm.isLoading ? 0.5 : 1.0)
+            .padding(.trailing, 1)
         }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
-        .background(.regularMaterial)
+        .padding(.vertical, 7)
+        .padding(.leading, 0)
+        .glassBackground(cornerRadius: 28)
+        .shadow(color: Color(hex: "#50321E").opacity(0.18), radius: 16, x: 0, y: 6)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 12)
+        .padding(.top, 8)
+        .background(DS.parchment)
     }
 
     private func submit() {
@@ -249,5 +392,52 @@ struct QueryView: View {
         let encoded = source.file.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? source.file
         guard let url = URL(string: "obsidian://open?vault=Alysha&file=\(encoded)") else { return }
         if UIApplication.shared.canOpenURL(url) { UIApplication.shared.open(url) }
+    }
+}
+
+// MARK: - FlowLayout helper (horizontal wrapping)
+
+private struct FlowLayout: Layout {
+    var spacing: CGFloat = 8
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let maxWidth = proposal.width ?? UIScreen.main.bounds.width
+        var x: CGFloat = 0
+        var y: CGFloat = 0
+        var rowHeight: CGFloat = 0
+        var totalHeight: CGFloat = 0
+
+        for view in subviews {
+            let size = view.sizeThatFits(.unspecified)
+            if x + size.width > maxWidth && x > 0 {
+                y += rowHeight + spacing
+                totalHeight = y
+                x = 0
+                rowHeight = 0
+            }
+            x += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
+        }
+        totalHeight += rowHeight
+        return CGSize(width: maxWidth, height: totalHeight)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let maxWidth = bounds.width
+        var x: CGFloat = bounds.minX
+        var y: CGFloat = bounds.minY
+        var rowHeight: CGFloat = 0
+
+        for view in subviews {
+            let size = view.sizeThatFits(.unspecified)
+            if x + size.width > bounds.maxX && x > bounds.minX {
+                y += rowHeight + spacing
+                x = bounds.minX
+                rowHeight = 0
+            }
+            view.place(at: CGPoint(x: x, y: y), proposal: ProposedViewSize(size))
+            x += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
+        }
     }
 }
