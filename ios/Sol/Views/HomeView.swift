@@ -195,12 +195,15 @@ struct HomeView: View {
                 .padding(.top, 60)
                 .padding(.horizontal, 18)
 
-            // Subtitle only — BreathingBackground renders the mark in center
-            Text("How can I help you today?")
-                .font(DS.newsreader(19, weight: .regular, italic: true))
-                .foregroundStyle(DS.inkDark.opacity(0.46))
-                .padding(.top, 14)
-                .frame(maxWidth: .infinity)
+            // Subtitle — hidden when chat or composer overlay is open
+            if !showChat && !showComposer {
+                Text("How can I help you today?")
+                    .font(DS.newsreader(19, weight: .regular, italic: true))
+                    .foregroundStyle(DS.inkDark.opacity(0.46))
+                    .padding(.top, 14)
+                    .frame(maxWidth: .infinity)
+                    .transition(.opacity)
+            }
 
             Spacer()
 
