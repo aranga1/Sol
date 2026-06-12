@@ -1,5 +1,15 @@
 import SwiftUI
 
+private func markdownText(_ raw: String) -> Text {
+    if let attributed = try? AttributedString(
+        markdown: raw,
+        options: .init(interpretedSyntax: .inlinesOnlyPreservingWhitespace)
+    ) {
+        return Text(attributed)
+    }
+    return Text(raw)
+}
+
 struct HistoryView: View {
     @ObservedObject private var store = HistoryStore.shared
 
@@ -78,7 +88,7 @@ private struct ConversationPreview: View {
                     }
                     // Answer — left aligned
                     HStack {
-                        Text(msg.answer)
+                        markdownText(msg.answer)
                             .font(.caption)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)

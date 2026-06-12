@@ -1,5 +1,16 @@
 import SwiftUI
 
+// Renders markdown (bold, italic, code) from a plain string
+private func markdownText(_ raw: String) -> Text {
+    if let attributed = try? AttributedString(
+        markdown: raw,
+        options: .init(interpretedSyntax: .inlinesOnlyPreservingWhitespace)
+    ) {
+        return Text(attributed)
+    }
+    return Text(raw)
+}
+
 @Observable
 @MainActor
 private final class QueryViewModel {
@@ -91,7 +102,7 @@ struct QueryView: View {
                             // Answer + sources
                             VStack(alignment: .leading, spacing: 8) {
                                 HStack {
-                                    Text(msg.answer)
+                                    markdownText(msg.answer)
                                         .textSelection(.enabled)
                                         .padding(.horizontal, 14)
                                         .padding(.vertical, 10)
