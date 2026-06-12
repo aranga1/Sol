@@ -380,26 +380,47 @@ struct QueryView: View {
         }
     }
 
-    // MARK: - Source chips
+    // MARK: - Source scroll
 
     private func sourceChips(_ sources: [SourceItem]) -> some View {
-        FlowLayout(spacing: 7) {
-            ForEach(sources) { source in
-                Button { openInObsidian(source) } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: "doc")
-                            .font(.system(size: 11))
-                            .foregroundStyle(DS.terracottaDark)
-                        Text(source.title)
-                            .font(.system(size: 12.5))
-                            .foregroundStyle(DS.terracottaDark)
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Sources")
+                .font(.system(size: 11, weight: .semibold))
+                .kerning(0.5)
+                .foregroundStyle(DS.inkFaint)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(sources) { source in
+                        Button { openInObsidian(source) } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: "doc.fill")
+                                    .font(.system(size: 15))
+                                    .foregroundStyle(DS.terracotta)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(source.title)
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundStyle(DS.inkDark)
+                                        .lineLimit(1)
+                                    Text("Open in Obsidian")
+                                        .font(.system(size: 11))
+                                        .foregroundStyle(DS.inkFaint)
+                                }
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 10)
+                            .frame(maxWidth: 200, alignment: .leading)
+                            .background(DS.parchmentCard, in: RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .strokeBorder(DS.terracotta.opacity(0.18), lineWidth: 1)
+                            )
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(DS.terracotta.opacity(0.045), in: Capsule())
-                    .overlay(Capsule().strokeBorder(DS.terracottaDark.opacity(0.32), lineWidth: 1))
                 }
-                .buttonStyle(.plain)
+                .padding(.horizontal, 2)
+                .padding(.vertical, 2)
             }
         }
     }

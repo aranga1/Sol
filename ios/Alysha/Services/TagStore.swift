@@ -23,6 +23,19 @@ final class TagStore {
         }
     }
 
+    /// Create a new tag in the vault and add it to the local cache immediately.
+    func createTag(_ tag: String) async {
+        let clean = tag.trimmingCharacters(in: .whitespacesAndNewlines).trimmingCharacters(in: CharacterSet(charactersIn: "#"))
+        guard !clean.isEmpty, !tags.contains(clean) else { return }
+        tags.append(clean)  // optimistic local update
+        tags.sort()
+        do {
+            try await APIClient.shared.createTag(clean)
+        } catch {
+            // Don't roll back — tag is still useful locally even if persist fails
+        }
+    }
+
     /// Synchronously filter tags matching a query string (case-insensitive prefix/contains).
     func suggestions(for query: String, excluding selected: [String]) -> [String] {
         guard !query.isEmpty else {

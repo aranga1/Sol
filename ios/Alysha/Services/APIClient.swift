@@ -99,6 +99,15 @@ final class APIClient: ObservableObject {
         catch { throw AlyshAPIError.decodingError(error) }
     }
 
+    func createTag(_ tag: String) async throws {
+        struct Body: Encodable { let tag: String }
+        let req = try makeRequest("/api/tags", method: "POST", body: Body(tag: tag))
+        let (_, response) = try await session.data(for: req)
+        guard let http = response as? HTTPURLResponse, (200...201).contains(http.statusCode) else {
+            throw AlyshAPIError.httpError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0)
+        }
+    }
+
     func fetchTags() async throws -> [String] {
         let req = try makeRequest("/api/tags")
         let (data, response) = try await session.data(for: req)

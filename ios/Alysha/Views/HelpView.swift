@@ -1,7 +1,10 @@
 import SwiftUI
 
 struct HelpView: View {
+    var onDismiss: (() -> Void)? = nil
     @Environment(\.dismiss) private var dismiss
+
+    private func close() { if let onDismiss { onDismiss() } else { dismiss() } }
 
     private let connectingItems: [(String, String)] = [
         ("What is the QR code?",
@@ -56,7 +59,7 @@ struct HelpView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    Button("Done") { close() }
                 }
             }
         }
