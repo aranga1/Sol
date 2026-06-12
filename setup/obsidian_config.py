@@ -20,9 +20,11 @@ def setup_vault(vault_path: str) -> None:
         "attachmentFolderPath": "Attachments"
     }, indent=2))
 
-    # Enable community plugins
+    # Enable community plugins — local-rest-api only.
+    # obsidian-importer is desktop-only and must NOT be listed here:
+    # iOS/iPad Obsidian will hang trying to load it if its JS files are absent.
     (obsidian / "community-plugins.json").write_text(
-        json.dumps(["obsidian-local-rest-api", "obsidian-importer"])
+        json.dumps(["obsidian-local-rest-api"])
     )
 
     # Local REST API plugin config (API key set by install.sh via config.json)
@@ -33,9 +35,6 @@ def setup_vault(vault_path: str) -> None:
         "enableHttps": False,
         "apiKey": ""  # will be set when user enables plugin in Obsidian
     }, indent=2))
-
-    # Obsidian Importer plugin directory (Obsidian downloads the actual files on first open)
-    (obsidian / "plugins" / "obsidian-importer").mkdir(parents=True, exist_ok=True)
 
     # Welcome note
     welcome = vault / "Notes" / "Welcome to Alysha.md"
