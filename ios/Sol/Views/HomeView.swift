@@ -143,9 +143,6 @@ struct HomeView: View {
             Text("Obsidian is not installed — get it from the App Store.")
         }
         .task { await WhisperService.shared.downloadModelIfNeeded() }
-        .overlay(alignment: .top) {
-            InAppNotificationBanner()
-        }
         .gesture(
             DragGesture(minimumDistance: 20)
                 .onEnded { v in

@@ -1,40 +1,37 @@
 import Foundation
 import UserNotifications
-import SwiftUI
+import UIKit
 
 struct DaemonNotification: Decodable, Identifiable {
     let id: String
     let title: String
     let body: String
-    let type: String   // "info" | "warning" | "update"
+    let type: String
 }
 
-// Observable so HomeView can bind to pending in-app banners
-@Observable
-@MainActor
-final class NotificationService: NSObject {
+final class NotificationService: NSObject, @unchecked Sendable {
     static let shared = NotificationService()
 
-    // In-app banner queue — HomeView watches this
-    var pending: DaemonNotification? = nil
-
-    private var pollTask: Task<Void, Never>? = nil
+    private var pollTask: Task<Void, Never>?
 
     override private init() {
         super.init()
-        // Become delegate so iOS shows banners even when app is in foreground
-        UNUserNotificationCenter.current().delegate = self
     }
 
-    func requestAuthorization() {
+    // Called from AppDelegate.didFinishLaunching — must be early
+    func setup() {
+        UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(
             options: [.alert, .sound, .badge]
-        ) { _, _ in }
+        ) { granted, error in
+            if !granted {
+                print("[Sol] Notification permission denied: \(error?.localizedDescription ?? "unknown")")
+            }
+        }
     }
 
-    // Call when app becomes active; cancels on background
     func startPolling() {
-        stopPolling()
+        guard pollTask == nil else { return }
         pollTask = Task { [weak self] in
             while !Task.isCancelled {
                 await self?.fetchAndDeliver()
@@ -48,36 +45,28 @@ final class NotificationService: NSObject {
         pollTask = nil
     }
 
-    func fetchAndDeliver() async {
+    private func fetchAndDeliver() async {
         guard let notifications = try? await APIClient.shared.fetchNotifications(),
               !notifications.isEmpty else { return }
 
         for n in notifications {
-            if UIApplication.shared.applicationState == .active {
-                // App is visible — show our own in-app banner
-                pending = n
-            } else {
-                // App is backgrounded — deliver via system notification
-                scheduleSystemNotification(n)
-            }
-        }
-    }
+            let content = UNMutableNotificationContent()
+            content.title = n.title
+            content.body = n.body
+            content.sound = n.type == "warning" ? .defaultCritical : .default
+            content.userInfo = ["type": n.type]
 
-    private func scheduleSystemNotification(_ n: DaemonNotification) {
-        let content = UNMutableNotificationContent()
-        content.title = n.title
-        content.body = n.body
-        content.sound = n.type == "warning" ? .defaultCritical : .default
-        content.userInfo = ["type": n.type]
-        UNUserNotificationCenter.current().add(
-            UNNotificationRequest(identifier: n.id, content: content, trigger: nil)
-        )
+            let request = UNNotificationRequest(
+                identifier: n.id, content: content, trigger: nil
+            )
+            try? await UNUserNotificationCenter.current().add(request)
+        }
     }
 }
 
-// Show system banner even when app is in foreground (needed for background→foreground edge cases)
+// Show banner + play sound even when app is in foreground
 extension NotificationService: UNUserNotificationCenterDelegate {
-    nonisolated func userNotificationCenter(
+    func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification,
         withCompletionHandler handler: @escaping (UNNotificationPresentationOptions) -> Void

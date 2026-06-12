@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0380CB6EB82EB31C066F55FB /* InAppNotificationBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F65F34FE06AA02BEFA49763 /* InAppNotificationBanner.swift */; };
 		06D978A769DC1C35AE0771A5 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E22711CC4EA5A88833898CE8 /* NotificationService.swift */; };
 		09B493E788ACB79861E22CA9 /* QueryResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7234FCACFC1F7924A21FF224 /* QueryResponse.swift */; };
 		14A830D8D0F52F55E51DA925 /* Newsreader.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B68D1B648FC1177733924726 /* Newsreader.ttf */; };
@@ -44,6 +43,7 @@
 		EFC02193C983BB03DE7D6C09 /* ConversationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED45EC41EF9E848BA58F6591 /* ConversationSession.swift */; };
 		F101F75B9D6C75A4F37E814B /* ManualEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FE67FF6154832FC45DB127 /* ManualEntryView.swift */; };
 		FC74327D57E0D1F1050E1DB6 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31287DDB302C963B7E2AF002 /* OnboardingView.swift */; };
+		FD6C80BF3088049E9F14FC02 /* SolAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA85A75E093A4CE68C2CE8C8 /* SolAppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,7 +60,6 @@
 		31287DDB302C963B7E2AF002 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		38358FEC4BCA209328EE3D0A /* AllChatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllChatsView.swift; sourceTree = "<group>"; };
 		3EC29BEB51B22345243B5D41 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
-		3F65F34FE06AA02BEFA49763 /* InAppNotificationBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppNotificationBanner.swift; sourceTree = "<group>"; };
 		4075C452ECF4EBE74177F209 /* BreathingBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathingBackground.swift; sourceTree = "<group>"; };
 		4460F7B444409B5A81A7B654 /* TextNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextNoteView.swift; sourceTree = "<group>"; };
 		452FE6CDB9179A1DCE564E33 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -78,6 +77,7 @@
 		A293A6186A131A8136E4DD18 /* QueryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryView.swift; sourceTree = "<group>"; };
 		B68D1B648FC1177733924726 /* Newsreader.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Newsreader.ttf; sourceTree = "<group>"; };
 		CD5DA0CD0F7301F36D00E441 /* WhisperService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperService.swift; sourceTree = "<group>"; };
+		DA85A75E093A4CE68C2CE8C8 /* SolAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolAppDelegate.swift; sourceTree = "<group>"; };
 		DD9AB5B0AB4FB24534B32E96 /* SolWidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = SolWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E22711CC4EA5A88833898CE8 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		E466C941B84FC46FB9463714 /* MarkdownEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownEditor.swift; sourceTree = "<group>"; };
@@ -130,7 +130,6 @@
 				3EC29BEB51B22345243B5D41 /* HelpView.swift */,
 				E4D636FB5C3E9FE738D13280 /* HistoryView.swift */,
 				F054FEA6F26B5A7196F679FB /* HomeView.swift */,
-				3F65F34FE06AA02BEFA49763 /* InAppNotificationBanner.swift */,
 				49FE67FF6154832FC45DB127 /* ManualEntryView.swift */,
 				E466C941B84FC46FB9463714 /* MarkdownEditor.swift */,
 				1FDDD108104B852671CB4C73 /* NoteComposerView.swift */,
@@ -202,6 +201,7 @@
 				6B1CDEA9768FAE42438C4F47 /* DesignSystem.swift */,
 				0D28268A8167025B88BECB36 /* Info.plist */,
 				76D87B6509DAB2C17F2E87A5 /* SolApp.swift */,
+				DA85A75E093A4CE68C2CE8C8 /* SolAppDelegate.swift */,
 				4DB443660B018343827FBC72 /* Models */,
 				D2DB0303235C67DAA3FA1538 /* Resources */,
 				6FC9BDDF5F863CBE9D9700E3 /* Services */,
@@ -322,7 +322,6 @@
 				7CA171B9A1380E35D163BE50 /* HistoryStore.swift in Sources */,
 				9B4C32AEBCF0949924EF07D7 /* HistoryView.swift in Sources */,
 				3E668C2A44BCA4C9A7585C41 /* HomeView.swift in Sources */,
-				0380CB6EB82EB31C066F55FB /* InAppNotificationBanner.swift in Sources */,
 				AB007F063F789B07ECDD15CC /* KeychainService.swift in Sources */,
 				F101F75B9D6C75A4F37E814B /* ManualEntryView.swift in Sources */,
 				D1CDC42E1B8C30B7D4E533A2 /* MarkdownEditor.swift in Sources */,
@@ -335,6 +334,7 @@
 				42760164C2B51D207E365511 /* QueryView.swift in Sources */,
 				D1A98C4951484D077C820F36 /* SettingsView.swift in Sources */,
 				36FEA7DF1A4AD4708E020134 /* SolApp.swift in Sources */,
+				FD6C80BF3088049E9F14FC02 /* SolAppDelegate.swift in Sources */,
 				E1DD56B41C51691FB3B231E5 /* SolMarkView.swift in Sources */,
 				DE0880242328A5D75C8C9807 /* SystemPrompt.swift in Sources */,
 				DF48CB3200F553D9E29DBC2F /* SystemPromptEditorView.swift in Sources */,

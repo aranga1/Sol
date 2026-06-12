@@ -2,6 +2,7 @@ import SwiftUI
 
 @main
 struct SolApp: App {
+    @UIApplicationDelegateAdaptor(SolAppDelegate.self) var appDelegate
     @State private var isOnboarded = KeychainService.load() != nil
     @Environment(\.scenePhase) private var scenePhase
     @State private var deepLinkTarget: DeepLinkTarget?
@@ -24,6 +25,7 @@ struct SolApp: App {
                                 deepLinkTarget = pending
                                 pendingDeepLink = nil
                             }
+                            NotificationService.shared.startPolling()
                         }
                         .sheet(item: $deepLinkTarget) { target in
                             switch target {
