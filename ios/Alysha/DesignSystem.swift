@@ -79,7 +79,7 @@ extension Color {
 extension View {
     /// Apply liquid glass to any shape. `interactive` adds the press-response animation.
     @ViewBuilder
-    func liquidGlass<S: Shape>(shape: S, interactive: Bool = false) -> some View {
+    func liquidGlass<S: InsettableShape>(shape: S, interactive: Bool = false) -> some View {
         if #available(iOS 26, *) {
             if interactive {
                 self.glassEffect(.regular.interactive(), in: shape)
@@ -97,7 +97,7 @@ extension View {
     }
 }
 
-private struct FallbackGlass<S: Shape>: ViewModifier {
+private struct FallbackGlass<S: InsettableShape>: ViewModifier {
     let shape: S
     func body(content: Content) -> some View {
         content.background(
