@@ -13,6 +13,8 @@ struct HomeView: View {
     @State private var showSettings = false
     @State private var showObsidianAlert = false
     @State private var showHistory = false
+    @State private var historyToContinue: [ConversationMessage] = []
+    @State private var navigateToContinue = false
 
     var body: some View {
         NavigationStack {
@@ -74,7 +76,18 @@ struct HomeView: View {
                 SettingsView(onResetConnection: onResetConnection)
             }
             .sheet(isPresented: $showHistory) {
-                HistoryView()
+                HistoryView { messages in
+                    showHistory = false
+                    historyToContinue = messages
+                    // Brief delay lets the sheet dismiss animation finish before pushing
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                        navigateToContinue = true
+                    }
+                }
+            }
+            .navigationDestination(isPresented: $navigateToContinue) {
+                QueryView(initialHistory: historyToContinue)
+                    .onDisappear { historyToContinue = [] }
             }
             .sheet(isPresented: $showVoiceNote) { VoiceNoteView() }
             .sheet(isPresented: $showTextNote) { TextNoteView(onSuccess: {}) }

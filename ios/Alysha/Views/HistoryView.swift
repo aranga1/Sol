@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct HistoryView: View {
+    var onContinue: ([ConversationMessage]) -> Void
     @ObservedObject private var store = HistoryStore.shared
     @Environment(\.dismiss) private var dismiss
     @State private var selectedSession: ConversationSession?
-    @State private var continueSession: ConversationSession?
 
     var body: some View {
         NavigationStack {
@@ -49,14 +49,10 @@ struct HistoryView: View {
                 }
             }
             .sheet(item: $selectedSession) { session in
-                SessionDetailView(session: session, onContinue: {
-                    continueSession = session
-                    selectedSession = nil
-                })
-            }
-            .navigationDestination(item: $continueSession) { session in
-                QueryView(initialHistory: session.messages)
-                    .onAppear { dismiss() }
+                SessionDetailView(session: session) { messages in
+                    dismiss()  // dismiss HistoryView sheet
+                    onContinue(messages)
+                }
             }
         }
     }
@@ -64,7 +60,7 @@ struct HistoryView: View {
 
 private struct SessionDetailView: View {
     let session: ConversationSession
-    let onContinue: () -> Void
+    let onContinue: ([ConversationMessage]) -> Void
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -108,8 +104,11 @@ private struct SessionDetailView: View {
                     Button("Close") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Continue") { onContinue() }
-                        .bold()
+                    Button("Continue") {
+                        dismiss()  // dismiss SessionDetailView sheet
+                        onContinue(session.messages)
+                    }
+                    .bold()
                 }
             }
         }
