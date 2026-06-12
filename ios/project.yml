@@ -31,6 +31,9 @@ targets:
           - obsidian
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
+        UIAppFonts:
+          - Newsreader.ttf
+          - Newsreader-Italic.ttf
     dependencies:
       - package: WhisperKit
         product: WhisperKit

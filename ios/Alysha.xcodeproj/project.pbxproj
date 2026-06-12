@@ -19,11 +19,13 @@
 		3F492F7E575808998B10B1A2 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06BAB5B588583DC1C941710A /* HomeView.swift */; };
 		3FC49D9FDE4C6F946A642216 /* QueryResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEE59A9C1C0C4EDDBAA0265D /* QueryResponse.swift */; };
 		4551F88B1E454CDA8A0E1C1D /* ConversationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A8C64CA65B97614B8E1BB8 /* ConversationSession.swift */; };
+		50811E3EE91DE26F52566B67 /* Newsreader-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A856B2555FA3C3938CC1DC3C /* Newsreader-Italic.ttf */; };
 		5F1BB308735B7BAC319AE2C7 /* SystemPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2704AD9532CF4E91E7E3772E /* SystemPrompt.swift */; };
 		6476050E19A8E9B842C7616C /* VoiceNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97A5F18839F6A0878F0B5E4D /* VoiceNoteView.swift */; };
 		678FD9224FE32CBB349E6066 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C411458A74D1BF80098D5DE /* APIClient.swift */; };
 		9A3C707A6E83F38086DADC31 /* WhisperService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A8B15663046933088DFD911 /* WhisperService.swift */; };
 		A716EF89B6D234AA73AE9B6B /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4767A08DCEC7D678663FBC84 /* WhisperKit */; };
+		A89B652854C24E8D21B266BA /* Newsreader.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2FFF2F96AA829FA47240AF5E /* Newsreader.ttf */; };
 		AA016C7DDB77AB091724CA04 /* ManualEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49BF43A079F250FCBE150A9E /* ManualEntryView.swift */; };
 		AF5CC8191FD1ECEA4C6A4BBA /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DF5C7A9BC25288C74E0CB8 /* KeychainService.swift */; };
 		B13E67385BBDCB6432107A57 /* TextNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BCB5465D47DB137C3C55F8A /* TextNoteView.swift */; };
@@ -44,6 +46,7 @@
 		2704AD9532CF4E91E7E3772E /* SystemPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemPrompt.swift; sourceTree = "<group>"; };
 		27A8C64CA65B97614B8E1BB8 /* ConversationSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationSession.swift; sourceTree = "<group>"; };
 		2C9DFD194C1CC056D73FE43A /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
+		2FFF2F96AA829FA47240AF5E /* Newsreader.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Newsreader.ttf; sourceTree = "<group>"; };
 		3BCB5465D47DB137C3C55F8A /* TextNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextNoteView.swift; sourceTree = "<group>"; };
 		4719D7EF02EB890E2420011A /* AlyshWidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = AlyshWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		49BF43A079F250FCBE150A9E /* ManualEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualEntryView.swift; sourceTree = "<group>"; };
@@ -57,6 +60,7 @@
 		8D95A2E0715ECC2A1AB2BE69 /* HistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
 		97A5F18839F6A0878F0B5E4D /* VoiceNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceNoteView.swift; sourceTree = "<group>"; };
 		9C411458A74D1BF80098D5DE /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		A856B2555FA3C3938CC1DC3C /* Newsreader-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Newsreader-Italic.ttf"; sourceTree = "<group>"; };
 		AC4CB24441BAD07613C1C7C1 /* QRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
 		BC65E0F4E8221FBD615A1A16 /* AlyshWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlyshWidget.swift; sourceTree = "<group>"; };
 		C92D1110006FEEA7F7F01799 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
@@ -107,6 +111,7 @@
 				C92D1110006FEEA7F7F01799 /* DesignSystem.swift */,
 				53BD7526735F7DF0D2872797 /* Info.plist */,
 				D466457B0B5A7594973BA18C /* Models */,
+				6F45F69D5CB56F6F99F5D2F5 /* Resources */,
 				A021D309B52EDF3CAD70C5CE /* Services */,
 				887E9477AA06766CF3E0E0B9 /* ViewModels */,
 				6D6AC858473D9ABD2CA6D136 /* Views */,
@@ -130,6 +135,23 @@
 				97A5F18839F6A0878F0B5E4D /* VoiceNoteView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		6F45F69D5CB56F6F99F5D2F5 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				7843F1595D1B6F9EB92D2054 /* Fonts */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		7843F1595D1B6F9EB92D2054 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				A856B2555FA3C3938CC1DC3C /* Newsreader-Italic.ttf */,
+				2FFF2F96AA829FA47240AF5E /* Newsreader.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 		86965CF7982764389AD305C2 = {
@@ -181,6 +203,7 @@
 			buildConfigurationList = 3747210F7519B3BF5F5D1E96 /* Build configuration list for PBXNativeTarget "Alysha" */;
 			buildPhases = (
 				FA1A21F1185F2F9FEC398505 /* Sources */,
+				63857305527FFA1A8B4472B3 /* Resources */,
 				737600C98298E110F03668A2 /* Frameworks */,
 			);
 			buildRules = (
@@ -245,6 +268,18 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		63857305527FFA1A8B4472B3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				50811E3EE91DE26F52566B67 /* Newsreader-Italic.ttf in Resources */,
+				A89B652854C24E8D21B266BA /* Newsreader.ttf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		5AEFFA7A3530D5B323CA93E0 /* Sources */ = {

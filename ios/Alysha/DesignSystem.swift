@@ -37,30 +37,12 @@ enum DS {
     )
 
     // ── Typography ─────────────────────────────────────────────────────────────
-    // New York is Apple's built-in warm serif — exactly the "New York–like" spec
-    // from the design brief. Available on iOS 13+ without bundling any files.
-    static func serif(_ size: CGFloat, weight: Font.Weight = .medium, italic: Bool = false) -> Font {
-        // PostScript size tiers: Small <20, Medium 20–35, Large 36+
-        let family: String
-        switch size {
-        case ..<20:  family = "NewYorkSmall"
-        case ..<36:  family = "NewYorkMedium"
-        default:     family = "NewYorkLarge"
-        }
-        let weightSuffix: String
-        switch weight {
-        case .semibold: weightSuffix = "Semibold"
-        case .bold:     weightSuffix = "Bold"
-        case .heavy:    weightSuffix = "Heavy"
-        default:        weightSuffix = "Medium"
-        }
-        let italicSuffix = italic ? "Italic" : ""
-        return .custom("\(family)-\(weightSuffix)\(italicSuffix)", size: size)
-    }
-
-    // Convenience alias kept so existing call sites compile unchanged
+    // Newsreader variable font — bundled as Newsreader.ttf + Newsreader-Italic.ttf
+    // PostScript names: Newsreader16pt-Regular / Newsreader16pt-Italic
+    // Weight axis (wght 300–800) is controlled via SwiftUI's .fontWeight() modifier.
     static func newsreader(_ size: CGFloat, weight: Font.Weight = .medium, italic: Bool = false) -> Font {
-        serif(size, weight: weight, italic: italic)
+        let psName = italic ? "Newsreader16pt-Italic" : "Newsreader16pt-Regular"
+        return .custom(psName, size: size).weight(weight)
     }
 
     // ── Corner radii ───────────────────────────────────────────────────────────

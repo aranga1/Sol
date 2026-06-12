@@ -246,12 +246,12 @@ struct HomeView: View {
             // Title sits immediately below the top bar (margin-top: 26 in design)
             VStack(spacing: 13) {
                 Text("Alysha")
-                    .font(DS.serif(39, weight: .medium))
+                    .font(DS.newsreader(39, weight: .medium))
                     .foregroundStyle(DS.inkDark.opacity(0.62))
                     .tracking(-0.015 * 39)
 
                 Text("How can I help you today?")
-                    .font(DS.serif(19, weight: .medium, italic: true))
+                    .font(DS.newsreader(19, weight: .regular, italic: true))
                     .foregroundStyle(DS.inkDark.opacity(0.46))
             }
             .padding(.top, 26)
