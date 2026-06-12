@@ -63,43 +63,40 @@ private struct ConversationPreview: View {
     let session: ConversationSession
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                ForEach(session.messages.prefix(3)) { msg in
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Spacer()
-                            Text(msg.question)
-                                .font(.subheadline)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 8)
-                                .background(Color.indigo, in: RoundedRectangle(cornerRadius: 14))
-                                .foregroundStyle(.white)
-                                .padding(.leading, 40)
-                        }
-
-                        HStack {
-                            Text(msg.answer)
-                                .font(.subheadline)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 8)
-                                .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 14))
-                                .padding(.trailing, 40)
-                            Spacer()
-                        }
+        VStack(alignment: .leading, spacing: 12) {
+            ForEach(session.messages.prefix(3)) { msg in
+                VStack(alignment: .leading, spacing: 6) {
+                    // Question — right aligned
+                    HStack {
+                        Spacer(minLength: 32)
+                        Text(msg.question)
+                            .font(.caption)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(Color.indigo, in: RoundedRectangle(cornerRadius: 12))
+                            .foregroundStyle(.white)
+                    }
+                    // Answer — left aligned
+                    HStack {
+                        Text(msg.answer)
+                            .font(.caption)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
+                        Spacer(minLength: 32)
                     }
                 }
-
-                if session.messages.count > 3 {
-                    Text("+ \(session.messages.count - 3) more message\(session.messages.count - 3 == 1 ? "" : "s")")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                }
             }
-            .padding()
+
+            if session.messages.count > 3 {
+                Text("+ \(session.messages.count - 3) more…")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+            }
         }
-        .frame(width: 320)
+        .padding(12)
+        .frame(minWidth: 260, maxWidth: 340)
         .background(Color(.systemBackground))
     }
 }

@@ -58,7 +58,7 @@ def query(
     index: VectorStoreIndex,
     question: str,
     history: list[dict] | None = None,
-    top_k: int = 5,
+    top_k: int = 8,
     system_prompt: str | None = None,
 ) -> tuple[str, list[dict]]:
     """
@@ -69,25 +69,29 @@ def query(
         return "Index not ready yet.", []
 
     retriever = index.as_retriever(similarity_top_k=top_k)
-    qa_prompt = PromptTemplate(system_prompt or DEFAULT_SYSTEM_PROMPT)
-    query_engine = RetrieverQueryEngine.from_args(
-        retriever,
-        text_qa_template=qa_prompt,
-    )
 
+    # Inject conversation history into the system prompt (not into {query_str})
+    # so the model can distinguish between "what's in the notes" and "prior turns"
+    base_prompt = system_prompt or DEFAULT_SYSTEM_PROMPT
     if history:
         history_text = "\n".join(
             f"{'User' if m['role'] == 'user' else 'Alysha'}: {m['content']}"
             for m in history
         )
-        synthesis_prompt = (
-            f"Previous conversation:\n{history_text}\n\n"
-            f"Continue the conversation and answer this follow-up using the notes: {question}"
+        effective_prompt = base_prompt.replace(
+            "Question: {query_str}",
+            f"Previous conversation (for context only — do NOT treat as notes):\n{history_text}\n\nQuestion: {{query_str}}"
         )
     else:
-        synthesis_prompt = question
+        effective_prompt = base_prompt
 
-    response = query_engine.query(synthesis_prompt)
+    qa_prompt = PromptTemplate(effective_prompt)
+    query_engine = RetrieverQueryEngine.from_args(
+        retriever,
+        text_qa_template=qa_prompt,
+    )
+
+    response = query_engine.query(question)
     answer = str(response)
 
     if not answer or answer.strip() in ("", "Empty Response", "None"):
