@@ -17,11 +17,17 @@ struct SystemPromptEditorView: View {
             DS.parchmentMid.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Header
+                // Header — back chevron provided by NavigationStack; we add Save on the right
                 HStack {
-                    Button("Cancel") { onCancel() }
-                        .font(.system(size: 16))
+                    Button(action: onCancel) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 16, weight: .medium))
+                            Text("Settings")
+                                .font(.system(size: 16))
+                        }
                         .foregroundStyle(DS.inkLight)
+                    }
 
                     Spacer()
 
@@ -46,7 +52,7 @@ struct SystemPromptEditorView: View {
                     .disabled(isSaving || text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 56)
+                .padding(.top, 16)
                 .padding(.bottom, 12)
 
                 Divider().padding(.horizontal, 20)

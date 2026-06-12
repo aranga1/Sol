@@ -39,136 +39,115 @@ private final class SettingsViewModel {
 
 struct SettingsView: View {
     var onResetConnection: () -> Void
-    var onDismiss: () -> Void
 
     @State private var vm = SettingsViewModel()
-    @State private var showHelp = false
-    @State private var showPromptEditor = false
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        ZStack {
-            DS.parchmentMid.ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                // Drag handle
-                RoundedRectangle(cornerRadius: 2.5)
-                    .fill(DS.inkDark.opacity(0.18))
-                    .frame(width: 36, height: 5)
-                    .padding(.top, 12)
-                    .padding(.bottom, 8)
-
-                // Header
-                HStack {
-                    Button("Cancel") { onDismiss() }
-                        .font(.system(size: 16))
-                        .foregroundStyle(DS.inkLight)
-                    Spacer()
-                    Text("Settings")
-                        .font(DS.newsreader(19, weight: .medium))
-                        .foregroundStyle(DS.inkDark)
-                    Spacer()
-                    // Placeholder to balance Cancel
-                    Text("Cancel").font(.system(size: 16)).foregroundStyle(.clear)
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 16)
-
-                if let err = vm.errorMessage {
-                    Text(err)
-                        .font(.system(size: 13))
-                        .foregroundStyle(.red)
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 8)
-                }
+        NavigationStack {
+            ZStack {
+                DS.parchmentMid.ignoresSafeArea()
 
                 ScrollView {
                     VStack(spacing: 24) {
-                        // ── Customisation ────────────────────────────────────
+                        if let err = vm.errorMessage {
+                            Text(err)
+                                .font(.system(size: 13))
+                                .foregroundStyle(.red)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+
+                        // ── Customisation ─────────────────────────────────
                         settingsSection(title: "Customisation") {
-                            settingsRow(
-                                icon: "text.quote",
-                                label: "System Prompt",
-                                chevron: true
-                            ) {
-                                showPromptEditor = true
+                            NavigationLink {
+                                SystemPromptEditorView(
+                                    initialText: vm.systemPrompt,
+                                    defaultText: vm.defaultPrompt,
+                                    onSave: { newPrompt in
+                                        Task { await vm.save(newPrompt) }
+                                    },
+                                    onCancel: {}  // back button handles dismiss
+                                )
+                                .navigationBarHidden(true)
+                            } label: {
+                                settingsRowLabel(icon: "text.quote", label: "System Prompt")
                             }
+                            .buttonStyle(.plain)
                         }
 
-                        // ── Support ──────────────────────────────────────────
+                        // ── Support ───────────────────────────────────────
                         settingsSection(title: nil) {
-                            settingsRow(icon: "questionmark.circle", label: "Help", chevron: true) {
-                                showHelp = true
+                            NavigationLink {
+                                HelpView()
+                                    .navigationBarHidden(true)
+                            } label: {
+                                settingsRowLabel(icon: "questionmark.circle", label: "Help")
                             }
+                            .buttonStyle(.plain)
                         }
 
-                        // ── Connection ───────────────────────────────────────
+                        // ── Connection ────────────────────────────────────
                         settingsSection(title: "Connection") {
-                            settingsRow(icon: "exclamationmark.triangle", label: "Reset Connection", isDestructive: true) {
-                                onDismiss()
+                            Button {
+                                dismiss()
                                 onResetConnection()
+                            } label: {
+                                settingsRowLabel(icon: "exclamationmark.triangle", label: "Reset Connection", isDestructive: true, chevron: false)
                             }
+                            .buttonStyle(.plain)
+
                             Text("Clears your current Mac connection and returns to the QR setup screen.")
                                 .font(.system(size: 13))
                                 .foregroundStyle(DS.inkFaint)
                                 .padding(.horizontal, 16)
-                                .padding(.bottom, 8)
+                                .padding(.bottom, 10)
                         }
                     }
                     .padding(.horizontal, 20)
+                    .padding(.top, 8)
                     .padding(.bottom, 40)
                 }
             }
-
-            // Save-success toast
-            if vm.saveSuccess {
-                VStack {
-                    Spacer()
-                    Text("Saved")
-                        .font(.subheadline)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(.green, in: Capsule())
-                        .foregroundStyle(.white)
-                        .padding(.bottom, 32)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                        .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { vm.saveSuccess = false }
-                        }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                        .foregroundStyle(DS.inkLight)
+                }
+                ToolbarItem(placement: .principal) {
+                    Text("Settings")
+                        .font(DS.newsreader(19, weight: .medium))
+                        .foregroundStyle(DS.inkDark)
                 }
             }
+            .toolbarBackground(DS.parchmentMid, for: .navigationBar)
+            .toolbarColorScheme(.light, for: .navigationBar)
         }
-        .overlay {
-            // Prompt editor slide-up
-            if showPromptEditor && !vm.isLoading {
-                SystemPromptEditorView(
-                    initialText: vm.systemPrompt,
-                    defaultText: vm.defaultPrompt,
-                    onSave: { newPrompt in
-                        Task {
-                            await vm.save(newPrompt)
-                            showPromptEditor = false
-                        }
-                    },
-                    onCancel: { showPromptEditor = false }
-                )
-                .transition(.move(edge: .bottom))
-                .zIndex(10)
+        // Sheet presentation style — partial reveal with home peeking at top
+        .presentationDetents([.large])
+        .presentationDragIndicator(.visible)
+        .presentationBackground(DS.parchmentMid)
+        .presentationCornerRadius(20)
+        .overlay(alignment: .bottom) {
+            if vm.saveSuccess {
+                Text("Saved")
+                    .font(.subheadline)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+                    .background(.green, in: Capsule())
+                    .foregroundStyle(.white)
+                    .padding(.bottom, 24)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { vm.saveSuccess = false }
+                    }
             }
         }
-        .overlay {
-            if showHelp {
-                HelpView(onDismiss: { showHelp = false })
-                    .transition(.move(edge: .bottom))
-                    .zIndex(10)
-            }
-        }
-        .animation(.spring(response: 0.38, dampingFraction: 0.88), value: showPromptEditor)
-        .animation(.spring(response: 0.38, dampingFraction: 0.88), value: showHelp)
         .animation(.easeInOut, value: vm.saveSuccess)
         .task { await vm.load() }
     }
 
-    // ── Section builder ───────────────────────────────────────────────────────
+    // ── Row helpers ───────────────────────────────────────────────────────────
     @ViewBuilder
     private func settingsSection(title: String?, @ViewBuilder content: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -187,33 +166,29 @@ struct SettingsView: View {
     }
 
     @ViewBuilder
-    private func settingsRow(
+    private func settingsRowLabel(
         icon: String,
         label: String,
-        chevron: Bool = false,
         isDestructive: Bool = false,
-        action: @escaping () -> Void
+        chevron: Bool = true
     ) -> some View {
-        Button(action: action) {
-            HStack(spacing: 14) {
-                Image(systemName: icon)
-                    .font(.system(size: 16))
-                    .foregroundStyle(isDestructive ? DS.terracotta : DS.inkMid)
-                    .frame(width: 22)
-                Text(label)
-                    .font(.system(size: 16))
-                    .foregroundStyle(isDestructive ? DS.terracotta : DS.inkDark)
-                Spacer()
-                if chevron {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(DS.inkFaint)
-                }
+        HStack(spacing: 14) {
+            Image(systemName: icon)
+                .font(.system(size: 16))
+                .foregroundStyle(isDestructive ? DS.terracotta : DS.inkMid)
+                .frame(width: 22)
+            Text(label)
+                .font(.system(size: 16))
+                .foregroundStyle(isDestructive ? DS.terracotta : DS.inkDark)
+            Spacer()
+            if chevron {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(DS.inkFaint)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 15)
-            .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 15)
+        .contentShape(Rectangle())
     }
 }

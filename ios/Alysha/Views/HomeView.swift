@@ -133,19 +133,13 @@ struct HomeView: View {
                 .zIndex(21)
             }
 
-            // ── Settings overlay (slides up) ──────────────────────────────
-            if showSettings {
-                SettingsView(
-                    onResetConnection: onResetConnection,
-                    onDismiss: {
-                        withAnimation(.spring(response: 0.38, dampingFraction: 0.88)) { showSettings = false }
-                    }
-                )
-                .transition(.move(edge: .bottom))
-                .zIndex(22)
-            }
         }
-        .animation(.spring(response: 0.38, dampingFraction: 0.88), value: showSettings)
+        .sheet(isPresented: $showSettings) {
+            SettingsView(onResetConnection: {
+                showSettings = false
+                onResetConnection()
+            })
+        }
         .alert("Obsidian Not Installed", isPresented: $showObsidianAlert) {
             Button("OK", role: .cancel) {}
         } message: {

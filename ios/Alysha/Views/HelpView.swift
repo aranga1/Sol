@@ -48,24 +48,31 @@ struct HelpView: View {
             DS.parchmentMid.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Drag handle
-                RoundedRectangle(cornerRadius: 2.5)
-                    .fill(DS.inkDark.opacity(0.18))
-                    .frame(width: 36, height: 5)
-                    .padding(.top, 12)
-                    .padding(.bottom, 8)
-
-                // Header
+                Spacer().frame(height: 16)
+                // Header — adapts to context (back button if pushed, Done if sheet)
                 HStack {
-                    Button("Done") { close() }
-                        .font(.system(size: 16))
-                        .foregroundStyle(DS.inkLight)
+                    Button(action: close) {
+                        if onDismiss != nil {
+                            // standalone sheet
+                            Text("Done")
+                                .font(.system(size: 16))
+                                .foregroundStyle(DS.inkLight)
+                        } else {
+                            // pushed from NavigationStack
+                            HStack(spacing: 4) {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 16, weight: .medium))
+                                Text("Settings")
+                                    .font(.system(size: 16))
+                            }
+                            .foregroundStyle(DS.inkLight)
+                        }
+                    }
                     Spacer()
                     Text("Help")
                         .font(DS.newsreader(19, weight: .medium))
                         .foregroundStyle(DS.inkDark)
                     Spacer()
-                    // Balance button
                     Text("Done").font(.system(size: 16)).foregroundStyle(.clear)
                 }
                 .padding(.horizontal, 20)
