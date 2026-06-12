@@ -217,10 +217,9 @@ private struct DrawerView: View {
                 // GeometryReader fills the space between the label and footer.
                 // We use it to count how many rows actually fit.
                 GeometryReader { geo in
-                    let maxFit = max(1, Int(geo.size.height / rowHeight))
-                    let needsAllChats = store.sessions.count > maxFit
-                    // Reserve one row for "All chats" button when needed
-                    let visibleCount = needsAllChats ? maxFit - 1 : min(store.sessions.count, maxFit)
+                    // Always reserve one slot for "All chats"
+                    let maxFit = max(2, Int(geo.size.height / rowHeight))
+                    let visibleCount = min(store.sessions.count, maxFit - 1)
 
                     VStack(alignment: .leading, spacing: 0) {
                         ForEach(Array(store.sessions.prefix(visibleCount))) { session in
@@ -237,20 +236,18 @@ private struct DrawerView: View {
                             Divider().padding(.horizontal, 20)
                         }
 
-                        if needsAllChats {
-                            Button(action: onOpenAllChats) {
-                                HStack {
-                                    Text("All chats")
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption2)
-                                        .foregroundStyle(.tertiary)
-                                }
-                                .padding(.horizontal, 20)
-                                .frame(height: rowHeight)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                        Button(action: onOpenAllChats) {
+                            HStack {
+                                Text("All chats")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                Image(systemName: "chevron.right")
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
                             }
+                            .padding(.horizontal, 20)
+                            .frame(height: rowHeight)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
 
                         Spacer()
