@@ -581,12 +581,9 @@ struct CaptureBar: View {
                 .onChanged { value in
                     // Phase 1: start the long-press timer on first touch
                     if pressTimer == nil && !longPressActive {
-                        let haptic = UIImpactFeedbackGenerator(style: .medium)
-                        haptic.prepare()
                         pressTimer = Timer.scheduledTimer(withTimeInterval: 0.45, repeats: false) { _ in
-                            haptic.impactOccurred()
                             withAnimation(.spring(response: 0.32, dampingFraction: 0.74)) {
-                                popOpen = true
+                                popOpen = true          // triggers .sensoryFeedback below
                             }
                             longPressActive = true
                         }
@@ -596,10 +593,7 @@ struct CaptureBar: View {
                     let loc = value.location
                     let newHover = popupItemFrames.first { $0.value.contains(loc) }?.key
                     if newHover != hoveredMode {
-                        if newHover != nil {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        }
-                        hoveredMode = newHover
+                        hoveredMode = newHover          // triggers .sensoryFeedback below
                     }
                 }
                 .onEnded { _ in
@@ -608,15 +602,19 @@ struct CaptureBar: View {
                     guard longPressActive else { return }
                     longPressActive = false
                     if let chosen = hoveredMode {
-                        // Finger released over an item — select it
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        barMode = chosen
+                        barMode = chosen                // triggers .sensoryFeedback below
                         hoveredMode = nil
                         withAnimation(.easeOut(duration: 0.15)) { popOpen = false }
                     }
-                    // No item hovered — leave popup open for a tap
                 }
         )
+        // ── Haptics via sensoryFeedback — no-ops gracefully on iPad ──────────
+        // Long-press activation: medium impact ("thud" when menu opens)
+        .sensoryFeedback(.impact(weight: .medium, intensity: 0.8), trigger: popOpen) { _, new in new }
+        // Hover over item: selection tick (same as iOS scroll wheel / picker)
+        .sensoryFeedback(.selection, trigger: hoveredMode)
+        // Confirm selection: rigid impact (crisp "snap")
+        .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.7), trigger: barMode)
     }
 
     // MARK: Middle section
