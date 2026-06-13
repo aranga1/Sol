@@ -428,18 +428,18 @@ struct QueryView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
                     ForEach(sources) { source in
-                        Button { openInObsidian(source) } label: {
+                        Button { openSource(source) } label: {
                             HStack(spacing: 10) {
-                                Image("SolTriadColor")
-                                    .resizable()
-                                    .scaledToFit()
+                                Image(systemName: sourceIcon(source))
+                                    .font(.system(size: 16))
+                                    .foregroundStyle(DS.terracotta)
                                     .frame(width: 20, height: 20)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(source.title)
                                         .font(.system(size: 13, weight: .medium))
                                         .foregroundStyle(DS.inkDark)
                                         .lineLimit(1)
-                                    Text("Open in Obsidian")
+                                    Text(sourceLabel(source))
                                         .font(.system(size: 11))
                                         .foregroundStyle(DS.inkFaint)
                                 }
@@ -460,6 +460,33 @@ struct QueryView: View {
                 .padding(.vertical, 2)
             }
         }
+    }
+
+    private func sourceIcon(_ source: SourceItem) -> String {
+        let type = source.sourceType ?? (source.file.hasPrefix("calendar:") ? "calendar" : "note")
+        switch type {
+        case "calendar": return "calendar"
+        default:         return "note.text"
+        }
+    }
+
+    private func sourceLabel(_ source: SourceItem) -> String {
+        let type = source.sourceType ?? (source.file.hasPrefix("calendar:") ? "calendar" : "note")
+        switch type {
+        case "calendar": return "Open in Calendar"
+        default:         return "Open in Obsidian"
+        }
+    }
+
+    private func openSource(_ source: SourceItem) {
+        if let urlString = source.url, let url = URL(string: urlString),
+           UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url)
+            return
+        }
+        // Fallback for notes without a backend-supplied URL
+        let type = source.sourceType ?? (source.file.hasPrefix("calendar:") ? "calendar" : "note")
+        if type != "calendar" { openInObsidian(source) }
     }
 
     // MARK: - Thinking indicator

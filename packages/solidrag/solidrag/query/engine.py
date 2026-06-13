@@ -112,10 +112,12 @@ async def _retrieve(
 
 def _extract_sources(results: list[dict], max_sources: int = 5) -> list[dict]:
     """Deduplicate and rank source references from retrieval results."""
+    import re as _re
+    from datetime import datetime as _dt
+
     if not results:
         return []
 
-    # file_path is vault-relative (e.g. "Notes/foo.md" or "uploads/pdf/.../bar.pdf")
     best_per_file: dict[str, tuple[dict, float]] = {}
     for r in results:
         fp = r["file_path"]
@@ -135,13 +137,39 @@ def _extract_sources(results: list[dict], max_sources: int = 5) -> list[dict]:
     sources = []
     for r, _ in relevant:
         fp = r["file_path"]
-        name = Path(fp).name
-        title = name.replace(".md", "").replace(".pdf", "").replace("-", " ").replace("_", " ")
-        for line in r["content"].split("\n"):
-            if line.startswith("# "):
-                title = line[2:].strip()
-                break
-        sources.append({"file": fp, "title": title})
+        content = r["content"]
+
+        if fp.startswith("calendar:"):
+            # Extract event title from "Event: <title>" line
+            title = "Calendar Event"
+            for line in content.split("\n"):
+                if line.startswith("Event: "):
+                    title = line[len("Event: "):].strip()
+                    break
+
+            # Build calshow: URL — CFAbsoluteTime = unix_ts - 978307200
+            url = "calshow://"
+            m = _re.search(r"Date: \w+ (\d+) (\w+) (\d{4})", content)
+            if m:
+                try:
+                    event_date = _dt.strptime(
+                        f"{m.group(1)} {m.group(2)} {m.group(3)}", "%d %B %Y"
+                    )
+                    cf_ts = int(event_date.timestamp()) - 978307200
+                    url = f"calshow:{cf_ts}"
+                except Exception:
+                    pass
+
+            sources.append({"file": fp, "title": title, "source_type": "calendar", "url": url})
+        else:
+            # Obsidian note / PDF / image
+            name = Path(fp).name
+            title = name.replace(".md", "").replace(".pdf", "").replace("-", " ").replace("_", " ")
+            for line in content.split("\n"):
+                if line.startswith("# "):
+                    title = line[2:].strip()
+                    break
+            sources.append({"file": fp, "title": title, "source_type": "note", "url": None})
 
     return sources
 

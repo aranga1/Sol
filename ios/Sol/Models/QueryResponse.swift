@@ -13,7 +13,15 @@ struct QueryRequest: Codable {
 struct SourceItem: Codable, Identifiable, Hashable {
     let file: String
     let title: String
+    let sourceType: String?   // "calendar" | "note" | nil (legacy)
+    let url: String?          // deep-link URL for this source
+
     var id: String { file }
+
+    enum CodingKeys: String, CodingKey {
+        case file, title, url
+        case sourceType = "source_type"
+    }
 }
 
 // SSE event emitted by /api/query stream
