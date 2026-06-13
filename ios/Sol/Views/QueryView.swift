@@ -16,6 +16,7 @@ private final class QueryViewModel {
     var isLoading = false
     var errorMessage: String?
     var followUpText = ""
+    var pendingCalendarPayload: CreateEventPayload? = nil
 
     private var session: ConversationSession?
 
@@ -77,6 +78,17 @@ private final class QueryViewModel {
                             answer: accumulated, sources: sources
                         )
                     }
+                case "action":
+                    if event.action == "create_event",
+                       let payloadData = payload.data(using: .utf8) {
+                        // Re-decode the full SSE event to extract the nested payload dict
+                        if let raw = try? JSONSerialization.jsonObject(with: payloadData) as? [String: Any],
+                           let payloadDict = raw["payload"],
+                           let payloadJSON = try? JSONSerialization.data(withJSONObject: payloadDict),
+                           let decoded = try? JSONDecoder().decode(CreateEventPayload.self, from: payloadJSON) {
+                            pendingCalendarPayload = decoded
+                        }
+                    }
                 case "error":
                     errorMessage = event.content ?? "Unknown error"
                     messages.removeLast()
@@ -113,6 +125,8 @@ struct QueryView: View {
     @State private var vm: QueryViewModel
     @State private var scrollID: UUID?
     @State private var thinkPhase = false
+    @State private var showCalendarEditor = false
+    @State private var eventNotCreated = false
     @Environment(\.dismiss) private var dismiss
 
     init(initialQuestion: String = "", onDismiss: (() -> Void)? = nil, onOpenDrawer: (() -> Void)? = nil) {
@@ -201,6 +215,20 @@ struct QueryView: View {
                                     .padding(.top, 60)
                             }
 
+                            if eventNotCreated {
+                                Text("Event not created.")
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(DS.inkFaint)
+                                    .italic()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.horizontal, 16)
+                                    .onAppear {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                                            eventNotCreated = false
+                                        }
+                                    }
+                            }
+
                             Color.clear.frame(height: 20)
                         }
                         .padding(.top, 16)
@@ -250,6 +278,36 @@ struct QueryView: View {
                 vm.loadSession(session)
             } else if !initialQuestion.isEmpty && vm.messages.isEmpty && !vm.isLoading {
                 Task { await vm.ask(initialQuestion) }
+            }
+        }
+        .onChange(of: vm.pendingCalendarPayload) { _, payload in
+            guard payload != nil else { return }
+            showCalendarEditor = true
+        }
+        .onChange(of: showCalendarEditor) { _, showing in
+            guard showing, let payload = vm.pendingCalendarPayload else { return }
+            Task { @MainActor in
+                let granted = await CalendarService.shared.requestAccess()
+                guard granted else {
+                    showCalendarEditor = false
+                    vm.pendingCalendarPayload = nil
+                    return
+                }
+                guard let windowScene = UIApplication.shared.connectedScenes
+                    .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
+                      let rootVC = windowScene.keyWindow?.rootViewController else {
+                    showCalendarEditor = false
+                    vm.pendingCalendarPayload = nil
+                    return
+                }
+                CalendarService.shared.presentEventEditor(
+                    payload: payload,
+                    from: rootVC
+                ) { saved in
+                    showCalendarEditor = false
+                    vm.pendingCalendarPayload = nil
+                    if !saved { eventNotCreated = true }
+                }
             }
         }
     }
