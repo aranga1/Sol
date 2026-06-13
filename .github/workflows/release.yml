@@ -51,6 +51,9 @@ jobs:
       - name: Install xcodegen
         run: brew install xcodegen && cd ios && xcodegen generate
 
+      - name: Initialize Xcode platforms
+        run: sudo xcodebuild -runFirstLaunch
+
       - name: Import signing certificate
         env:
           APPLE_CERT_BASE64: ${{ secrets.APPLE_CERT_BASE64 }}
@@ -83,7 +86,7 @@ jobs:
             -scheme Sol \
             -configuration Release \
             -archivePath $RUNNER_TEMP/Sol.xcarchive \
-            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
             DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
             CODE_SIGN_STYLE=Manual
 
