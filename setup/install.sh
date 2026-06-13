@@ -21,17 +21,25 @@ if ! command -v gum &>/dev/null; then
   brew install gum --quiet
 fi
 
+# ── Color palette (matches Sol design system) ─────────────────────────────────
+# Terracotta #A23E2D — primary accent (headings, success, highlights)
+# Ink dark   #2B2521 — step arrows, primary text
+# Ink light  #7C7468 — secondary / skip / muted
+# Amber      #B5701F — time estimates / warm accent
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
-step()    { gum style --foreground 33  "  → $*"; }
-ok()      { gum style --foreground 82  "  ✓ $*"; }
-skip()    { gum style --foreground 245 "  – $*"; }
-section() { echo ""; gum style --bold --foreground 212 "$*"; }
-spin()    { gum spin --spinner dot --title " $1" -- "${@:2}"; }
+step()    { gum style --foreground "#7C7468" "  → $*"; }
+ok()      { gum style --foreground "#A23E2D" "  ✓ $*"; }
+skip()    { gum style --foreground "#A0937F" "  – $*"; }
+section() { echo ""; gum style --bold --foreground "#A23E2D" "$*"; }
+spin()    { gum spin --spinner dot --spinner.foreground "#A23E2D" --title " $1" -- "${@:2}"; }
 
 ask() {
   # ask <header> <yes-label> <no-label>
   gum choose \
     --header "$1" \
+    --cursor.foreground "#A23E2D" \
+    --selected.foreground "#A23E2D" \
     --cursor "▸ " \
     --cursor-prefix "  " \
     --selected-prefix "✓ " \
@@ -41,30 +49,30 @@ ask() {
 # ── Header ────────────────────────────────────────────────────────────────────
 gum style \
   --border rounded \
-  --border-foreground 212 \
-  --foreground 212 \
+  --border-foreground "#8C3322" \
+  --foreground "#A23E2D" \
   --bold \
   --padding "1 4" \
   --margin "1 0" \
   "Sol Setup"
 
-[[ "$(uname)" == "Darwin" ]] || { gum style --foreground 196 "Sol requires macOS."; exit 1; }
-gum style --foreground 245 "  macOS $(sw_vers -productVersion)  ·  $(uname -m)"
+[[ "$(uname)" == "Darwin" ]] || { gum style --foreground "#A23E2D" "Sol requires macOS."; exit 1; }
+gum style --foreground "#A0937F" "  macOS $(sw_vers -productVersion)  ·  $(uname -m)"
 echo ""
 
 # ── Time estimate ─────────────────────────────────────────────────────────────
 gum style \
   --border normal \
-  --border-foreground 245 \
+  --border-foreground "#A0937F" \
   --padding "0 2" \
-  "$(gum style --foreground 212 --bold "Estimated time on a fast connection (~100 Mbps):")
+  "$(gum style --foreground "#A23E2D" --bold "Estimated time on a fast connection (~100 Mbps):")
 
-  $(gum style --foreground 82 "~1 min")   Install dependencies (Homebrew, Python, Tailscale, Ollama, Obsidian)
-  $(gum style --foreground 82 "~8 min")   Download AI model  (qwen2.5:7b · 4.7 GB)
-  $(gum style --foreground 82 "~1 min")   Python environment + daemon setup
-  $(gum style --foreground 82 "~2 min")   Tailscale auth + Obsidian plugin setup
-  $(gum style --foreground 245 "─────────────────────────────────────────────")
-  $(gum style --foreground 212 --bold "~10 min")   Total (may vary — model download dominates)"
+  $(gum style --foreground "#B5701F" "~1 min")   Install dependencies (Homebrew, Python, Tailscale, Ollama, Obsidian)
+  $(gum style --foreground "#B5701F" "~8 min")   Download AI model  (qwen2.5:7b · 4.7 GB)
+  $(gum style --foreground "#B5701F" "~1 min")   Python environment + daemon setup
+  $(gum style --foreground "#B5701F" "~2 min")   Tailscale auth + Obsidian plugin setup
+  $(gum style --foreground "#A0937F" "─────────────────────────────────────────────")
+  $(gum style --foreground "#A23E2D" --bold "~10 min")   Total (may vary — model download dominates)"
 echo ""
 
 # ── 1. Dependencies ───────────────────────────────────────────────────────────
@@ -209,8 +217,8 @@ tailscale_auth() {
     ts_key=$(gum input --placeholder "tskey-auth-...")
     tailscale up --auth-key="$ts_key" --accept-routes
   else
-    gum style --foreground 245 "  A browser window will open — sign in and return here."
-    gum style --foreground 245 "  If no browser opens, copy the URL printed below:"
+    gum style --foreground "#A0937F" "  A browser window will open — sign in and return here."
+    gum style --foreground "#A0937F" "  If no browser opens, copy the URL printed below:"
     echo ""
     tailscale up --accept-routes  # blocks until auth complete; prints URL to stdout
   fi
@@ -227,7 +235,7 @@ if tailscale status &>/dev/null 2>&1; then
     TAILSCALE_IP=$(tailscale ip -4 2>/dev/null || echo "127.0.0.1")
   fi
 else
-  gum style --foreground 245 "  Tailscale connects your iPhone to this Mac from anywhere."
+  gum style --foreground "#A0937F" "  Tailscale connects your iPhone to this Mac from anywhere."
   echo ""
   tailscale_auth
   TAILSCALE_IP=$(tailscale ip -4 2>/dev/null || echo "127.0.0.1")
@@ -243,23 +251,23 @@ PLUGIN_DATA="$VAULT_PATH/.obsidian/plugins/obsidian-local-rest-api/data.json"
 echo ""
 gum style \
   --border normal \
-  --border-foreground 226 \
+  --border-foreground "#A23E2D" \
   --padding "1 3" \
-  "$(gum style --foreground 226 --bold "Action required — Obsidian is opening now.")
+  "$(gum style --foreground "#A23E2D" --bold "Action required — Obsidian is opening now.")
 
-$(gum style --foreground 255 "Step 1 ·") $(gum style --foreground 245 "If prompted, open the Sol vault from the vault switcher.")
+$(gum style --foreground "#2B2521" "Step 1 ·") $(gum style --foreground "#A0937F" "If prompted, open the Sol vault from the vault switcher.")
 
-$(gum style --foreground 255 "Step 2 ·") $(gum style --foreground 245 "Go to Settings (bottom-left cog) → Community Plugins.")
-            $(gum style --foreground 245 "If you see a 'Turn on community plugins' button, click it.")
+$(gum style --foreground "#2B2521" "Step 2 ·") $(gum style --foreground "#A0937F" "Go to Settings (bottom-left cog) → Community Plugins.")
+            $(gum style --foreground "#A0937F" "If you see a 'Turn on community plugins' button, click it.")
 
-$(gum style --foreground 255 "Step 3 ·") $(gum style --foreground 245 "Click Browse, search for: Local REST API with MCP by Adam Coddington")
-            $(gum style --foreground 245 "Click Install, then toggle it on to Enable.")
+$(gum style --foreground "#2B2521" "Step 3 ·") $(gum style --foreground "#A0937F" "Click Browse, search for: Local REST API with MCP by Adam Coddington")
+            $(gum style --foreground "#A0937F" "Click Install, then toggle it on to Enable.")
 
-$(gum style --foreground 255 "Step 4 ·") $(gum style --foreground 245 "You may see a message about HTTPS certificates or browser trust — ignore it.")
-            $(gum style --foreground 245 "Sol talks to the plugin directly and does not need that setup.")
+$(gum style --foreground "#2B2521" "Step 4 ·") $(gum style --foreground "#A0937F" "You may see a message about HTTPS certificates or browser trust — ignore it.")
+            $(gum style --foreground "#A0937F" "Sol talks to the plugin directly and does not need that setup.")
 
-$(gum style --foreground 255 "Step 5 ·") $(gum style --foreground 245 "Click the plugin's Options button (or Settings → Community Plugins → Local REST API).")
-            $(gum style --foreground 245 "You will see an API Key field. Copy that key starting from 'Bearer <key>' — you will need it for the next step.")"
+$(gum style --foreground "#2B2521" "Step 5 ·") $(gum style --foreground "#A0937F" "Click the plugin's Options button (or Settings → Community Plugins → Local REST API).")
+            $(gum style --foreground "#A0937F" "You will see an API Key field. Copy that key starting from 'Bearer <key>' — you will need it for the next step.")"
 
 open -a Obsidian "$VAULT_PATH" 2>/dev/null || true
 echo ""
@@ -270,8 +278,8 @@ gum confirm \
 
 echo ""
 
-gum style --foreground 245 "  In Obsidian: Settings → Community Plugins → Local REST API → Options"
-gum style --foreground 245 "  Copy the value in the 'API Key' field and paste it below."
+gum style --foreground "#A0937F" "  In Obsidian: Settings → Community Plugins → Local REST API → Options"
+gum style --foreground "#A0937F" "  Copy the value in the 'API Key' field and paste it below."
 echo ""
 OBSIDIAN_API_KEY_FROM_PLUGIN=$(gum input --placeholder "Paste the Obsidian Local REST API key here...")
 
@@ -332,32 +340,32 @@ done
 echo ""
 gum style \
   --border rounded \
-  --border-foreground 82 \
-  --foreground 82 \
+  --border-foreground "#8C3322" \
+  --foreground "#A23E2D" \
   --bold \
   --padding "1 4" \
   --margin "1 0" \
   "Sol is ready!"
 
-gum style "  Vault       $(gum style --foreground 245 "$VAULT_PATH")"
-gum style "  Daemon      $(gum style --foreground 245 "http://$TAILSCALE_IP:$DAEMON_PORT")"
-gum style "  Logs        $(gum style --foreground 245 "$CONFIG_DIR/daemon.log")"
-gum style "  Connect QR  $(gum style --foreground 245 "$CONFIG_DIR/sol-connect.png")"
-gum style "  CLI         $(gum style --foreground 245 "$LOCAL_BIN/sol --help")"
+gum style "  Vault       $(gum style --foreground "#A0937F" "$VAULT_PATH")"
+gum style "  Daemon      $(gum style --foreground "#A0937F" "http://$TAILSCALE_IP:$DAEMON_PORT")"
+gum style "  Logs        $(gum style --foreground "#A0937F" "$CONFIG_DIR/daemon.log")"
+gum style "  Connect QR  $(gum style --foreground "#A0937F" "$CONFIG_DIR/sol-connect.png")"
+gum style "  CLI         $(gum style --foreground "#A0937F" "$LOCAL_BIN/sol --help")"
 echo ""
-gum style --foreground 245 "  iPhone next steps:"
-gum style --foreground 245 "  1. Install Tailscale → sign in with the same account"
-gum style --foreground 245 "  2. Install Sol (see GitHub Releases)"
-gum style --foreground 245 "  3. Scan the connection QR code printed above"
-gum style --foreground 245 "  4. Open Obsidian iOS → Open vault from iCloud → Sol"
+gum style --foreground "#7C7468" "  iPhone next steps:"
+gum style --foreground "#7C7468" "  1. Install Tailscale → sign in with the same account"
+gum style --foreground "#7C7468" "  2. Install Sol (see GitHub Releases)"
+gum style --foreground "#7C7468" "  3. Scan the connection QR code printed above"
+gum style --foreground "#7C7468" "  4. Open Obsidian iOS → Open vault from iCloud → Sol"
 echo ""
 gum style \
   --border normal \
-  --border-foreground 33 \
+  --border-foreground "#7C7468" \
   --padding "0 2" \
-  "$(gum style --foreground 33 --bold "Activate the sol command in this terminal:")
+  "$(gum style --foreground "#A23E2D" --bold "Activate the sol command in this terminal:")
 
-  $(gum style --foreground 255 "source ~/.zshrc")
+  $(gum style --foreground "#2B2521" "source ~/.zshrc")
 
-  $(gum style --foreground 245 "Or open a new terminal — it will be available automatically from then on.")"
+  $(gum style --foreground "#A0937F" "Or open a new terminal — it will be available automatically from then on.")"
 echo ""
