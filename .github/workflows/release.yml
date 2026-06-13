@@ -46,8 +46,11 @@ jobs:
       - name: Install xcodegen
         run: brew install xcodegen && cd ios && xcodegen generate
 
-      - name: Download iOS platform
-        run: sudo xcodebuild -downloadPlatform iOS
+      - name: Initialize Xcode and iOS platform
+        run: |
+          sudo xcodebuild -runFirstLaunch || true
+          xcrun simctl list >/dev/null 2>&1 || true
+          sudo xcodebuild -downloadPlatform iOS || sudo xcodebuild -downloadPlatform iOS || true
 
       - name: Import signing certificate
         env:
