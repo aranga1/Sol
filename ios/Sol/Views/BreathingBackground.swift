@@ -6,7 +6,7 @@ import SwiftUI
 //
 // breath = 0.5 + 0.5 * sin(t / 3.1)   → ~19.5 s full cycle
 // rings: f = (t/5.2 + phase) mod 1     → 5.2 s each, ⅓ staggered
-// sway:  sin(t / 7) * 2.2°             → ~44 s full cycle
+// rotate: t / 90 * 360°               → one full clockwise turn per 90 s
 
 struct BreathingBackground: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -86,7 +86,7 @@ struct BreathingBackground: View {
     private var markLayer: some View {
         let breath   = reduceMotion ? 0.75 : 0.5 + 0.5 * sin(t / 3.1)
         let scale    = 1 + breath * 0.05
-        let rotation = reduceMotion ? 0.0 : sin(t / 7) * 2.2
+        let rotation = reduceMotion ? 0.0 : (t / 90.0) * 360.0
 
         return Image("node-sun")
             .resizable()

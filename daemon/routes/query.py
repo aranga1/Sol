@@ -40,8 +40,9 @@ async def query_vault(request: Request, body: QueryRequest):
     Clients should treat the connection as done when they receive type=done
     or type=error. The stream ends after that event.
     """
-    index = getattr(request.app.state, "vault_index_llama", None)
-    if index is None:
+    faiss_index = getattr(request.app.state, "vault_index", None)
+    nodestore = getattr(request.app.state, "vault_nodestore", None)
+    if faiss_index is None or nodestore is None:
         return JSONResponse(status_code=503, content={"detail": "Index not ready yet"})
 
     history = [{"role": m.role, "content": m.content} for m in (body.history or [])]
@@ -50,7 +51,8 @@ async def query_vault(request: Request, body: QueryRequest):
     async def generate():
         try:
             async for event in query_stream_async(
-                index,
+                faiss_index,
+                nodestore,
                 body.question,
                 history=history,
                 system_prompt=system_prompt,

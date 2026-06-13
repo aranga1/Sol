@@ -19,6 +19,7 @@ from llama_index.embeddings.ollama import OllamaEmbedding
 from solidrag.config import SolidRagConfig
 from solidrag.extractors.registry import ExtractorRegistry
 from solidrag.index.manifest import IndexManifest
+from solidrag.index.nodestore import NodeStore
 
 if TYPE_CHECKING:
     from llama_index.core.schema import TextNode
@@ -96,6 +97,16 @@ def _embed_nodes(nodes: list[TextNode], config: SolidRagConfig) -> np.ndarray:
     return arr
 
 
+def _vault_rel_path(filepath: str, config: SolidRagConfig) -> str:
+    """Return *filepath* relative to the first matching source_dir, or basename."""
+    for source_dir in config.source_dirs:
+        try:
+            return str(Path(filepath).relative_to(source_dir))
+        except ValueError:
+            continue
+    return Path(filepath).name
+
+
 def _extract_file(
     filepath: str, registry: ExtractorRegistry
 ) -> list[TextNode]:
@@ -126,7 +137,7 @@ def _build_faiss_index() -> faiss.IndexIDMap2:
 def build_index(
     config: SolidRagConfig,
     registry: ExtractorRegistry | None = None,
-) -> tuple[faiss.IndexIDMap2, IndexManifest]:
+) -> tuple[faiss.IndexIDMap2, IndexManifest, NodeStore]:
     """Build or incrementally update the FAISS index.
 
     On first boot (or missing/corrupt manifest) performs a full rebuild.
@@ -139,8 +150,8 @@ def build_index(
                   default registry is constructed from *config*.
 
     Returns:
-        ``(faiss_index, manifest)`` — the populated index and the updated
-        manifest (not yet saved to disk; caller decides when to persist).
+        ``(faiss_index, manifest, nodestore)`` — the populated index, the
+        updated manifest, and the node content store.
     """
     from solidrag.extractors import default_registry
 
@@ -150,34 +161,44 @@ def build_index(
             vision_model=config.vision_model,
         )
 
-    manifest_path = Path(config.persist_dir) / "manifest.json"
+    persist_dir = Path(config.persist_dir)
+    persist_dir.mkdir(parents=True, exist_ok=True)
+
+    manifest_path = persist_dir / "manifest.json"
     manifest = IndexManifest(manifest_path)
     manifest.load()
 
-    faiss_index = _build_faiss_index()
+    nodestore = NodeStore(persist_dir / "nodestore.json")
+    nodestore.load()
 
+    faiss_path = persist_dir / "solidrag.faiss"
     current_files = _scan_source_dirs(config, registry)
 
-    if not manifest.all_paths():
-        # Full rebuild
-        logger.info("No existing manifest — performing full index build.")
-        _index_files(list(current_files.keys()), faiss_index, manifest, current_files, config, registry)
-    else:
+    if faiss_path.exists() and manifest.all_paths() and nodestore.all_node_ids():
+        # Load persisted FAISS index and apply only the filesystem delta.
+        faiss_index = faiss.read_index(str(faiss_path))
         new_files, modified_files, deleted_files = manifest.diff(current_files)
         logger.info(
-            "Incremental update: %d new, %d modified, %d deleted",
+            "Loaded persisted index — delta: %d new, %d modified, %d deleted",
             len(new_files), len(modified_files), len(deleted_files),
         )
-        _remove_files(deleted_files + modified_files, faiss_index, manifest)
-        _index_files(new_files + modified_files, faiss_index, manifest, current_files, config, registry)
+        _remove_files(deleted_files + modified_files, faiss_index, manifest, nodestore)
+        _index_files(new_files + modified_files, faiss_index, manifest, nodestore, current_files, config, registry)
+    else:
+        logger.info("No persisted index — performing full index build.")
+        faiss_index = _build_faiss_index()
+        _index_files(list(current_files.keys()), faiss_index, manifest, nodestore, current_files, config, registry)
 
+    faiss.write_index(faiss_index, str(faiss_path))
     manifest.save()
-    return faiss_index, manifest
+    nodestore.save()
+    return faiss_index, manifest, nodestore
 
 
 def incremental_update(
     faiss_index: faiss.IndexIDMap2,
     manifest: IndexManifest,
+    nodestore: NodeStore,
     config: SolidRagConfig,
     registry: ExtractorRegistry,
     lock: asyncio.Lock,
@@ -220,15 +241,21 @@ def incremental_update(
     # perform the mutation directly — the lock is passed in for future
     # async integration but the critical section is brief.
 
-    _remove_files(to_delete, faiss_index, manifest)
+    _remove_files(to_delete, faiss_index, manifest, nodestore)
 
     for filepath, nodes in new_nodes_by_file.items():
         embeddings = new_embeddings_by_file[filepath]
         ids = np.array([_node_id_to_int(n.node_id) for n in nodes], dtype=np.int64)
         faiss_index.add_with_ids(embeddings, ids)
         manifest.update(filepath, current_files[filepath], [n.node_id for n in nodes])
+        rel = _vault_rel_path(filepath, config)
+        for node in nodes:
+            nodestore.add(node.node_id, node.get_content(), rel)
 
+    faiss_path = Path(config.persist_dir) / "solidrag.faiss"
+    faiss.write_index(faiss_index, str(faiss_path))
     manifest.save()
+    nodestore.save()
     logger.info(
         "incremental_update complete: removed %d files, indexed %d files",
         len(to_delete), len(new_nodes_by_file),
@@ -244,8 +271,9 @@ def _remove_files(
     filepaths: list[str],
     faiss_index: faiss.IndexIDMap2,
     manifest: IndexManifest,
+    nodestore: NodeStore,
 ) -> None:
-    """Remove all vectors for *filepaths* from *faiss_index* and *manifest*."""
+    """Remove all vectors for *filepaths* from *faiss_index*, *manifest*, and *nodestore*."""
     for filepath in filepaths:
         entry = manifest.get(filepath)
         if entry and entry.node_ids:
@@ -256,6 +284,7 @@ def _remove_files(
                 faiss_index.remove_ids(ids)
             except Exception:
                 logger.exception("Failed to remove vectors for %s", filepath)
+            nodestore.delete_many(entry.node_ids)
         manifest.remove(filepath)
 
 
@@ -263,6 +292,7 @@ def _index_files(
     filepaths: list[str],
     faiss_index: faiss.IndexIDMap2,
     manifest: IndexManifest,
+    nodestore: NodeStore,
     current_files: dict[str, float],
     config: SolidRagConfig,
     registry: ExtractorRegistry,
@@ -287,4 +317,7 @@ def _index_files(
             current_files.get(filepath, 0.0),
             [n.node_id for n in nodes],
         )
+        rel = _vault_rel_path(filepath, config)
+        for node in nodes:
+            nodestore.add(node.node_id, node.get_content(), rel)
         logger.debug("Indexed %d nodes from %s", len(nodes), filepath)

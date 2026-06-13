@@ -20,8 +20,9 @@ import psutil
 
 from solidrag.config import SolidRagConfig
 from solidrag.extractors.registry import ExtractorRegistry
-from solidrag.index.builder import _embed_nodes, _node_id_to_int, _IMAGE_EXTENSIONS
+from solidrag.index.builder import _embed_nodes, _node_id_to_int, _IMAGE_EXTENSIONS, _vault_rel_path
 from solidrag.index.manifest import IndexManifest
+from solidrag.index.nodestore import NodeStore
 
 import numpy as np
 
@@ -42,12 +43,14 @@ class ResourceAwareScheduler:
         config: SolidRagConfig,
         faiss_index,
         manifest: IndexManifest,
+        nodestore: NodeStore,
         registry: ExtractorRegistry,
         lock: asyncio.Lock,
     ) -> None:
         self._config = config
         self._faiss_index = faiss_index
         self._manifest = manifest
+        self._nodestore = nodestore
         self._registry = registry
         self._lock = lock
 
@@ -185,15 +188,19 @@ class ResourceAwareScheduler:
         # Splice into FAISS index in a single operation
         self._faiss_index.add_with_ids(all_embeddings, ids)
 
-        # Update manifest for each image
+        # Update manifest and nodestore for each image
         for filepath, nodes in file_node_map.items():
             try:
                 mtime = os.path.getmtime(filepath)
             except OSError:
                 mtime = 0.0
             self._manifest.update(filepath, mtime, [n.node_id for n in nodes])
+            rel = _vault_rel_path(filepath, self._config)
+            for node in nodes:
+                self._nodestore.add(node.node_id, node.get_content(), rel)
 
         self._manifest.save()
+        self._nodestore.save()
         logger.info("Scheduler: indexed %d image(s) (%d nodes)", len(file_node_map), len(all_nodes))
 
     # ------------------------------------------------------------------

@@ -2,12 +2,9 @@ import asyncio
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-import faiss
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from llama_index.core import StorageContext, VectorStoreIndex
-from llama_index.vector_stores.faiss import FaissVectorStore
 
 from daemon.config import load_config
 from daemon.obsidian_client import ObsidianClient
@@ -21,6 +18,7 @@ from daemon.routes import uploads as uploads_router
 from solidrag import SolidRagConfig, SourceWatcher, build_index, configure_settings
 from solidrag.extractors import default_registry
 from solidrag.index.manifest import IndexManifest
+from solidrag.index.nodestore import NodeStore
 from solidrag.index.scheduler import ResourceAwareScheduler
 
 
@@ -49,31 +47,28 @@ async def lifespan(app: FastAPI):
     )
 
     app.state.vault_index = None
-    app.state.vault_index_llama = None
+    app.state.vault_nodestore = None
     app.state.index_lock = asyncio.Lock()
 
     try:
-        faiss_idx, manifest = build_index(solidrag_config, registry)
+        faiss_idx, manifest, nodestore = build_index(solidrag_config, registry)
         app.state.vault_index = faiss_idx
+        app.state.vault_nodestore = nodestore
         app.state.index_manifest = manifest
         app.state.solidrag_config = solidrag_config
-
-        # Wrap the FAISS index in a VectorStoreIndex so query_stream_async
-        # can call index.as_retriever() on it (solidrag's query engine expects
-        # a llama-index VectorStoreIndex, not a raw faiss.IndexIDMap2).
-        faiss_store = FaissVectorStore(faiss_index=faiss_idx)
-        storage_ctx = StorageContext.from_defaults(vector_store=faiss_store)
-        app.state.vault_index_llama = VectorStoreIndex([], storage_context=storage_ctx)
     except Exception as e:
         print(f"[startup] Initial index build failed: {e}")
         manifest = IndexManifest(solidrag_config.persist_dir / "manifest.json")
+        nodestore = NodeStore(solidrag_config.persist_dir / "nodestore.json")
         app.state.index_manifest = manifest
+        app.state.vault_nodestore = nodestore
         app.state.solidrag_config = solidrag_config
 
     watcher = SourceWatcher(
         config=solidrag_config,
         faiss_index=app.state.vault_index,
         manifest=app.state.index_manifest,
+        nodestore=app.state.vault_nodestore,
         registry=registry,
         lock=app.state.index_lock,
     )
@@ -84,6 +79,7 @@ async def lifespan(app: FastAPI):
         config=solidrag_config,
         faiss_index=app.state.vault_index,
         manifest=app.state.index_manifest,
+        nodestore=app.state.vault_nodestore,
         registry=registry,
         lock=app.state.index_lock,
     )

@@ -1,30 +1,33 @@
 """solidRag query engine — intent routing, streaming, and source extraction."""
 from __future__ import annotations
 
+import hashlib
+import logging
 from pathlib import Path
-from typing import AsyncGenerator
+from typing import TYPE_CHECKING, AsyncGenerator
 
+import numpy as np
 from llama_index.core import Settings
 from llama_index.embeddings.ollama import OllamaEmbedding
 from llama_index.llms.ollama import Ollama
 
 from solidrag.config import SolidRagConfig
+from solidrag.index.nodestore import NodeStore
 from solidrag.query.prompts import (
     NEEDS_VAULT_PROMPT,
     build_direct_prompt,
     build_rag_prompt,
 )
 
-# Module-level LLM instance so tests can patch _get_llm without touching
-# the global llama-index Settings singleton.
+if TYPE_CHECKING:
+    import faiss
+
+logger = logging.getLogger(__name__)
+
 _llm_instance: Ollama | None = None
 
 
 def configure_settings(config: SolidRagConfig) -> None:
-    """Configure llama-index Settings with Ollama LLM and embedding model.
-
-    Call this once at startup before using query_stream_async.
-    """
     global _llm_instance
     _llm_instance = Ollama(
         model=config.ollama_model,
@@ -40,94 +43,114 @@ def configure_settings(config: SolidRagConfig) -> None:
     )
 
 
-def _get_llm():
-    """Return the active LLM instance (Settings.llm or module-level instance)."""
+def _get_llm() -> Ollama:
     if _llm_instance is not None:
         return _llm_instance
     return Settings.llm
 
 
-async def _needs_vault_async(question: str) -> bool:
-    """Classify whether the question requires vault retrieval.
+def _node_id_to_int(node_id: str) -> int:
+    digest = hashlib.sha256(node_id.encode()).hexdigest()
+    return int(digest[:16], 16) % (2**63)
 
-    Uses the LLM to perform intent routing. Returns True if the LLM responds
-    with a word starting with 'Y' (YES), False otherwise.
-    """
+
+async def _needs_vault_async(question: str) -> bool:
     prompt = NEEDS_VAULT_PROMPT.format(question=question)
     llm = _get_llm()
     result = await llm.acomplete(prompt)
     return str(result).strip().upper().startswith("Y")
 
 
-async def _extract_relevant_sources(
-    nodes: list,
-    max_sources: int = 5,
+async def _retrieve(
+    faiss_index: "faiss.IndexIDMap2",
+    nodestore: NodeStore,
+    question: str,
+    top_k: int,
 ) -> list[dict]:
-    """Extract and deduplicate source references from retrieved nodes.
+    """Embed *question*, search FAISS, return list of {content, file_path, score}."""
+    embed_model = Settings.embed_model
+    q_vec = await embed_model.aget_query_embedding(question)
+    q_arr = np.array([q_vec], dtype=np.float32)
 
-    Strategy:
-    - Deduplicate by file, keeping the node with the best (lowest) L2 score per file.
-    - Filter to nodes within 0.25 of the best score.
-    - Cap results at max_sources.
+    # Build reverse map: int64 FAISS id → node_id string
+    int_to_nid: dict[int, str] = {
+        _node_id_to_int(nid): nid for nid in nodestore.all_node_ids()
+    }
 
-    Returns a list of {"file": "...", "title": "..."} dicts.
-    """
-    if not nodes:
+    distances, ids = faiss_index.search(q_arr, top_k)
+
+    results = []
+    for dist, raw_id in zip(distances[0], ids[0]):
+        int_id = int(raw_id)
+        if int_id == -1:
+            continue
+        nid = int_to_nid.get(int_id)
+        if nid is None:
+            continue
+        content = nodestore.get_content(nid)
+        if not content:
+            continue
+        results.append({
+            "content": content,
+            "file_path": nodestore.get_file_path(nid) or "",
+            "score": float(dist),
+        })
+
+    return results
+
+
+def _extract_sources(results: list[dict], max_sources: int = 5) -> list[dict]:
+    """Deduplicate and rank source references from retrieval results."""
+    if not results:
         return []
 
-    best_per_file: dict[str, tuple] = {}
-    for node in nodes:
-        fp = node.metadata.get("file_path", "") or node.metadata.get("file_name", "")
+    # file_path is vault-relative (e.g. "Notes/foo.md" or "uploads/pdf/.../bar.pdf")
+    best_per_file: dict[str, tuple[dict, float]] = {}
+    for r in results:
+        fp = r["file_path"]
         if not fp:
             continue
-        rel = Path(fp).name
-        score = node.score if node.score is not None else 999.0
-        if rel not in best_per_file or score < best_per_file[rel][1]:
-            best_per_file[rel] = (node, score)
+        score = r["score"]
+        if fp not in best_per_file or score < best_per_file[fp][1]:
+            best_per_file[fp] = (r, score)
 
     if not best_per_file:
         return []
 
     ranked = sorted(best_per_file.values(), key=lambda x: x[1])
     best_score = ranked[0][1]
-    relevant = [(n, s) for n, s in ranked if s <= best_score + 0.25][:max_sources]
+    relevant = [(r, s) for r, s in ranked if s <= best_score + 0.25][:max_sources]
 
     sources = []
-    for node, _ in relevant:
-        fp = node.metadata.get("file_path", "") or node.metadata.get("file_name", "")
-        rel = Path(fp).name
-        title = rel.replace(".md", "").replace("-", " ").replace("_", " ")
-        try:
-            for line in node.get_content().split("\n"):
-                if line.startswith("# "):
-                    title = line[2:].strip()
-                    break
-        except Exception:
-            pass
-        sources.append({"file": f"Notes/{rel}", "title": title})
+    for r, _ in relevant:
+        fp = r["file_path"]
+        name = Path(fp).name
+        title = name.replace(".md", "").replace(".pdf", "").replace("-", " ").replace("_", " ")
+        for line in r["content"].split("\n"):
+            if line.startswith("# "):
+                title = line[2:].strip()
+                break
+        sources.append({"file": fp, "title": title})
 
     return sources
 
 
 async def query_stream_async(
-    index,
+    faiss_index: "faiss.IndexIDMap2 | None",
+    nodestore: NodeStore | None,
     question: str,
     history: list[dict] | None = None,
     top_k: int = 8,
     system_prompt: str | None = None,
 ) -> AsyncGenerator[dict, None]:
-    """Stream query results from the index as an async generator.
+    """Stream query results as an async generator.
 
     Yields event dicts:
-      {"type": "token",   "content": "<token_string>"}
-      {"type": "sources", "sources": [{"file": ..., "title": ...}]}
+      {"type": "token",   "content": "<string>"}
+      {"type": "sources", "sources": [...]}
       {"type": "done"}
-
-    If index is None, yields a "not ready" token followed by empty sources and done.
-    Intent routing classifies the question first — general knowledge questions skip
-    vault retrieval and are answered directly from the LLM.
     """
-    if index is None:
+    if faiss_index is None or nodestore is None:
         yield {"type": "token", "content": "Index not ready — try again in a moment."}
         yield {"type": "sources", "sources": []}
         yield {"type": "done"}
@@ -136,7 +159,6 @@ async def query_stream_async(
     needs_vault = await _needs_vault_async(question)
 
     if not needs_vault:
-        # Direct answer path — no retrieval
         prompt = build_direct_prompt(question, history)
         llm = _get_llm()
         async for chunk in await llm.astream_complete(prompt):
@@ -146,18 +168,15 @@ async def query_stream_async(
         yield {"type": "done"}
         return
 
-    # RAG path: retrieve context, build prompt, stream
-    retriever = index.as_retriever(similarity_top_k=top_k)
-    nodes = await retriever.aretrieve(question)
-    sources = await _extract_relevant_sources(nodes)
+    results = await _retrieve(faiss_index, nodestore, question, top_k)
+    sources = _extract_sources(results)
 
-    context_parts = [node.get_content() for node in nodes]
-    context_str = "\n\n---\n\n".join(context_parts)
+    context_str = "\n\n---\n\n".join(r["content"] for r in results)
 
     _default_system = (
         "You are Sol, a personal second-brain assistant. "
-        "Answer the user's question using the relevant notes provided. "
-        "Cite specific details from the notes where helpful."
+        "Answer the user's question using the relevant notes and documents provided. "
+        "Cite specific details from the content where helpful."
     )
 
     prompt = build_rag_prompt(

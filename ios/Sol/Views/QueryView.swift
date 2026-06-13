@@ -166,8 +166,8 @@ struct QueryView: View {
                                     .padding(.vertical, 12)
                             }
 
-                            // Thinking indicator
-                            if vm.isLoading {
+                            // Thinking indicator — only while waiting for first token
+                            if vm.pendingQuestion != nil {
                                 thinkingIndicator
                                     .padding(.horizontal, 20)
                                     .padding(.vertical, 16)
@@ -524,7 +524,10 @@ struct QueryView: View {
 
     @MainActor
     private func openInObsidian(_ source: SourceItem) {
-        let encoded = source.file.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? source.file
+        // Use query-value encoding but exclude & = + # so filenames with & don't break the URL
+        var allowed = CharacterSet.urlQueryAllowed
+        allowed.remove(charactersIn: "&=+#")
+        let encoded = source.file.addingPercentEncoding(withAllowedCharacters: allowed) ?? source.file
         guard let url = URL(string: "obsidian://open?vault=Sol&file=\(encoded)") else { return }
         if UIApplication.shared.canOpenURL(url) { UIApplication.shared.open(url) }
     }

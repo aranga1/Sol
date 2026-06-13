@@ -18,6 +18,7 @@ from solidrag.config import SolidRagConfig
 from solidrag.extractors.registry import ExtractorRegistry
 from solidrag.index.builder import incremental_update
 from solidrag.index.manifest import IndexManifest
+from solidrag.index.nodestore import NodeStore
 
 logger = logging.getLogger(__name__)
 
@@ -60,12 +61,14 @@ class SourceWatcher:
         config: SolidRagConfig,
         faiss_index,
         manifest: IndexManifest,
+        nodestore: NodeStore,
         registry: ExtractorRegistry,
         lock: asyncio.Lock,
     ) -> None:
         self._config = config
         self._faiss_index = faiss_index
         self._manifest = manifest
+        self._nodestore = nodestore
         self._registry = registry
         self._lock = lock
 
@@ -128,6 +131,7 @@ class SourceWatcher:
             incremental_update(
                 self._faiss_index,
                 self._manifest,
+                self._nodestore,
                 self._config,
                 self._registry,
                 self._lock,
