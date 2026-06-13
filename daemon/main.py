@@ -15,9 +15,14 @@ from daemon.routes import config as config_router
 from daemon.routes import notifications as notifications_router
 from daemon.routes import tags as tags_router
 from daemon.routes import uploads as uploads_router
+import time
+
+import numpy as np
+
 from solidrag import CalendarWatcher, SolidRagConfig, SourceWatcher, build_index, configure_settings
 from solidrag.index.builder import apply_source_diff, _node_id_to_int
 from solidrag.extractors import default_registry
+from solidrag.extractors.base import IndexDiff
 from solidrag.index.manifest import IndexManifest
 from solidrag.index.nodestore import NodeStore
 from solidrag.index.scheduler import ResourceAwareScheduler
@@ -87,42 +92,47 @@ async def lifespan(app: FastAPI):
     scheduler.start()
     app.state.scheduler = scheduler
 
-    def _on_calendar_diff(diff):
-        import numpy as np
-        import time
-        fi = app.state.vault_index
-        manifest = app.state.index_manifest
-        config = app.state.solidrag_config
-        if fi is None:
-            return
-        for node in diff.to_add:
-            apply_source_diff(
-                fi,
-                manifest,
-                diff.__class__(to_add=[node]),
-                source_id="calendar",
-                source_key=node.metadata.get("event_id", node.node_id),
-                mtime=time.time(),
-                config=config,
-            )
-        for old_ids, new_nodes in diff.to_update:
-            from solidrag.extractors.base import IndexDiff
-            apply_source_diff(
-                fi,
-                manifest,
-                IndexDiff(to_update=[(old_ids, new_nodes)]),
-                source_id="calendar",
-                source_key=new_nodes[0].metadata.get("event_id", new_nodes[0].node_id) if new_nodes else "unknown",
-                mtime=time.time(),
-                config=config,
-            )
-        if diff.to_delete:
-            ids = np.array([_node_id_to_int(nid) for nid in diff.to_delete], dtype=np.int64)
-            try:
-                fi.remove_ids(ids)
-            except Exception as e:
-                print(f"[CalendarWatcher] remove_ids error: {e}")
-        manifest.save()
+    async def _apply_calendar_diff_async(diff) -> None:
+        """Apply a CalendarWatcher diff under the index lock (asyncio event loop)."""
+        async with app.state.index_lock:
+            fi = app.state.vault_index
+            manifest = app.state.index_manifest
+            config = app.state.solidrag_config
+            if fi is None:
+                return
+            now = time.time()
+            for node in diff.to_add:
+                apply_source_diff(
+                    fi,
+                    manifest,
+                    IndexDiff(to_add=[node]),
+                    source_id="calendar",
+                    source_key=node.metadata.get("event_id", node.node_id),
+                    mtime=now,
+                    config=config,
+                )
+            for old_ids, new_nodes in diff.to_update:
+                apply_source_diff(
+                    fi,
+                    manifest,
+                    IndexDiff(to_update=[(old_ids, new_nodes)]),
+                    source_id="calendar",
+                    source_key=new_nodes[0].metadata.get("event_id", new_nodes[0].node_id) if new_nodes else "unknown",
+                    mtime=now,
+                    config=config,
+                )
+            if diff.to_delete:
+                ids = np.array([_node_id_to_int(nid) for nid in diff.to_delete], dtype=np.int64)
+                try:
+                    fi.remove_ids(ids)
+                except Exception as e:
+                    print(f"[CalendarWatcher] remove_ids error: {e}")
+            manifest.save()
+
+    loop = asyncio.get_event_loop()
+
+    def _on_calendar_diff(diff) -> None:
+        asyncio.run_coroutine_threadsafe(_apply_calendar_diff_async(diff), loop)
 
     calendar_watcher = CalendarWatcher(
         manifest=app.state.index_manifest,
