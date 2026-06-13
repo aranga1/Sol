@@ -79,7 +79,7 @@ struct NoteComposerView: View {
                         retryUpload(item)
                     }
                     .padding(.horizontal, 20)
-                    .padding(.vertical, 8)
+                    .padding(.vertical, 12)
                     .animation(.easeOut(duration: 0.2), value: uploadItems.count)
                 }
 
@@ -110,23 +110,27 @@ struct NoteComposerView: View {
     // ── Header ────────────────────────────────────────────────────────────────
     private var header: some View {
         HStack {
-            Button("Cancel") { onDismiss() }
-                .font(.system(size: 16))
-                .foregroundStyle(DS.inkLight)
+            // Left: Cancel + photo button — keeps title centered against Send on the right
+            HStack(spacing: 0) {
+                Button("Cancel") { onDismiss() }
+                    .font(.system(size: 16))
+                    .foregroundStyle(DS.inkLight)
+                Button {
+                    showImageSourceSheet = true
+                } label: {
+                    Image(systemName: "photo")
+                        .font(.system(size: 16))
+                        .foregroundStyle(DS.inkFaint)
+                        .frame(width: 36, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
             Spacer()
             Text(isVoice ? "Voice Note" : "New Note")
                 .font(DS.newsreader(19, weight: .medium))
                 .foregroundStyle(DS.inkDark)
             Spacer()
-            Button {
-                showImageSourceSheet = true
-            } label: {
-                Image(systemName: "photo.on.rectangle.angled")
-                    .font(.system(size: 18))
-                    .foregroundStyle(DS.inkLight)
-            }
-            .buttonStyle(.plain)
-            .padding(.trailing, 12)
             Button {
                 Task { await send() }
             } label: {
@@ -433,8 +437,7 @@ private struct ThumbnailCell: View {
                             .resizable()
                             .scaledToFill()
                             .frame(width: 40, height: 40)
-                            .clipped()
-                            .cornerRadius(8)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                     } else {
                         RoundedRectangle(cornerRadius: 8)
                             .fill(DS.parchmentDeep)
@@ -449,8 +452,8 @@ private struct ThumbnailCell: View {
             Button(action: onRemove) {
                 Image(systemName: "xmark.circle.fill")
                     .font(.system(size: 14))
-                    .foregroundStyle(DS.inkMid)
-                    .background(Circle().fill(DS.parchment).padding(2))
+                    .foregroundStyle(DS.inkLight)
+                    .background(Circle().fill(DS.parchmentCard).padding(2))
             }
             .buttonStyle(.plain)
             .offset(x: 6, y: -6)
@@ -463,12 +466,12 @@ private struct ThumbnailCell: View {
         switch item.state {
         case .uploading:
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color.black.opacity(0.35))
+                .fill(DS.espressoDeep.opacity(0.42))
                 .frame(width: 40, height: 40)
                 .overlay(ProgressView().tint(.white).scaleEffect(0.7))
         case .done:
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color.black.opacity(0.18))
+                .fill(DS.espressoDeep.opacity(0.22))
                 .frame(width: 40, height: 40)
                 .overlay(
                     Image(systemName: "checkmark")
@@ -477,12 +480,12 @@ private struct ThumbnailCell: View {
                 )
         case .failed:
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color.black.opacity(0.45))
+                .fill(DS.espressoDeep.opacity(0.55))
                 .frame(width: 40, height: 40)
                 .overlay(
                     Image(systemName: "exclamationmark.triangle.fill")
                         .font(.system(size: 14))
-                        .foregroundStyle(Color.yellow)
+                        .foregroundStyle(DS.terracottaBright)
                 )
         }
     }
