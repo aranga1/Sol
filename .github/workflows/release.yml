@@ -97,7 +97,7 @@ jobs:
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
             "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0"><dict>
-            <key>method</key><string>development</string>
+            <key>method</key><string>app-store</string>
             <key>teamID</key><string>${{ secrets.APPLE_TEAM_ID }}</string>
             <key>compileBitcode</key><false/>
             <key>stripSwiftSymbols</key><true/>
@@ -107,6 +107,20 @@ jobs:
             -archivePath $RUNNER_TEMP/Sol.xcarchive \
             -exportPath $RUNNER_TEMP/export \
             -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist
+
+      - name: Upload to TestFlight
+        env:
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "$ASC_PRIVATE_KEY" > ~/.appstoreconnect/private_keys/AuthKey_${ASC_API_KEY_ID}.p8
+          xcrun altool --upload-app \
+            -f $RUNNER_TEMP/export/Sol.ipa \
+            -t ios \
+            --apiKey "$ASC_API_KEY_ID" \
+            --apiIssuer "$ASC_ISSUER_ID"
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
@@ -153,7 +167,7 @@ jobs:
           |-------|-------------|
           | `sol-daemon-*.tar.gz` | Python daemon — extract and run via \`install.sh\` |
           | `sol-setup-*.tar.gz` | Setup scripts (install.sh, sol_cli.py, qr_generate.py) |
-          | `Sol.ipa` _(if present)_ | iOS app — install on registered development devices |
+          | `Sol.ipa` _(if present)_ | iOS app — also uploaded to TestFlight automatically |
 
           ### Install
           \`\`\`bash
@@ -161,8 +175,7 @@ jobs:
           \`\`\`
 
           ### iOS app
-          The IPA is signed for development. It installs on devices registered to the
-          developer account. Sideload via \`xcrun devicectl device install app\` or
-          configure TestFlight (issue #42) for broader distribution.
+          The iOS build is submitted to TestFlight automatically on each release tag.
+          Install via the TestFlight app once Apple's processing completes (usually ~10 min).
           EOF
           )"

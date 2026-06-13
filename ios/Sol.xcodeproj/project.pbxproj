@@ -301,7 +301,7 @@
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					26576A1A9DA45F5F031C1E15 = {
-						DevelopmentTeam = W396434AGH;
+						DevelopmentTeam = J6X383NXGF;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -402,7 +402,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = W396434AGH;
+				DEVELOPMENT_TEAM = J6X383NXGF;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -560,7 +560,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = W396434AGH;
+				DEVELOPMENT_TEAM = J6X383NXGF;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
