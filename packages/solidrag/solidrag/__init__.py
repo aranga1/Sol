@@ -6,7 +6,8 @@ SolidRagConfig       Configuration dataclass.
 ExtractorRegistry    Maps file extensions to Extractor implementations.
 build_index          Build a FAISS-backed index from source dirs.
 SourceWatcher        Watch source dirs and incrementally update the index.
-query_stream_async   (stub) Stream query results from the index.
+configure_settings   Configure llama-index Settings with Ollama models.
+query_stream_async   Stream query results from the index.
 """
 from __future__ import annotations
 
@@ -14,21 +15,13 @@ from solidrag.config import SolidRagConfig
 from solidrag.extractors.registry import ExtractorRegistry
 from solidrag.index.builder import build_index
 from solidrag.index.watcher import SourceWatcher
+from solidrag.query.engine import configure_settings, query_stream_async
 
 __all__ = [
     "SolidRagConfig",
     "ExtractorRegistry",
     "build_index",
     "SourceWatcher",
+    "configure_settings",
     "query_stream_async",
 ]
-
-
-async def query_stream_async(*args, **kwargs):  # type: ignore[return]
-    """Async generator that streams query results from the index.
-
-    Not yet implemented — will be added in a later issue.
-    """
-    raise NotImplementedError("query_stream_async is not implemented yet")
-    # make mypy happy with an unreachable yield so this is typed as an async generator
-    yield  # pragma: no cover
