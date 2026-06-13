@@ -18,9 +18,10 @@ struct SourceItem: Codable, Identifiable, Hashable {
 
 // SSE event emitted by /api/query stream
 struct SSEEvent: Decodable {
-    let type: String          // "token" | "sources" | "done" | "error"
-    let content: String?      // present for type=token and type=error
+    let type: String           // "token" | "sources" | "done" | "error" | "action"
+    let content: String?       // present for type=token and type=error
     let sources: [SourceItem]? // present for type=sources
+    let action: String?        // present for type=action
 }
 
 struct ConversationMessage: Identifiable, Codable, Hashable {
