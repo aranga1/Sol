@@ -812,6 +812,23 @@
   box-shadow: 0 4px 18px rgba(162, 62, 45, 0.28);
 }
 
+.btn-capabilities {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--terracotta);
+  text-decoration: none;
+  border: 1px solid var(--terracotta-30);
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s;
+}
+
+.btn-capabilities:hover {
+  background: rgba(162, 62, 45, 0.06);
+  text-decoration: none;
+  color: var(--terracotta);
+}
+
 .btn-open-sol:hover {
   transform: scale(1.04);
   box-shadow: 0 8px 28px rgba(162, 62, 45, 0.38);

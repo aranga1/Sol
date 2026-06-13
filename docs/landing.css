@@ -823,6 +823,13 @@
   color: var(--terracotta);
 }
 
+.cta-secondary-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 .cta-secondary-link {
   font-family: var(--font-body);
   font-size: 0.875rem;
