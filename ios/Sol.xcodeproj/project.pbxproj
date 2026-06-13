@@ -40,6 +40,10 @@
 		E1DD56B41C51691FB3B231E5 /* SolMarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECDCBD5E48632668D824AAA4 /* SolMarkView.swift */; };
 		EE44D8D7DB9FD1DA3BA3CC4D /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CBB9AA2E1CBC2EE0927B6A3 /* APIClient.swift */; };
 		EE619684EE8ACE8CA4A0768D /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = D2CDE0D8D1ADA486797901F7 /* WhisperKit */; };
+		31CC705AA8DB41A09C1275BF /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21615652EBCC476DA4CDB3F9 /* EventKit.framework */; };
+		5DCA611D5D404B9290067041 /* EventKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72F0904D67E0466097394C2B /* EventKitUI.framework */; };
+		E56DBB648497429C8FF60EF2 /* CalendarModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1E89E9C5CF43AD943E2107 /* CalendarModels.swift */; };
+		BF8389FC56504163AFC01F58 /* CalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A315BB539147DDAF8EBA20 /* CalendarService.swift */; };
 		EFC02193C983BB03DE7D6C09 /* ConversationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED45EC41EF9E848BA58F6591 /* ConversationSession.swift */; };
 		F101F75B9D6C75A4F37E814B /* ManualEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FE67FF6154832FC45DB127 /* ManualEntryView.swift */; };
 		FC74327D57E0D1F1050E1DB6 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31287DDB302C963B7E2AF002 /* OnboardingView.swift */; };
@@ -93,6 +97,10 @@
 		AA11BB22CC33DD44EE55FF67 /* UploadService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadService.swift; sourceTree = "<group>"; };
 		BB22CC33DD44EE55FF66AA12 /* UploadItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadItem.swift; sourceTree = "<group>"; };
 		CC33DD44EE55FF66AA11BB23 /* FileUploadJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUploadJob.swift; sourceTree = "<group>"; };
+		21615652EBCC476DA4CDB3F9 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
+		72F0904D67E0466097394C2B /* EventKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKitUI.framework; path = System/Library/Frameworks/EventKitUI.framework; sourceTree = SDKROOT; };
+		FA1E89E9C5CF43AD943E2107 /* CalendarModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarModels.swift; sourceTree = "<group>"; };
+		E6A315BB539147DDAF8EBA20 /* CalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +109,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				EE619684EE8ACE8CA4A0768D /* WhisperKit in Frameworks */,
+				31CC705AA8DB41A09C1275BF /* EventKit.framework in Frameworks */,
+				5DCA611D5D404B9290067041 /* EventKitUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +129,7 @@
 		4DB443660B018343827FBC72 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				FA1E89E9C5CF43AD943E2107 /* CalendarModels.swift */,
 				0F514DF6D482ADE02B9FB552 /* ConnectionConfig.swift */,
 				ED45EC41EF9E848BA58F6591 /* ConversationSession.swift */,
 				006805B7AFA09E6024C2BFEF /* Note.swift */,
@@ -157,6 +168,7 @@
 			isa = PBXGroup;
 			children = (
 				4CBB9AA2E1CBC2EE0927B6A3 /* APIClient.swift */,
+				E6A315BB539147DDAF8EBA20 /* CalendarService.swift */,
 				06DCA450FCA101B732AC5766 /* HistoryStore.swift */,
 				10174D681C9749FC5C9F3D7C /* KeychainService.swift */,
 				E22711CC4EA5A88833898CE8 /* NotificationService.swift */,
@@ -326,6 +338,8 @@
 			files = (
 				EE44D8D7DB9FD1DA3BA3CC4D /* APIClient.swift in Sources */,
 				8E2085060802A4AB4CF8770B /* AllChatsView.swift in Sources */,
+				E56DBB648497429C8FF60EF2 /* CalendarModels.swift in Sources */,
+				BF8389FC56504163AFC01F58 /* CalendarService.swift in Sources */,
 				8FED257FA4BDEEDCFAE4072E /* BreathingBackground.swift in Sources */,
 				8F34F69E45EDFCB5AA0B9E04 /* ConnectionConfig.swift in Sources */,
 				EFC02193C983BB03DE7D6C09 /* ConversationSession.swift in Sources */,
