@@ -31,6 +31,7 @@ class IndexManifest:
     def __init__(self, path: Path) -> None:
         self._path = Path(path)
         self._entries: dict[str, ManifestEntry] = {}
+        self._sources: dict[str, dict[str, ManifestEntry]] = {}
 
     # ------------------------------------------------------------------
     # Persistence
@@ -41,9 +42,13 @@ class IndexManifest:
 
         If the file is missing or contains invalid JSON, the manifest
         starts fresh (empty).  This is the recovery path for corruption.
+
+        Supports both the legacy flat format (filepath -> entry dict) and
+        the new structured format with ``files`` and ``sources`` keys.
         """
         if not self._path.exists():
             self._entries = {}
+            self._sources = {}
             return
 
         try:
@@ -54,23 +59,48 @@ class IndexManifest:
                     mtime=float(entry["mtime"]),
                     node_ids=list(entry.get("node_ids", [])),
                 )
-                for filepath, entry in data.items()
+                for filepath, entry in data.get("files", data).items()
+                if isinstance(entry, dict) and "mtime" in entry
+            }
+            raw_sources = data.get("sources", {})
+            self._sources = {
+                source_id: {
+                    key: ManifestEntry(
+                        mtime=float(e["mtime"]),
+                        node_ids=list(e.get("node_ids", [])),
+                    )
+                    for key, e in entries.items()
+                }
+                for source_id, entries in raw_sources.items()
             }
         except (json.JSONDecodeError, KeyError, ValueError, TypeError):
             # Corrupt manifest — start fresh
             self._entries = {}
+            self._sources = {}
 
     def save(self) -> None:
         """Atomically persist the manifest to disk.
 
         Writes to a temporary file in the same directory then renames it
         so the manifest is never partially written.
+
+        The on-disk format uses ``files`` and ``sources`` top-level keys.
+        Legacy flat manifests are upgraded automatically on the next save.
         """
         self._path.parent.mkdir(parents=True, exist_ok=True)
 
         data = {
-            filepath: {"mtime": entry.mtime, "node_ids": entry.node_ids}
-            for filepath, entry in self._entries.items()
+            "files": {
+                filepath: {"mtime": entry.mtime, "node_ids": entry.node_ids}
+                for filepath, entry in self._entries.items()
+            },
+            "sources": {
+                source_id: {
+                    key: {"mtime": e.mtime, "node_ids": e.node_ids}
+                    for key, e in entries.items()
+                }
+                for source_id, entries in self._sources.items()
+            },
         }
 
         tmp_fd, tmp_name = tempfile.mkstemp(
@@ -107,6 +137,31 @@ class IndexManifest:
     def all_paths(self) -> set[str]:
         """Return the set of all tracked file paths."""
         return set(self._entries.keys())
+
+    # ------------------------------------------------------------------
+    # Source namespace — for non-file sources (e.g. calendar events)
+    # ------------------------------------------------------------------
+
+    def get_source(self, source_id: str, key: str) -> ManifestEntry | None:
+        """Return the entry for *key* within *source_id*, or None if absent."""
+        return self._sources.get(source_id, {}).get(key)
+
+    def update_source(self, source_id: str, key: str, mtime: float, node_ids: list[str]) -> None:
+        """Insert or replace the entry for *key* within *source_id*."""
+        if source_id not in self._sources:
+            self._sources[source_id] = {}
+        self._sources[source_id][key] = ManifestEntry(mtime=mtime, node_ids=list(node_ids))
+
+    def remove_source(self, source_id: str, key: str) -> None:
+        """Remove the entry for *key* within *source_id* (no-op if absent)."""
+        if source_id in self._sources:
+            self._sources[source_id].pop(key, None)
+            if not self._sources[source_id]:
+                del self._sources[source_id]
+
+    def all_source_keys(self, source_id: str) -> set[str]:
+        """Return the set of all tracked keys for *source_id*."""
+        return set(self._sources.get(source_id, {}).keys())
 
     # ------------------------------------------------------------------
     # Diff
