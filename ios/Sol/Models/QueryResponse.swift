@@ -24,7 +24,7 @@ struct SSEEvent: Decodable {
     let action: String?        // present for type=action
 }
 
-struct CreateEventPayload: Decodable {
+struct CreateEventPayload: Decodable, Equatable {
     let title: String
     let start: Date
     let durationMinutes: Int

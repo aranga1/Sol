@@ -21,9 +21,7 @@
 		8A75F173527CA378DF4A4E2F /* TagStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA69B30D4AD283DDA320EF7 /* TagStore.swift */; };
 		8E2085060802A4AB4CF8770B /* AllChatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38358FEC4BCA209328EE3D0A /* AllChatsView.swift */; };
 		8EEE8B472FDD6E2F002D2556 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21615652EBCC476DA4CDB3F9 /* EventKit.framework */; };
-		8EEE8B482FDD6E2F002D2556 /* EventKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 21615652EBCC476DA4CDB3F9 /* EventKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8EEE8B4A2FDD6E31002D2556 /* EventKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72F0904D67E0466097394C2B /* EventKitUI.framework */; };
-		8EEE8B4B2FDD6E31002D2556 /* EventKitUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 72F0904D67E0466097394C2B /* EventKitUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8F34F69E45EDFCB5AA0B9E04 /* ConnectionConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F514DF6D482ADE02B9FB552 /* ConnectionConfig.swift */; };
 		8FED257FA4BDEEDCFAE4072E /* BreathingBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4075C452ECF4EBE74177F209 /* BreathingBackground.swift */; };
 		9B4C32AEBCF0949924EF07D7 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D636FB5C3E9FE738D13280 /* HistoryView.swift */; };
@@ -55,20 +53,6 @@
 		FD6C80BF3088049E9F14FC02 /* SolAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA85A75E093A4CE68C2CE8C8 /* SolAppDelegate.swift */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		8EEE8B492FDD6E30002D2556 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				8EEE8B4B2FDD6E31002D2556 /* EventKitUI.framework in Embed Frameworks */,
-				8EEE8B482FDD6E2F002D2556 /* EventKit.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		006805B7AFA09E6024C2BFEF /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
@@ -294,7 +278,6 @@
 				29A0337D912A5EAC2B02B03C /* Sources */,
 				540C3797BEB88B4B83845FF0 /* Resources */,
 				245349072A6FA4C443F164DB /* Frameworks */,
-				8EEE8B492FDD6E30002D2556 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
