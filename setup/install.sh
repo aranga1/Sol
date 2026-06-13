@@ -365,7 +365,7 @@ gum style \
   --padding "0 2" \
   "$(gum style --foreground "#A23E2D" --bold "Activate the sol command in this terminal:")
 
-  $(gum style --foreground "#2B2521" "source ~/.zshrc")
+  $(gum style --foreground "#C0995F" --bold "source ~/.zshrc")
 
   $(gum style --foreground "#A0937F" "Or open a new terminal — it will be available automatically from then on.")"
 echo ""
