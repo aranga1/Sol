@@ -62,11 +62,23 @@
       </form>
 
       <!-- Success state -->
-      <div class="beta-state beta-success" id="beta-success" role="alert" aria-live="polite" hidden>
-        <div class="beta-state-icon" aria-hidden="true">✓</div>
-        <div class="beta-state-body">
-          <strong>You're on the list.</strong>
-          <span>Check your inbox for an invite from <code>testflight@email.apple.com</code> — it usually arrives in a few minutes.</span>
+      <div class="beta-success-card" id="beta-success" role="alert" aria-live="polite" hidden>
+        <div class="beta-success-top">
+          <div class="beta-success-icon" aria-hidden="true">✓</div>
+          <div>
+            <strong class="beta-success-title">You're on the list.</strong>
+            <p class="beta-success-note">An invite from <code>testflight@email.apple.com</code> is on its way — usually takes a few minutes. While you wait:</p>
+          </div>
+        </div>
+        <div class="beta-next-actions">
+          <a href="install.html" class="beta-next-btn beta-next-primary">
+            <span class="beta-next-label">Set up Sol on your Mac →</span>
+            <span class="beta-next-sub">Install the daemon and connect your Obsidian vault</span>
+          </a>
+          <a href="capabilities.html" class="beta-next-btn beta-next-secondary">
+            <span class="beta-next-label">Explore capabilities →</span>
+            <span class="beta-next-sub">What Sol can do and the full CLI reference</span>
+          </a>
         </div>
       </div>
 
@@ -226,8 +238,9 @@
         )
         .then(function (r) {
           if (r.status === 204) {
-            form.hidden    = true;
+            form.hidden      = true;
             successEl.hidden = false;
+            successEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           } else {
             throw new Error('HTTP ' + r.status);
           }
