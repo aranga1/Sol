@@ -1,6 +1,6 @@
 import json
 import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi.testclient import TestClient
 
 VALID_CONFIG = {
@@ -19,7 +19,23 @@ def client(tmp_path, monkeypatch):
     cfg = tmp_path / "config.json"
     cfg.write_text(json.dumps(VALID_CONFIG))
     monkeypatch.setenv("SOL_CONFIG", str(cfg))
-    with patch("daemon.main.ObsidianClient") as MockObs:
+    mock_faiss_idx = MagicMock()
+    mock_manifest = MagicMock()
+    mock_watcher = MagicMock()
+    mock_watcher.start = MagicMock()
+    mock_watcher.stop = MagicMock()
+    mock_scheduler = MagicMock()
+    mock_scheduler.start = MagicMock()
+    mock_scheduler.stop = MagicMock()
+    with patch("daemon.main.ObsidianClient") as MockObs, \
+         patch("daemon.main.build_index", return_value=(mock_faiss_idx, mock_manifest)), \
+         patch("daemon.main.configure_settings"), \
+         patch("daemon.main.default_registry", return_value=MagicMock()), \
+         patch("daemon.main.SourceWatcher", return_value=mock_watcher), \
+         patch("daemon.main.ResourceAwareScheduler", return_value=mock_scheduler), \
+         patch("daemon.main.FaissVectorStore", return_value=MagicMock()), \
+         patch("daemon.main.StorageContext"), \
+         patch("daemon.main.VectorStoreIndex", return_value=MagicMock()):
         inst = MockObs.return_value
         inst.health = AsyncMock(return_value=True)
         inst.note_count = AsyncMock(return_value=0)

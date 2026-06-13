@@ -1,54 +1,101 @@
+import asyncio
 from contextlib import asynccontextmanager
+from pathlib import Path
 
+import faiss
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from llama_index.core import StorageContext, VectorStoreIndex
+from llama_index.vector_stores.faiss import FaissVectorStore
 
 from daemon.config import load_config
 from daemon.obsidian_client import ObsidianClient
-from daemon.rag import build_index, VaultWatcher
 from daemon.routes import health as health_router
 from daemon.routes import notes as notes_router
 from daemon.routes import query as query_router
 from daemon.routes import config as config_router
 from daemon.routes import notifications as notifications_router
 from daemon.routes import tags as tags_router
+from daemon.routes import uploads as uploads_router
+from solidrag import SolidRagConfig, SourceWatcher, build_index, configure_settings
+from solidrag.extractors import default_registry
+from solidrag.index.manifest import IndexManifest
+from solidrag.index.scheduler import ResourceAwareScheduler
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.config = load_config()
+    cfg = app.state.config
+
     app.state.obsidian = ObsidianClient(
-        base_url=f"https://localhost:{app.state.config.obsidian_port}",
-        api_key=app.state.config.obsidian_api_key,
+        base_url=f"https://localhost:{cfg.obsidian_port}",
+        api_key=cfg.obsidian_api_key,
     )
-    print(f"Sol daemon running on port {app.state.config.daemon_port}")
+    print(f"Sol daemon running on port {cfg.daemon_port}")
 
-    vault_path = app.state.config.vault_path
-    ollama_base = app.state.config.ollama_base_url
-    ollama_model = app.state.config.ollama_model
+    source_dirs = [Path(cfg.vault_path)]
+    solidrag_config = SolidRagConfig(
+        source_dirs=source_dirs,
+        ollama_base_url=cfg.ollama_base_url,
+        ollama_model=cfg.ollama_model,
+    )
+    configure_settings(solidrag_config)
 
-    app.state.vault_index = None  # will be set once built
+    registry = default_registry(
+        ollama_base_url=cfg.ollama_base_url,
+        vision_model=solidrag_config.vision_model,
+    )
 
-    def on_index_ready(new_index):
-        app.state.vault_index = new_index
+    app.state.vault_index = None
+    app.state.vault_index_llama = None
+    app.state.index_lock = asyncio.Lock()
 
-    # Build initial index (blocking — runs before first request)
     try:
-        app.state.vault_index = build_index(vault_path, ollama_base, ollama_model)
+        faiss_idx, manifest = build_index(solidrag_config, registry)
+        app.state.vault_index = faiss_idx
+        app.state.index_manifest = manifest
+        app.state.solidrag_config = solidrag_config
+
+        # Wrap the FAISS index in a VectorStoreIndex so query_stream_async
+        # can call index.as_retriever() on it (solidrag's query engine expects
+        # a llama-index VectorStoreIndex, not a raw faiss.IndexIDMap2).
+        faiss_store = FaissVectorStore(faiss_index=faiss_idx)
+        storage_ctx = StorageContext.from_defaults(vector_store=faiss_store)
+        app.state.vault_index_llama = VectorStoreIndex([], storage_context=storage_ctx)
     except Exception as e:
         print(f"[startup] Initial index build failed: {e}")
+        manifest = IndexManifest(solidrag_config.persist_dir / "manifest.json")
+        app.state.index_manifest = manifest
+        app.state.solidrag_config = solidrag_config
 
-    # Start background watcher
-    watcher = VaultWatcher(vault_path, ollama_base, ollama_model, on_index_ready)
+    watcher = SourceWatcher(
+        config=solidrag_config,
+        faiss_index=app.state.vault_index,
+        manifest=app.state.index_manifest,
+        registry=registry,
+        lock=app.state.index_lock,
+    )
     watcher.start()
     app.state.vault_watcher = watcher
+
+    scheduler = ResourceAwareScheduler(
+        config=solidrag_config,
+        faiss_index=app.state.vault_index,
+        manifest=app.state.index_manifest,
+        registry=registry,
+        lock=app.state.index_lock,
+    )
+    scheduler.start()
+    app.state.scheduler = scheduler
 
     yield
 
     # Teardown
     await app.state.obsidian.close()
     app.state.vault_watcher.stop()
+    app.state.scheduler.stop()
 
 
 app = FastAPI(lifespan=lifespan)
@@ -79,6 +126,7 @@ app.include_router(query_router.router)
 app.include_router(config_router.router)
 app.include_router(notifications_router.router)
 app.include_router(tags_router.router)
+app.include_router(uploads_router.router)
 
 
 if __name__ == "__main__":
