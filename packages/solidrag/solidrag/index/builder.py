@@ -134,6 +134,25 @@ def _build_faiss_index() -> faiss.IndexIDMap2:
 # ---------------------------------------------------------------------------
 
 
+def cleanup_deleted_images(
+    faiss_index: faiss.IndexIDMap2,
+    manifest: IndexManifest,
+    nodestore: NodeStore,
+) -> list[str]:
+    """Remove index entries for image files that no longer exist on disk.
+
+    Returns the list of filepaths that were pruned.
+    """
+    to_remove = [
+        fp for fp in manifest.all_paths()
+        if Path(fp).suffix.lower() in _IMAGE_EXTENSIONS and not os.path.exists(fp)
+    ]
+    if to_remove:
+        _remove_files(to_remove, faiss_index, manifest, nodestore)
+        logger.info("cleanup_deleted_images: pruned %d stale image(s)", len(to_remove))
+    return to_remove
+
+
 def build_index(
     config: SolidRagConfig,
     registry: ExtractorRegistry | None = None,
@@ -178,11 +197,18 @@ def build_index(
         # Load persisted FAISS index and apply only the filesystem delta.
         faiss_index = faiss.read_index(str(faiss_path))
         new_files, modified_files, deleted_files = manifest.diff(current_files)
+        # Images are excluded from _scan_source_dirs (handled by the scheduler),
+        # so they always appear as "deleted" in the diff — skip them here.
+        deleted_non_images = [
+            f for f in deleted_files
+            if Path(f).suffix.lower() not in _IMAGE_EXTENSIONS
+        ]
         logger.info(
-            "Loaded persisted index — delta: %d new, %d modified, %d deleted",
-            len(new_files), len(modified_files), len(deleted_files),
+            "Loaded persisted index — delta: %d new, %d modified, %d deleted (%d image entries preserved)",
+            len(new_files), len(modified_files), len(deleted_non_images),
+            len(deleted_files) - len(deleted_non_images),
         )
-        _remove_files(deleted_files + modified_files, faiss_index, manifest, nodestore)
+        _remove_files(deleted_non_images + modified_files, faiss_index, manifest, nodestore)
         _index_files(new_files + modified_files, faiss_index, manifest, nodestore, current_files, config, registry)
     else:
         logger.info("No persisted index — performing full index build.")

@@ -20,7 +20,10 @@ import psutil
 
 from solidrag.config import SolidRagConfig
 from solidrag.extractors.registry import ExtractorRegistry
-from solidrag.index.builder import _embed_nodes, _node_id_to_int, _IMAGE_EXTENSIONS, _vault_rel_path
+from solidrag.index.builder import (
+    _embed_nodes, _node_id_to_int, _IMAGE_EXTENSIONS, _vault_rel_path,
+    cleanup_deleted_images,
+)
 from solidrag.index.manifest import IndexManifest
 from solidrag.index.nodestore import NodeStore
 
@@ -147,6 +150,15 @@ class ResourceAwareScheduler:
         """Extract, embed, and splice all *image_paths* into the FAISS index."""
         import os
         from solidrag.extractors.image import ImageExtractor
+
+        # Prune stale entries for images deleted since last run
+        removed = cleanup_deleted_images(self._faiss_index, self._manifest, self._nodestore)
+        if removed:
+            faiss_path = Path(self._config.persist_dir) / "solidrag.faiss"
+            import faiss as _faiss
+            _faiss.write_index(self._faiss_index, str(faiss_path))
+            self._manifest.save()
+            self._nodestore.save()
 
         img_extractor = ImageExtractor(
             ollama_base_url=self._config.ollama_base_url,

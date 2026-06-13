@@ -180,6 +180,7 @@ def cmd_index_images(_args):
         from solidrag.index.nodestore import NodeStore
         from solidrag.index.builder import (
             _embed_nodes, _node_id_to_int, _vault_rel_path, _IMAGE_EXTENSIONS,
+            cleanup_deleted_images,
         )
         from solidrag.extractors.image import ImageExtractor
         import faiss
@@ -207,6 +208,20 @@ def cmd_index_images(_args):
     nodestore = NodeStore(persist_dir / "nodestore.json")
     manifest.load()
     nodestore.load()
+    faiss_index = faiss.read_index(str(faiss_path))
+
+    # ── Prune deleted images ─────────────────────────────────────────────────
+    step("Checking for deleted images to prune…")
+    removed = cleanup_deleted_images(faiss_index, manifest, nodestore)
+    if removed:
+        for r in removed:
+            info(f"  Pruned: {_Path(r).name}")
+        faiss.write_index(faiss_index, str(faiss_path))
+        manifest.save()
+        nodestore.save()
+        ok(f"Pruned {len(removed)} deleted image(s)")
+    else:
+        ok("Nothing to prune")
 
     # ── Find unindexed images ────────────────────────────────────────────────
     step("Scanning for unindexed images…")
@@ -248,7 +263,6 @@ def cmd_index_images(_args):
         ollama_base_url=solidrag_cfg.ollama_base_url,
         vision_model=vision_model,
     )
-    faiss_index = faiss.read_index(str(faiss_path))
 
     indexed_files  = 0
     indexed_nodes  = 0
