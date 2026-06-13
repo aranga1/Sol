@@ -229,8 +229,39 @@ async def query_stream_async(
         yield {"type": "done"}
         return
 
-    # Calendar queries: inject all calendar events first, then fill with note results.
+    # Calendar queries: retrieve calendar events directly from NodeStore (bypass FAISS)
+    # and pre-filter by date so the small LLM doesn't need to do date math.
     if is_calendar_query:
+        import re as _re
+        from datetime import timedelta as _td
+
+        today = _date.today()
+        q_lower = question.lower()
+        if "tomorrow" in q_lower:
+            target_dates = {today + _td(days=1)}
+            retrieval_question = question.replace("tomorrow", (today + _td(days=1)).strftime("%A %d %B %Y"))
+        elif "today" in q_lower:
+            target_dates = {today}
+            retrieval_question = question.replace("today", today.strftime("%A %d %B %Y"))
+        elif "this week" in q_lower:
+            start = today - _td(days=today.weekday())
+            target_dates = {start + _td(days=i) for i in range(7)}
+        elif "next week" in q_lower:
+            start = today + _td(days=7 - today.weekday())
+            target_dates = {start + _td(days=i) for i in range(7)}
+        else:
+            target_dates = None  # no filter — return all
+
+        def _event_date(content: str) -> "_date | None":
+            m = _re.search(r"Date: \w+ (\d+) (\w+) (\d{4})", content)
+            if m:
+                try:
+                    from datetime import datetime as _dt
+                    return _dt.strptime(f"{m.group(1)} {m.group(2)} {m.group(3)}", "%d %B %Y").date()
+                except Exception:
+                    pass
+            return None
+
         seen_fps: set[str] = set()
         cal_results: list[dict] = []
         for nid in nodestore.all_node_ids():
@@ -238,8 +269,10 @@ async def query_stream_async(
             if fp.startswith("calendar:") and fp not in seen_fps:
                 content = nodestore.get_content(nid)
                 if content:
-                    cal_results.append({"content": content, "file_path": fp, "score": 0.0})
+                    if target_dates is None or _event_date(content) in target_dates:
+                        cal_results.append({"content": content, "file_path": fp, "score": 0.0})
                     seen_fps.add(fp)
+
         note_results = await _retrieve(faiss_index, nodestore, retrieval_question, top_k)
         note_results = [r for r in note_results if not r["file_path"].startswith("calendar:")]
         results = cal_results + note_results[:max(0, top_k - len(cal_results))]
@@ -249,18 +282,28 @@ async def query_stream_async(
 
     context_str = "\n\n---\n\n".join(r["content"] for r in results)
 
+    from datetime import timedelta as _td2
+    if is_calendar_query:
+        today_str = _date.today().strftime("%A %d %B %Y")
+        tomorrow_str = (_date.today() + _td2(days=1)).strftime("%A %d %B %Y")
+        today_context = (
+            f" Today is {today_str}. Tomorrow is {tomorrow_str}."
+            " Answer only from the calendar events provided in the context."
+        )
+    else:
+        today_context = ""
     _default_system = (
         "You are Sol, a personal second-brain assistant. "
         "Answer the user's question using the relevant notes, documents, and image descriptions provided. "
         "Image contents have been extracted by a vision model and stored as text descriptions — "
         "treat those descriptions as the ground truth about what is in the image. "
-        "Cite specific details from the content where helpful."
+        f"Cite specific details from the content where helpful.{today_context}"
     )
 
     prompt = build_rag_prompt(
         system_prompt or _default_system,
         context_str,
-        question,
+        retrieval_question,  # use date-resolved question for LLM too
         history,
     )
 

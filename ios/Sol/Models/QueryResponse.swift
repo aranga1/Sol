@@ -42,19 +42,28 @@ struct CreateEventPayload: Decodable, Equatable {
         durationMinutes = try container.decode(Int.self, forKey: .durationMinutes)
 
         let startString = try container.decode(String.self, forKey: .start)
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        if let date = formatter.date(from: startString) {
+        // Try multiple formats: LLM may omit timezone (e.g. "2026-06-14T12:00:00")
+        let iso = ISO8601DateFormatter()
+        iso.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = iso.date(from: startString) {
             start = date
         } else {
-            formatter.formatOptions = [.withInternetDateTime]
-            if let date = formatter.date(from: startString) {
+            iso.formatOptions = [.withInternetDateTime]
+            if let date = iso.date(from: startString) {
                 start = date
             } else {
-                throw DecodingError.dataCorruptedError(
-                    forKey: .start, in: container,
-                    debugDescription: "Cannot parse date: \(startString)"
-                )
+                // Fallback: no timezone — treat as local time
+                let local = DateFormatter()
+                local.locale = Locale(identifier: "en_US_POSIX")
+                local.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+                if let date = local.date(from: startString) {
+                    start = date
+                } else {
+                    // Last resort: use noon today so the editor still opens
+                    var comps = Calendar.current.dateComponents([.year, .month, .day], from: Date())
+                    comps.hour = 12; comps.minute = 0
+                    start = Calendar.current.date(from: comps) ?? Date()
+                }
             }
         }
     }
