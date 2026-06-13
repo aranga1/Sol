@@ -15,6 +15,7 @@ from daemon.routes import config as config_router
 from daemon.routes import notifications as notifications_router
 from daemon.routes import tags as tags_router
 from daemon.routes import uploads as uploads_router
+from daemon.routes import calendar as calendar_router
 import time
 
 import numpy as np
@@ -178,6 +179,7 @@ app.include_router(config_router.router)
 app.include_router(notifications_router.router)
 app.include_router(tags_router.router)
 app.include_router(uploads_router.router)
+app.include_router(calendar_router.router)
 
 
 if __name__ == "__main__":

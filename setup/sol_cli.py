@@ -336,6 +336,137 @@ def cmd_index_images(_args):
     print()
 
 
+def cmd_index_calendar(_args):
+    """Trigger an immediate calendar sync — indexes new/changed events without waiting 60s."""
+    cfg = load_config()
+    port = cfg.get("daemon_port", 8765)
+    key  = cfg.get("daemon_api_key", "")
+
+    print()
+    # ── Fast path: daemon is running → hit the live endpoint ────────────────
+    if daemon_running():
+        step("Daemon is running — triggering live calendar sync…")
+        payload = b"{}"
+        req = urllib.request.Request(
+            f"http://localhost:{port}/api/index-calendar",
+            data=payload,
+            headers={"X-API-Key": key, "Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                result = json.loads(resp.read())
+        except urllib.error.HTTPError as e:
+            body = e.read().decode()
+            fail(f"Daemon returned HTTP {e.code}: {body}")
+            sys.exit(1)
+        except urllib.error.URLError as e:
+            fail(f"Could not reach daemon: {e}")
+            sys.exit(1)
+
+        if "error" in result:
+            fail(result["error"])
+            sys.exit(1)
+
+        msg = result.get("message")
+        if msg:
+            ok(msg)
+        else:
+            ok(f"Added {result['added']}  Updated {result['updated']}  Deleted {result['deleted']}")
+        print()
+        return
+
+    # ── Slow path: daemon stopped → index files directly ────────────────────
+    step("Daemon is not running — indexing calendar events directly…")
+
+    try:
+        import sys as _sys
+        _sys.path.insert(0, str(REPO_DIR / "packages/solidrag"))
+        from solidrag import SolidRagConfig
+        from solidrag.index.manifest import IndexManifest
+        from solidrag.index.nodestore import NodeStore
+        from solidrag.index.builder import apply_source_diff, _node_id_to_int
+        from solidrag.extractors.base import IndexDiff
+        from solidrag.extractors.calendar import CalendarExtractor
+        from solidrag.query.engine import configure_settings
+        import faiss
+        import numpy as np
+    except ImportError as e:
+        fail(f"Could not import solidrag: {e}")
+        fail("Run: sol update")
+        sys.exit(1)
+
+    solidrag_cfg = SolidRagConfig(
+        source_dirs=[],
+        ollama_base_url=cfg.get("ollama_base_url", "http://localhost:11434"),
+        ollama_model=cfg.get("ollama_model", "qwen2.5:3b"),
+    )
+    configure_settings(solidrag_cfg)
+
+    from pathlib import Path as _Path
+    persist_dir = _Path(solidrag_cfg.persist_dir)
+    faiss_path  = persist_dir / "solidrag.faiss"
+
+    if not faiss_path.exists():
+        fail("FAISS index not found — start the daemon first to build the initial index")
+        sys.exit(1)
+
+    manifest    = IndexManifest(persist_dir / "manifest.json")
+    nodestore   = NodeStore(persist_dir / "nodestore.json")
+    manifest.load()
+    nodestore.load()
+    faiss_index = faiss.read_index(str(faiss_path))
+
+    step("Running CalendarExtractor sync…")
+    extractor = CalendarExtractor()
+    if not extractor._authorized:
+        fail("Calendar access denied — grant permission to the Python process in System Settings → Privacy → Calendars")
+        sys.exit(1)
+
+    diff = extractor.sync(manifest)
+    added   = len(diff.to_add)
+    updated = len(diff.to_update)
+    deleted = len(diff.to_delete)
+
+    if not (added or updated or deleted):
+        ok("Index already up to date — no changes detected")
+        print()
+        return
+
+    info(f"Changes: +{added} new  ~{updated} updated  -{deleted} deleted")
+    now = import_time()
+
+    for node in diff.to_add:
+        apply_source_diff(
+            faiss_index, manifest, IndexDiff(to_add=[node]),
+            source_id="calendar",
+            source_key=node.metadata.get("event_id", node.node_id),
+            mtime=now, config=solidrag_cfg, nodestore=nodestore,
+        )
+    for old_ids, new_nodes in diff.to_update:
+        apply_source_diff(
+            faiss_index, manifest, IndexDiff(to_update=[(old_ids, new_nodes)]),
+            source_id="calendar",
+            source_key=new_nodes[0].metadata.get("event_id", new_nodes[0].node_id) if new_nodes else "unknown",
+            mtime=now, config=solidrag_cfg, nodestore=nodestore,
+        )
+    if diff.to_delete:
+        ids = np.array([_node_id_to_int(nid) for nid in diff.to_delete], dtype=np.int64)
+        faiss_index.remove_ids(ids)
+
+    step("Saving index…")
+    faiss.write_index(faiss_index, str(faiss_path))
+    nodestore.save()
+    manifest.save()
+    ok(f"Done — Added {added}  Updated {updated}  Deleted {deleted}")
+    print()
+
+
+def import_time():
+    import time
+    return time.time()
+
+
 def cmd_config(_args):
     if not CONFIG_FILE.exists():
         fail(f"Config not found: {CONFIG_FILE}")
@@ -497,7 +628,8 @@ USAGE = f"""\
   {cyan('qr')}            Regenerate the iPhone connection QR code
   {cyan('notify')}        Queue a notification to your iPhone  (title body [type])
   {cyan('update-ios')}    Check for a new iOS app release and show install QR
-  {cyan('index-images')}  Describe unindexed images with the vision model and add to index
+  {cyan('index-images')}    Describe unindexed images with the vision model and add to index
+  {cyan('index-calendar')}  Sync calendar events into the index immediately (no 60s wait)
 
 {bold('OPTIONS')}
   -h, --help    Show this help message
@@ -517,7 +649,8 @@ COMMANDS = {
     "qr":           cmd_qr,
     "notify":       cmd_notify,
     "update-ios":   cmd_update_ios,
-    "index-images": cmd_index_images,
+    "index-images":    cmd_index_images,
+    "index-calendar":  cmd_index_calendar,
     "_install-shim": cmd_install_shim,  # called by install.sh
 }
 
