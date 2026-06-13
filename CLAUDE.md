@@ -34,6 +34,8 @@ sol restart        # bounce the LaunchAgent daemon
 sol update         # pull + reinstall solidrag + restart (use after git pull)
 ```
 
+**Never use `launchctl` directly** — always go through `sol restart`. Direct `launchctl unload/load` skips the CLI's guard logic and is one mistake away from a double-daemon. Same applies to `python -m uvicorn daemon.main:app` — never run this manually.
+
 Verify only one process is running:
 ```bash
 lsof -i :8765 | grep LISTEN   # should show exactly one entry with TCP *:8765
