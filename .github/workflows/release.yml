@@ -39,10 +39,7 @@ jobs:
   build-ipa:
     name: Build iOS IPA
     runs-on: macos-15
-    # Skip if signing secrets are not configured
-    if: >
-      vars.SKIP_IPA_BUILD != 'true' &&
-      secrets.APPLE_CERT_BASE64 != ''
+    if: vars.SKIP_IPA_BUILD != 'true'
     steps:
       - uses: actions/checkout@v4
 
