@@ -129,7 +129,7 @@ async def lifespan(app: FastAPI):
                     print(f"[CalendarWatcher] remove_ids error: {e}")
             manifest.save()
 
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
 
     def _on_calendar_diff(diff) -> None:
         asyncio.run_coroutine_threadsafe(_apply_calendar_diff_async(diff), loop)
