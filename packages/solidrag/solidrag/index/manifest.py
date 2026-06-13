@@ -156,6 +156,8 @@ class IndexManifest:
         """Remove the entry for *key* within *source_id* (no-op if absent)."""
         if source_id in self._sources:
             self._sources[source_id].pop(key, None)
+            if not self._sources[source_id]:
+                del self._sources[source_id]
 
     def all_source_keys(self, source_id: str) -> set[str]:
         """Return the set of all tracked keys for *source_id*."""
