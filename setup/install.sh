@@ -162,12 +162,14 @@ section "5 / 8  Python environment"
 
 if [[ -f "$VENV/bin/pip" ]]; then
   step "Venv exists — updating dependencies..."
+  spin "Installing solidrag..." "$VENV/bin/pip" install --quiet -e "$REPO_DIR/packages/solidrag"
   spin "Updating packages..." "$VENV/bin/pip" install --quiet --upgrade -r "$REPO_DIR/daemon/requirements.txt"
   ok "Dependencies up to date"
 else
   step "Creating venv..."
   python3.12 -m venv "$VENV" 2>/dev/null || python3 -m venv "$VENV"
   spin "Installing packages..." "$VENV/bin/pip" install --quiet --upgrade pip
+  spin "Installing solidrag..." "$VENV/bin/pip" install --quiet -e "$REPO_DIR/packages/solidrag"
   spin "Installing daemon deps..." "$VENV/bin/pip" install --quiet -r "$REPO_DIR/daemon/requirements.txt"
   ok "Python environment ready"
 fi

@@ -139,10 +139,18 @@ def cmd_update(_args):
     subprocess.run(["git", "-C", str(REPO_DIR), "pull"], check=True)
 
     step("Updating Python dependencies…")
+    # Install solidrag first — it's a local editable package and must be installed
+    # before the rest of the daemon deps reference it.
+    subprocess.run(
+        [str(VENV_PYTHON), "-m", "pip", "install", "--quiet", "-e",
+         str(REPO_DIR / "packages/solidrag")],
+        check=True,
+    )
     req = REPO_DIR / "daemon/requirements.txt"
     subprocess.run(
         [str(VENV_PYTHON), "-m", "pip", "install", "--quiet", "--upgrade", "-r", str(req)],
-        check=True
+        cwd=str(REPO_DIR / "daemon"),
+        check=True,
     )
 
     step("Re-copying CLI shim…")
