@@ -139,3 +139,120 @@ def test_apply_source_diff_deletes_nodes(tmp_path):
 
     assert faiss_index.ntotal == 0
     assert manifest.get_source("calendar", "evt-del") is None
+
+
+# ---------------------------------------------------------------------------
+# Task 4: CalendarExtractor tests
+# ---------------------------------------------------------------------------
+
+from unittest.mock import MagicMock
+from solidrag.extractors.calendar import CalendarExtractor, _format_event
+
+
+def _make_mock_event(
+    event_id="evt-1",
+    title="Team Standup",
+    start_ts=1749823800.0,
+    end_ts=1749827400.0,
+    location="Zoom",
+    notes="Daily sync",
+    attendee_names=("Alice", "Bob"),
+    last_modified_ts=1749823000.0,
+):
+    event = MagicMock()
+    event.eventIdentifier.return_value = event_id
+    event.title.return_value = title
+    start = MagicMock()
+    start.timeIntervalSince1970.return_value = start_ts
+    end = MagicMock()
+    end.timeIntervalSince1970.return_value = end_ts
+    event.startDate.return_value = start
+    event.endDate.return_value = end
+    event.location.return_value = location
+    event.notes.return_value = notes
+    attendees = []
+    for name in attendee_names:
+        a = MagicMock()
+        a.name.return_value = name
+        attendees.append(a)
+    event.attendees.return_value = attendees
+    lm = MagicMock()
+    lm.timeIntervalSince1970.return_value = last_modified_ts
+    event.lastModifiedDate.return_value = lm
+    return event
+
+
+def test_format_event_includes_title():
+    event = _make_mock_event(title="Budget Review")
+    text = _format_event(event)
+    assert "Budget Review" in text
+
+
+def test_format_event_includes_attendees():
+    event = _make_mock_event(attendee_names=("Alice", "Bob"))
+    text = _format_event(event)
+    assert "Alice" in text
+    assert "Bob" in text
+
+
+def test_format_event_includes_location():
+    event = _make_mock_event(location="Room 4B")
+    text = _format_event(event)
+    assert "Room 4B" in text
+
+
+def test_format_event_no_location_when_none():
+    event = _make_mock_event(location=None)
+    text = _format_event(event)
+    assert "Location" not in text
+
+
+def test_sync_detects_new_event(tmp_path):
+    manifest_path = tmp_path / "manifest.json"
+    from solidrag.index.manifest import IndexManifest
+    manifest = IndexManifest(manifest_path)
+    manifest.load()
+
+    mock_event = _make_mock_event()
+
+    extractor = CalendarExtractor.__new__(CalendarExtractor)
+    extractor._authorized = True
+    extractor._store = MagicMock()
+    extractor._fetch_events = MagicMock(return_value=[mock_event])
+
+    diff = extractor.sync(manifest)
+    assert len(diff.to_add) == 1
+    assert "Team Standup" in diff.to_add[0].get_content()
+
+
+def test_sync_detects_deleted_event(tmp_path):
+    manifest_path = tmp_path / "manifest.json"
+    from solidrag.index.manifest import IndexManifest
+    manifest = IndexManifest(manifest_path)
+    manifest.load()
+    manifest.update_source("calendar", "evt-gone", mtime=1.0, node_ids=["old-node"])
+
+    extractor = CalendarExtractor.__new__(CalendarExtractor)
+    extractor._authorized = True
+    extractor._fetch_events = MagicMock(return_value=[])
+
+    diff = extractor.sync(manifest)
+    assert "old-node" in diff.to_delete
+
+
+def test_sync_detects_modified_event(tmp_path):
+    manifest_path = tmp_path / "manifest.json"
+    from solidrag.index.manifest import IndexManifest
+    manifest = IndexManifest(manifest_path)
+    manifest.load()
+    manifest.update_source("calendar", "evt-1", mtime=999.0, node_ids=["old-node"])
+
+    mock_event = _make_mock_event(last_modified_ts=1000.0)
+    extractor = CalendarExtractor.__new__(CalendarExtractor)
+    extractor._authorized = True
+    extractor._fetch_events = MagicMock(return_value=[mock_event])
+
+    diff = extractor.sync(manifest)
+    assert len(diff.to_update) == 1
+    old_ids, new_nodes = diff.to_update[0]
+    assert "old-node" in old_ids
