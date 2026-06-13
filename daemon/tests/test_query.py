@@ -21,22 +21,19 @@ def client(tmp_path, monkeypatch):
     monkeypatch.setenv("SOL_CONFIG", str(cfg))
     mock_faiss_idx = MagicMock()
     mock_manifest = MagicMock()
+    mock_nodestore = MagicMock()
     mock_watcher = MagicMock()
     mock_watcher.start = MagicMock()
     mock_watcher.stop = MagicMock()
     mock_scheduler = MagicMock()
     mock_scheduler.start = MagicMock()
     mock_scheduler.stop = MagicMock()
-    mock_llama_idx = MagicMock()
     with patch("daemon.main.ObsidianClient") as MockObs, \
-         patch("daemon.main.build_index", return_value=(mock_faiss_idx, mock_manifest)), \
+         patch("daemon.main.build_index", return_value=(mock_faiss_idx, mock_manifest, mock_nodestore)), \
          patch("daemon.main.configure_settings"), \
          patch("daemon.main.default_registry", return_value=MagicMock()), \
          patch("daemon.main.SourceWatcher", return_value=mock_watcher), \
-         patch("daemon.main.ResourceAwareScheduler", return_value=mock_scheduler), \
-         patch("daemon.main.FaissVectorStore", return_value=MagicMock()), \
-         patch("daemon.main.StorageContext"), \
-         patch("daemon.main.VectorStoreIndex", return_value=mock_llama_idx):
+         patch("daemon.main.ResourceAwareScheduler", return_value=mock_scheduler):
         inst = MockObs.return_value
         inst.health = AsyncMock(return_value=True)
         inst.note_count = AsyncMock(return_value=5)
@@ -88,7 +85,8 @@ def test_query_missing_key_returns_401(client):
 
 def test_query_index_not_ready_returns_503(client):
     from daemon.main import app
-    app.state.vault_index_llama = None
+    app.state.vault_index = None
+    app.state.vault_nodestore = None
     resp = client.post(
         "/api/query",
         json={"question": "test"},

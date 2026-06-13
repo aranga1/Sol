@@ -33,14 +33,11 @@ def client(config_file, monkeypatch):
     mock_scheduler.start = MagicMock()
     mock_scheduler.stop = MagicMock()
     with patch("daemon.main.ObsidianClient") as MockObs, \
-         patch("daemon.main.build_index", return_value=(MagicMock(), MagicMock())), \
+         patch("daemon.main.build_index", return_value=(MagicMock(), MagicMock(), MagicMock())), \
          patch("daemon.main.configure_settings"), \
          patch("daemon.main.default_registry", return_value=MagicMock()), \
          patch("daemon.main.SourceWatcher", return_value=mock_watcher), \
-         patch("daemon.main.ResourceAwareScheduler", return_value=mock_scheduler), \
-         patch("daemon.main.FaissVectorStore", return_value=MagicMock()), \
-         patch("daemon.main.StorageContext"), \
-         patch("daemon.main.VectorStoreIndex", return_value=MagicMock()):
+         patch("daemon.main.ResourceAwareScheduler", return_value=mock_scheduler):
         inst = MockObs.return_value
         inst.health = AsyncMock(return_value=True)
         inst.close = AsyncMock()
