@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Install Sol — Set up in 5 steps</title>
+  <title>Install Sol — Set up in 6 steps</title>
   <meta name="description" content="Install Sol in about 20 minutes. You'll need a Mac, an iPhone, and an Obsidian vault.">
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" href="favicon.png">
@@ -28,7 +28,7 @@
 
     <!-- ── Header ─────────────────────────────────────────────────────────── -->
     <header class="install-header">
-      <h1 class="install-heading">Set up Sol<br>in 5 steps.</h1>
+      <h1 class="install-heading">Set up Sol<br>in 6 steps.</h1>
       <p class="install-subhead">Takes about 20 minutes. You'll need a Mac, an iPhone, and an Obsidian vault.</p>
     </header>
 
@@ -42,18 +42,8 @@
           <h2 class="step-title">Run the installer</h2>
           <p class="step-desc">One command clones the repo, creates the Python environment, and installs the macOS daemon. Estimated time: ~12 minutes including model download.</p>
 
-          <!-- Terminal animation -->
-          <div class="step-visual vis-terminal" aria-hidden="true">
-            <div class="term-prompt">$ curl -L https://raw.githubusercontent.com/aranga1/Sol/main/setup/install.sh | bash</div>
-            <div class="term-line">→ Checking dependencies…</div>
-            <div class="term-line">→ Pulling phi3.5 model (2.2 GB)…</div>
-            <div class="term-line">→ Installing daemon service…</div>
-            <div class="term-ok">✓ Sol installed successfully</div>
-          </div>
-
-          <!-- Code block -->
           <div class="code-block" role="region" aria-label="Install command">
-            <button class="copy-btn" type="button" aria-label="Copy install command to clipboard">Copy</button>
+            <button class="copy-btn" type="button" aria-label="Copy install command to clipboard"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>
             <code>curl -L https://raw.githubusercontent.com/aranga1/Sol/main/setup/install.sh | bash</code>
           </div>
         </div>
@@ -64,121 +54,142 @@
         <div class="step-circle" aria-hidden="true">2</div>
         <div class="step-body">
           <h2 class="step-title">Point Sol at your vault</h2>
-          <p class="step-desc">The installer asks for your Obsidian vault path. It's the folder you see in iCloud Drive → Obsidian — usually named after your vault.</p>
+          <p class="step-desc">When the installer asks for your vault path, find your Obsidian vault folder. It's usually at iCloud Drive → Obsidian → [your vault name]. Paste the full path.</p>
 
-          <!-- Folder tree animation -->
-          <div class="step-visual vis-folder" aria-hidden="true">
-            <div class="folder-item">
-              <span class="folder-icon">▼</span>
-              <span>iCloud Drive</span>
+          <!-- macOS Obsidian app mockup -->
+          <div class="step-visual vis-obsidian" aria-hidden="true">
+            <div class="obs-titlebar">
+              <div class="obs-dots">
+                <span class="mac-dot mac-dot-red"></span>
+                <span class="mac-dot mac-dot-yellow"></span>
+                <span class="mac-dot mac-dot-green"></span>
+              </div>
+              <span class="obs-title">Sol — Obsidian</span>
             </div>
-            <div class="folder-item" style="padding-left: 1.2rem;">
-              <span class="folder-icon">▼</span>
-              <span>Obsidian</span>
+            <div class="obs-body">
+              <div class="obs-sidebar">
+                <div class="obs-vault-item">📔 Sol</div>
+                <div class="obs-file-item obs-file-active">Morning notes</div>
+                <div class="obs-file-item">Project ideas</div>
+                <div class="obs-file-item">Reading list</div>
+              </div>
+              <div class="obs-editor">
+                <div class="obs-note-title">Morning notes</div>
+                <div class="obs-note-line obs-line-1"></div>
+                <div class="obs-note-line obs-line-2"></div>
+                <div class="obs-note-line obs-line-short"></div>
+                <div class="obs-tag">#journal  #daily</div>
+              </div>
             </div>
-            <div class="folder-item highlight" style="padding-left: 2.4rem;">
-              <span class="folder-icon">📂</span>
-              <span>Sol</span>
-            </div>
-            <div class="folder-path">~/Library/Mobile Documents/…/Sol</div>
           </div>
         </div>
       </article>
 
       <!-- Step 3 -->
-      <article class="step" role="listitem" aria-label="Step 3: Start the daemon">
+      <article class="step" role="listitem" aria-label="Step 3: Sol configures your daemon">
         <div class="step-circle" aria-hidden="true">3</div>
         <div class="step-body">
-          <h2 class="step-title">Start the daemon</h2>
-          <p class="step-desc">The daemon runs in the background on your Mac. It indexes your vault, handles queries via Ollama, and auto-restarts after reboots.</p>
+          <h2 class="step-title">Sol configures your daemon</h2>
+          <p class="step-desc">The installer registers Sol as a macOS background service via launchd. It starts automatically with your Mac — no <code class="inline-code">sol start</code> command required.</p>
 
-          <!-- Daemon heartbeat animation -->
-          <div class="step-visual vis-daemon" aria-hidden="true">
-            <div class="daemon-node">
-              <div class="daemon-ring"></div>
-              <div class="daemon-dot"></div>
+          <!-- macOS menu bar + notification mockup -->
+          <div class="step-visual vis-daemon-auto" aria-hidden="true">
+            <div class="menubar-strip">
+              <span class="menubar-left">🍎 &nbsp; Finder &nbsp; File &nbsp; Edit</span>
+              <span class="menubar-right">
+                <span class="menubar-sol-icon">☀</span>
+                <span class="menubar-time">9:41 AM</span>
+              </span>
             </div>
-            <div class="daemon-status">Listening on :8765</div>
-          </div>
-
-          <!-- Code block -->
-          <div class="code-block" role="region" aria-label="Start daemon command">
-            <button class="copy-btn" type="button" aria-label="Copy start command to clipboard">Copy</button>
-            <code>sol start</code>
+            <div class="desktop-area">
+              <div class="mac-notif">
+                <div class="mac-notif-icon">☀</div>
+                <div class="mac-notif-text">
+                  <div class="mac-notif-app">Sol</div>
+                  <div class="mac-notif-body">Daemon running · vault indexed</div>
+                </div>
+                <div class="mac-notif-dot"></div>
+              </div>
+              <div class="daemon-status-row">
+                <span class="daemon-status-dot"></span>
+                <span class="daemon-status-label">Listening on :8765</span>
+              </div>
+            </div>
           </div>
         </div>
       </article>
 
-      <!-- Step 4 -->
-      <article class="step" role="listitem" aria-label="Step 4: Connect your iPhone">
+      <!-- Step 4 (NEW) — Tailscale -->
+      <article class="step" role="listitem" aria-label="Step 4: Connect via Tailscale">
         <div class="step-circle" aria-hidden="true">4</div>
         <div class="step-body">
-          <h2 class="step-title">Connect your iPhone</h2>
-          <p class="step-desc">The installer prints a QR code containing your Mac's Tailscale IP and API key. Open Sol on your iPhone and tap <em>Scan</em> to connect over your local network — no typing required.</p>
+          <h2 class="step-title">Connect via Tailscale</h2>
+          <p class="step-desc">Tailscale gives your iPhone a secure private connection to your Mac — even over mobile data. Install it on both devices and sign in with the same account. Free for personal use.</p>
 
-          <!-- QR scan animation -->
-          <div class="step-visual vis-qr" aria-hidden="true">
-            <div class="qr-grid" style="position:relative;">
-              <!-- Row 1 -->
-              <div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell amber"></div><div class="qr-cell dark"></div>
-              <!-- Row 2 -->
-              <div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell light"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div>
-              <!-- Row 3 -->
-              <div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell amber"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div><div class="qr-cell amber"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div>
-              <!-- Row 4 -->
-              <div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell light"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell amber"></div><div class="qr-cell dark"></div>
-              <!-- Row 5 -->
-              <div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div>
-              <!-- Row 6 -->
-              <div class="qr-cell amber"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell amber"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div>
-              <!-- Row 7 -->
-              <div class="qr-cell dark"></div><div class="qr-cell amber"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell amber"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div>
-              <!-- Row 8 -->
-              <div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell amber"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div><div class="qr-cell light"></div><div class="qr-cell dark"></div><div class="qr-cell dark"></div>
-              <!-- Scanline overlays the grid -->
-              <div class="qr-scanline" style="position:absolute; left:0; right:0; top:0;"></div>
+          <!-- Two-device connection animation -->
+          <div class="step-visual vis-tailscale" aria-hidden="true">
+            <div class="ts-scene">
+              <div class="ts-device ts-mac">
+                <div class="ts-device-body ts-mac-body"></div>
+                <div class="ts-device-label">Mac</div>
+                <div class="ts-node ts-node-mac"></div>
+              </div>
+              <div class="ts-line-wrap">
+                <div class="ts-line"></div>
+                <div class="ts-lock">🔒</div>
+              </div>
+              <div class="ts-device ts-iphone">
+                <div class="ts-device-body ts-iphone-body"></div>
+                <div class="ts-device-label">iPhone</div>
+                <div class="ts-node ts-node-iphone"></div>
+              </div>
             </div>
-            <div class="qr-check">
-              <div class="qr-check-circle">✓</div>
-            </div>
+          </div>
+
+          <div class="tailscale-links">
+            <a href="https://tailscale.com/download/mac" target="_blank" rel="noopener" class="ts-link">↓ Tailscale for Mac</a>
+            <a href="https://apps.apple.com/app/tailscale/id1470499037" target="_blank" rel="noopener" class="ts-link">↓ Tailscale for iPhone</a>
           </div>
         </div>
       </article>
 
-      <!-- Step 5 -->
-      <article class="step" role="listitem" aria-label="Step 5: Ask your first question">
+      <!-- Step 5 — Connect your iPhone -->
+      <article class="step" role="listitem" aria-label="Step 5: Connect your iPhone">
         <div class="step-circle" aria-hidden="true">5</div>
+        <div class="step-body">
+          <h2 class="step-title">Connect your iPhone</h2>
+          <p class="step-desc">Run <code class="inline-code">sol connect</code> in Terminal. It prints a QR code with your connection details. Open Sol on your iPhone and tap Scan.</p>
+
+          <!-- Code block -->
+          <div class="code-block" role="region" aria-label="Connect command">
+            <button class="copy-btn" type="button" aria-label="Copy connect command to clipboard"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <code>sol connect</code>
+          </div>
+
+        </div>
+      </article>
+
+      <!-- Step 6 — Ask your first question -->
+      <article class="step" role="listitem" aria-label="Step 6: Ask your first question">
+        <div class="step-circle" aria-hidden="true">6</div>
         <div class="step-body">
           <h2 class="step-title">Ask your first question</h2>
           <p class="step-desc">Type or speak. Sol searches your vault with semantic search powered by Ollama and answers in plain language — with links back to the source notes.</p>
 
-          <!-- Query animation -->
-          <div class="step-visual vis-query" aria-hidden="true">
-            <!-- Small node-sun mark -->
-            <svg
-              class="query-mark"
-              viewBox="-45 -45 90 90"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <line x1="0" y1="0" x2="0"   y2="-28"  stroke="#B5701F" stroke-width="2" stroke-linecap="round"/>
-              <line x1="0" y1="0" x2="24"  y2="-14"  stroke="#B5701F" stroke-width="2" stroke-linecap="round"/>
-              <line x1="0" y1="0" x2="24"  y2="14"   stroke="#B5701F" stroke-width="2" stroke-linecap="round"/>
-              <line x1="0" y1="0" x2="0"   y2="28"   stroke="#B5701F" stroke-width="2" stroke-linecap="round"/>
-              <line x1="0" y1="0" x2="-24" y2="14"   stroke="#B5701F" stroke-width="2" stroke-linecap="round"/>
-              <line x1="0" y1="0" x2="-24" y2="-14"  stroke="#B5701F" stroke-width="2" stroke-linecap="round"/>
-              <circle cx="0"   cy="-28" r="5" fill="none" stroke="#A23E2D" stroke-width="1.5"/>
-              <circle cx="24"  cy="-14" r="5" fill="none" stroke="#A23E2D" stroke-width="1.5"/>
-              <circle cx="24"  cy="14"  r="5" fill="none" stroke="#A23E2D" stroke-width="1.5"/>
-              <circle cx="0"   cy="28"  r="5" fill="none" stroke="#A23E2D" stroke-width="1.5"/>
-              <circle cx="-24" cy="14"  r="5" fill="none" stroke="#A23E2D" stroke-width="1.5"/>
-              <circle cx="-24" cy="-14" r="5" fill="none" stroke="#A23E2D" stroke-width="1.5"/>
-              <circle cx="0" cy="0" r="13" fill="#A23E2D"/>
-            </svg>
-
-            <div class="query-bubbles">
-              <div class="query-bubble query-q">What do I know about deep work?</div>
-              <div class="query-bubble query-a">From your notes: Cal Newport defines deep work as…</div>
+          <!-- iPhone mockup with Sol UI -->
+          <div class="step-visual vis-iphone" aria-hidden="true">
+            <div class="iphone-shell">
+              <div class="iphone-notch"></div>
+              <div class="iphone-screen">
+                <div class="iphone-topbar">Ask Sol</div>
+                <div class="iphone-chat-area">
+                  <div class="iphone-msg iphone-msg-q">What do I know about pomegranates?</div>
+                  <div class="iphone-msg iphone-msg-a">Your notes mention pomegranates are your favourite fruit. You've noted them in 3 entries.</div>
+                </div>
+                <div class="iphone-input-bar">
+                  <div class="iphone-input-field">Ask your vault…</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

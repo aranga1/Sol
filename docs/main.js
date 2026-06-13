@@ -26,6 +26,17 @@
   }
 
   /* ── Copy-to-clipboard ──────────────────────────────────────────────── */
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
   function initCopyButtons() {
     document.querySelectorAll('.copy-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -39,34 +50,25 @@
         var text = codeEl.textContent.trim();
         var originalLabel = btn.getAttribute('aria-label');
 
-        navigator.clipboard.writeText(text).then(function () {
-          btn.textContent = 'Copied!';
+        function markCopied() {
           btn.setAttribute('aria-label', 'Copied to clipboard');
           btn.classList.add('copied');
           setTimeout(function () {
-            btn.textContent = 'Copy';
             btn.setAttribute('aria-label', originalLabel);
             btn.classList.remove('copied');
           }, 2000);
-        }).catch(function () {
-          // Fallback for older browsers
-          var ta = document.createElement('textarea');
-          ta.value = text;
-          ta.style.position = 'fixed';
-          ta.style.opacity = '0';
-          document.body.appendChild(ta);
-          ta.select();
-          try { document.execCommand('copy'); } catch (e) {}
-          document.body.removeChild(ta);
-          btn.textContent = 'Copied!';
-          btn.setAttribute('aria-label', 'Copied to clipboard');
-          btn.classList.add('copied');
-          setTimeout(function () {
-            btn.textContent = 'Copy';
-            btn.setAttribute('aria-label', originalLabel);
-            btn.classList.remove('copied');
-          }, 2000);
-        });
+        }
+
+        // Try modern clipboard API first, fall back to execCommand
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(markCopied).catch(function () {
+            legacyCopy(text);
+            markCopied();
+          });
+        } else {
+          legacyCopy(text);
+          markCopied();
+        }
       });
     });
   }

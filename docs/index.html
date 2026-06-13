@@ -16,83 +16,61 @@
 </head>
 <body>
 
-  <!-- ── Nav ────────────────────────────────────────────────────────────── -->
+  <!-- ── Nav (fixed) ──────────────────────────────────────────────────── -->
   <nav class="site-nav" role="navigation" aria-label="Main navigation">
     <a href="index.html" class="nav-wordmark" aria-label="Sol home">Sol.</a>
-    <a
-      href="https://github.com/aranga1/Sol"
-      class="nav-link"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="View Sol on GitHub (opens in new tab)"
-    >GitHub ↗</a>
+    <a href="https://github.com/aranga1/Sol" class="nav-link" target="_blank" rel="noopener noreferrer" aria-label="View Sol on GitHub (opens in new tab)">GitHub ↗</a>
   </nav>
 
-  <main>
+  <main class="snap-container">
 
-    <!-- ── Hero ───────────────────────────────────────────────────────────── -->
-    <section class="hero" aria-label="Hero">
-
-      <!-- Breathing node-sun background -->
+    <!-- ── Page 1: Hero (animation is the hero) ─────────────────────── -->
+    <section class="snap-section section-hero" aria-label="Sol">
       <div class="node-sun-bg" aria-hidden="true">
         <div class="ns-glow"></div>
         <div class="ns-ring ns-ring-a"></div>
         <div class="ns-ring ns-ring-b"></div>
         <div class="ns-ring ns-ring-c"></div>
-        <!-- Node-sun SVG mark -->
-        <svg
-          class="ns-mark"
-          viewBox="-90 -90 180 180"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <!-- 6 rays at 60° intervals -->
+        <svg class="ns-mark" viewBox="-90 -90 180 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
           <line x1="0" y1="0" x2="0"   y2="-55"  stroke="#B5701F" stroke-width="3" stroke-linecap="round"/>
           <line x1="0" y1="0" x2="47"  y2="-27"  stroke="#B5701F" stroke-width="3" stroke-linecap="round"/>
           <line x1="0" y1="0" x2="47"  y2="27"   stroke="#B5701F" stroke-width="3" stroke-linecap="round"/>
           <line x1="0" y1="0" x2="0"   y2="55"   stroke="#B5701F" stroke-width="3" stroke-linecap="round"/>
           <line x1="0" y1="0" x2="-47" y2="27"   stroke="#B5701F" stroke-width="3" stroke-linecap="round"/>
           <line x1="0" y1="0" x2="-47" y2="-27"  stroke="#B5701F" stroke-width="3" stroke-linecap="round"/>
-          <!-- 6 outer ring dots at ray tips -->
           <circle cx="0"   cy="-55" r="10" fill="none" stroke="#A23E2D" stroke-width="2"/>
           <circle cx="47"  cy="-27" r="10" fill="none" stroke="#A23E2D" stroke-width="2"/>
           <circle cx="47"  cy="27"  r="10" fill="none" stroke="#A23E2D" stroke-width="2"/>
           <circle cx="0"   cy="55"  r="10" fill="none" stroke="#A23E2D" stroke-width="2"/>
           <circle cx="-47" cy="27"  r="10" fill="none" stroke="#A23E2D" stroke-width="2"/>
           <circle cx="-47" cy="-27" r="10" fill="none" stroke="#A23E2D" stroke-width="2"/>
-          <!-- Center circle -->
           <circle cx="0" cy="0" r="28" fill="#A23E2D"/>
         </svg>
       </div>
+      <div class="hero-scroll-hint" aria-hidden="true">scroll</div>
+    </section>
 
-      <div class="hero-content">
+    <!-- ── Page 2: Description ──────────────────────────────────────── -->
+    <section class="snap-section section-desc" aria-label="About Sol">
+      <div class="desc-content">
         <h1 class="hero-headline">Your Obsidian vault,<br>on your phone.</h1>
-        <p class="hero-subhead">
-          Ask questions. Capture thoughts. Fully local —<br>
-          your Mac, your data, your rules.
-        </p>
-        <a href="install.html" class="btn-primary">Get started →</a>
+        <p class="hero-subhead">Ask questions. Capture thoughts. Fully local —<br>your Mac, your data, your rules.</p>
       </div>
     </section>
 
-    <!-- ── Features ───────────────────────────────────────────────────────── -->
-    <section class="features" aria-label="Features">
-      <h2 class="features-heading">Everything your vault knows,<br>in your pocket.</h2>
-
+    <!-- ── Page 3: Feature cards (3 × 2) ────────────────────────────── -->
+    <section class="snap-section section-features" aria-label="Features">
       <div class="features-grid" role="list">
 
-        <!-- Card 1: Ask your vault -->
         <article class="feature-card" role="listitem">
           <div class="feature-visual vis-chat" aria-hidden="true">
-            <div class="chat-bubble chat-user">What's my pomegranate note?</div>
-            <div class="chat-bubble chat-sol">Your favorite fruit is pomegranates.</div>
+            <div class="chat-bubble chat-user">What's my diet plan this week?</div>
+            <div class="chat-bubble chat-sol">High-protein, intermittent fasting from your Tuesday note.</div>
           </div>
           <h3 class="feature-name">Ask your vault</h3>
-          <p class="feature-desc">Natural language questions over everything you've captured. Sol finds the answer and links back to the source.</p>
+          <p class="feature-desc">Ask anything. Sol searches your vault and cites the source note.</p>
         </article>
 
-        <!-- Card 2: Voice notes -->
         <article class="feature-card" role="listitem">
           <div class="feature-visual" aria-hidden="true">
             <div class="vis-voice">
@@ -107,10 +85,9 @@
             </div>
           </div>
           <h3 class="feature-name">Voice notes</h3>
-          <p class="feature-desc">Tap, speak, done. Transcription happens on-device and the note lands in your vault in under 15 seconds.</p>
+          <p class="feature-desc">Tap, speak, done. Transcribed on-device, saved to Obsidian in seconds.</p>
         </article>
 
-        <!-- Card 3: Text notes -->
         <article class="feature-card" role="listitem">
           <div class="feature-visual vis-text" aria-hidden="true">
             <div class="text-field-mock">
@@ -119,24 +96,22 @@
             <div class="tag-chip">#coffee &nbsp;#places</div>
           </div>
           <h3 class="feature-name">Text notes</h3>
-          <p class="feature-desc">Quick markdown capture with automatic tag suggestions based on your vault's existing taxonomy.</p>
+          <p class="feature-desc">Markdown capture with tag autocomplete from your vault.</p>
         </article>
 
-        <!-- Card 4: Conversation history -->
         <article class="feature-card" role="listitem">
           <div class="feature-visual vis-history" aria-hidden="true">
             <div class="sidebar-panel">
-              <div class="sidebar-item">Pomegranate notes</div>
+              <div class="sidebar-item">Weekly diet plan review</div>
               <div class="sidebar-item">Morning routine review</div>
               <div class="sidebar-item">Book highlights — Piranesi</div>
               <div class="sidebar-item">Coffee spots in SF</div>
             </div>
           </div>
           <h3 class="feature-name">Conversation history</h3>
-          <p class="feature-desc">Every query session is saved. Pick up any thread from any time — your conversations are part of the vault.</p>
+          <p class="feature-desc">Every session saved. Pick up any thread, any time.</p>
         </article>
 
-        <!-- Card 5: Notifications -->
         <article class="feature-card" role="listitem">
           <div class="feature-visual vis-notif" aria-hidden="true">
             <div class="notif-banner">
@@ -148,10 +123,9 @@
             </div>
           </div>
           <h3 class="feature-name">Notifications</h3>
-          <p class="feature-desc">The daemon sends timely nudges from your own notes — review reminders, daily digests, whatever you configure.</p>
+          <p class="feature-desc">Get push notifications from your own notes via the Mac CLI.</p>
         </article>
 
-        <!-- Card 6: Fully local -->
         <article class="feature-card" role="listitem">
           <div class="feature-visual vis-local" aria-hidden="true">
             <div class="local-network">
@@ -165,32 +139,26 @@
             </div>
           </div>
           <h3 class="feature-name">Fully local</h3>
-          <p class="feature-desc">Everything runs on your Mac. No cloud API keys, no subscriptions, no data leaving your network.</p>
+          <p class="feature-desc">Runs entirely on your Mac. No cloud, no subscriptions.</p>
         </article>
 
       </div>
     </section>
 
-    <!-- ── CTA band ────────────────────────────────────────────────────────── -->
-    <section class="cta-band" aria-label="Get started">
-      <h2 class="cta-band-heading">Ready to connect your vault?</h2>
-      <a href="install.html" class="btn-secondary">Get started →</a>
-      <p class="cta-note">Requires macOS + iPhone. Free and open source.</p>
+    <!-- ── Page 4: CTA + Footer ──────────────────────────────────────── -->
+    <section class="snap-section section-cta" aria-label="Get started">
+      <div class="cta-content">
+        <h2 class="cta-heading">Ready to connect your vault?</h2>
+        <a href="install.html" class="btn-cta">Get started →</a>
+        <p class="cta-note">Requires macOS + iPhone. Free and open source.</p>
+      </div>
+      <footer class="site-footer" role="contentinfo">
+        <p class="footer-text">Sol &middot; Open source</p>
+        <a href="https://github.com/aranga1/Sol" class="footer-link" target="_blank" rel="noopener noreferrer" aria-label="View aranga1/Sol on GitHub (opens in new tab)">aranga1/Sol ↗</a>
+      </footer>
     </section>
 
   </main>
-
-  <!-- ── Footer ─────────────────────────────────────────────────────────── -->
-  <footer class="site-footer" role="contentinfo">
-    <p class="footer-text">Sol &middot; Open source</p>
-    <a
-      href="https://github.com/aranga1/Sol"
-      class="footer-link"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="View aranga1/Sol on GitHub (opens in new tab)"
-    >aranga1/Sol ↗</a>
-  </footer>
 
   <script src="main.js"></script>
 </body>

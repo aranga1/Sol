@@ -84,7 +84,11 @@
   color: var(--cream);
 }
 
+/* CRITICAL: min-width:0 prevents grid blowout from long code lines;
+   overflow:visible ensures copy button is never clipped */
 .step-body {
+  min-width: 0;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -107,10 +111,20 @@
   max-width: 560px;
 }
 
+/* Inline code used within step-desc prose */
+.inline-code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: rgba(162, 62, 45, 0.08);
+  color: var(--terracotta);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
 /* ── Step visual box ─────────────────────────────────────────────────────── */
 .step-visual {
-  width: 280px;
-  height: 160px;
+  width: 100%;
+  max-width: 420px;
   background: var(--cream);
   border-radius: var(--radius-sm);
   border: 1px solid var(--terracotta-15);
@@ -121,357 +135,635 @@
 
 @media (max-width: 600px) {
   .step-visual {
-    width: 100%;
-    height: 140px;
+    max-width: 100%;
   }
 }
 
-/* ── Step 1: Terminal animation ──────────────────────────────────────────── */
-.vis-terminal {
-  background: var(--terminal-bg);
-  padding: 1rem;
-  height: 100%;
+/* ── Step 1: macOS Terminal window mockup ────────────────────────────────── */
+.mac-window {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(27, 22, 17, 0.18);
+  max-width: 520px;
+}
+
+.mac-titlebar {
+  background: #3a3a3a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+}
+
+.mac-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mac-dot-red    { background: #ff5f57; }
+.mac-dot-yellow { background: #ffbd2e; }
+.mac-dot-green  { background: #28c840; }
+
+.mac-title {
   font-family: var(--font-mono);
   font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Override .code-block's default border-radius on the terminal body */
+.mac-terminal-body {
+  border-radius: 0 0 10px 10px !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
+/* ── Step 2: Obsidian app mockup ─────────────────────────────────────────── */
+.vis-obsidian {
+  height: 220px;
+  background: #1e1e1e;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  color: transparent;
 }
 
-.term-prompt {
-  color: var(--amber);
-}
-
-.term-line {
-  color: rgba(252, 239, 230, 0.6);
-  opacity: 0;
-}
-
-.term-ok {
-  color: var(--success);
-  opacity: 0;
-}
-
-.step-visual.animate .term-line:nth-child(2) { animation: term-appear 0.3s 0.4s forwards, term-loop 5s 0.4s infinite; }
-.step-visual.animate .term-line:nth-child(3) { animation: term-appear 0.3s 1.0s forwards, term-loop 5s 1.0s infinite; }
-.step-visual.animate .term-line:nth-child(4) { animation: term-appear 0.3s 1.6s forwards, term-loop 5s 1.6s infinite; }
-.step-visual.animate .term-ok              { animation: term-appear 0.4s 2.4s forwards, term-loop 5s 2.4s infinite; }
-
-@keyframes term-appear {
-  to { opacity: 1; }
-}
-
-@keyframes term-loop {
-  0%, 48%  { opacity: 1; }
-  55%, 95% { opacity: 0; }
-  100%     { opacity: 1; }
-}
-
-/* ── Step 2: Folder tree ─────────────────────────────────────────────────── */
-.vis-folder {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.3rem;
-  height: 100%;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-}
-
-.folder-item {
+.obs-titlebar {
+  background: #2a2a2a;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  color: var(--espresso-70);
-  padding: 0.15rem 0.3rem;
-  border-radius: 4px;
-  transition: all 0.3s;
+  gap: 8px;
+  padding: 8px 10px;
+  flex-shrink: 0;
 }
 
-.folder-item.highlight {
-  border: 1.5px solid transparent;
-  transition: border-color 0.4s, color 0.4s;
+.obs-dots {
+  display: flex;
+  gap: 6px;
 }
 
-.folder-icon {
-  color: var(--amber);
-}
-
-.folder-path {
+.obs-title {
   font-family: var(--font-mono);
   font-size: 0.65rem;
-  color: var(--terracotta);
-  opacity: 0;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 auto;
+}
+
+.obs-body {
+  display: flex;
+  flex: 1;
   overflow: hidden;
-  white-space: nowrap;
-  max-width: 0;
-  padding: 0.2rem 0.4rem;
-  border-radius: 4px;
-  background: rgba(162, 62, 45, 0.08);
-  border: 1px solid var(--terracotta-15);
 }
 
-.step-visual.animate .folder-item.highlight {
-  animation: folder-glow 4s 0s infinite;
+.obs-sidebar {
+  width: 110px;
+  background: #252525;
+  border-right: 1px solid #333;
+  padding: 8px 0;
+  flex-shrink: 0;
 }
 
-.step-visual.animate .folder-path {
-  animation: path-type 4s 0s infinite;
+.obs-vault-item {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: #a78bfa;
+  padding: 4px 10px;
+  font-weight: 600;
 }
 
-@keyframes folder-glow {
-  0%, 90%, 100% { border-color: transparent; color: var(--espresso-70); }
-  20%, 70%      { border-color: var(--terracotta-30); color: var(--terracotta); }
+.obs-file-item {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 3px 10px 3px 18px;
+  cursor: pointer;
+  border-radius: 3px;
 }
 
-@keyframes path-type {
-  0%, 15%   { opacity: 0; max-width: 0; }
-  30%, 75%  { opacity: 1; max-width: 200px; }
-  90%, 100% { opacity: 0; max-width: 0; }
+.obs-file-active {
+  color: #fcefe6;
+  background: rgba(162, 62, 45, 0.35);
 }
 
-/* ── Step 3: Daemon heartbeat ─────────────────────────────────────────────── */
-.vis-daemon {
+.step-visual.animate .obs-file-active {
+  animation: obs-pulse 3s ease-in-out infinite;
+}
+
+@keyframes obs-pulse {
+  0%, 100% { background: rgba(162, 62, 45, 0.25); }
+  50%      { background: rgba(162, 62, 45, 0.5); color: #fff; }
+}
+
+.obs-editor {
+  flex: 1;
+  padding: 12px;
+  background: #1e1e1e;
+}
+
+.obs-note-title {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.obs-note-line {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  margin-bottom: 5px;
+}
+
+.obs-line-1     { width: 90%; }
+.obs-line-2     { width: 75%; }
+.obs-line-short { width: 45%; }
+
+.obs-tag {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: #a78bfa;
+  margin-top: 6px;
+}
+
+/* ── Step 3: Daemon auto — menu bar + notification ───────────────────────── */
+.vis-daemon-auto {
+  height: 220px;
+  background: #e8dfd0;
+  display: flex;
+  flex-direction: column;
+}
+
+.menubar-strip {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  height: 24px;
+  font-size: 0.6rem;
+  font-family: var(--font-body);
+  color: #333;
+  flex-shrink: 0;
+}
+
+.menubar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.menubar-sol-icon {
+  font-size: 0.75rem;
+  color: var(--terracotta);
+}
+
+.menubar-time {
+  font-size: 0.6rem;
+  color: #333;
+}
+
+.desktop-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px;
+  gap: 10px;
+}
+
+.mac-notif {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 220px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.step-visual.animate .mac-notif {
+  animation: notif-slide 4s ease-out infinite;
+}
+
+@keyframes notif-slide {
+  0%,  10% { opacity: 0; transform: translateX(20px); }
+  25%, 75% { opacity: 1; transform: translateX(0); }
+  90%,100% { opacity: 0; transform: translateX(20px); }
+}
+
+.mac-notif-icon {
+  font-size: 1.2rem;
+}
+
+.mac-notif-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.mac-notif-app {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #333;
+  font-family: var(--font-body);
+}
+
+.mac-notif-body {
+  font-size: 0.6rem;
+  color: #555;
+  font-family: var(--font-body);
+}
+
+.mac-notif-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.daemon-status-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: rgba(27, 22, 17, 0.5);
+}
+
+.daemon-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+}
+
+.step-visual.animate .daemon-status-dot {
+  animation: daemon-blink 2s ease-in-out infinite;
+}
+
+@keyframes daemon-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+/* ── Step 4: Tailscale ───────────────────────────────────────────────────── */
+.tailscale-links {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.ts-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--terracotta);
+  border: 1px solid var(--terracotta-30);
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.ts-link:hover {
+  background: rgba(162, 62, 45, 0.06);
+  text-decoration: none;
+}
+
+.vis-tailscale {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ts-scene {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  max-width: 320px;
+  justify-content: center;
+}
+
+.ts-device {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  height: 100%;
+  gap: 6px;
   position: relative;
 }
 
-.daemon-node {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--espresso);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.ts-mac-body {
+  width: 52px;
+  height: 34px;
+  background: #444;
+  border-radius: 4px;
+  border: 2px solid #666;
 }
 
-.daemon-dot {
+.ts-iphone-body {
+  width: 24px;
+  height: 44px;
+  background: #444;
+  border-radius: 6px;
+  border: 2px solid #666;
+}
+
+.ts-device-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--espresso-60);
+}
+
+.ts-node {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   background: var(--neutral);
-  transition: background 0.5s;
-  position: relative;
-  z-index: 1;
-}
-
-.daemon-ring {
   position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 1.5px solid transparent;
+  top: -4px;
+  right: -4px;
 }
 
-.daemon-status {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--espresso-40);
-  opacity: 0;
+.step-visual.animate .ts-node {
+  animation: ts-node-active 3s ease-in-out infinite;
 }
 
-.step-visual.animate .daemon-dot {
-  animation: heartbeat-color 3s 0.5s infinite;
+@keyframes ts-node-active {
+  0%,  30% { background: var(--neutral); box-shadow: none; }
+  50%, 80% { background: var(--success); box-shadow: 0 0 6px rgba(110, 231, 183, 0.6); }
+  100%     { background: var(--neutral); box-shadow: none; }
 }
 
-.step-visual.animate .daemon-ring {
-  animation: heartbeat-ring 3s 0.5s infinite;
-}
-
-.step-visual.animate .daemon-status {
-  animation: daemon-status-appear 3s 0.5s infinite;
-}
-
-@keyframes heartbeat-color {
-  0%, 30%  { background: var(--neutral); }
-  50%, 80% { background: var(--success); }
-  100%     { background: var(--neutral); }
-}
-
-@keyframes heartbeat-ring {
-  0%, 30%  { border-color: transparent; transform: scale(1); opacity: 1; }
-  50%      { border-color: rgba(110, 231, 183, 0.6); transform: scale(1.5); opacity: 0; }
-  51%, 100%{ border-color: transparent; transform: scale(1); opacity: 1; }
-}
-
-@keyframes daemon-status-appear {
-  0%, 40%   { opacity: 0; }
-  55%, 90%  { opacity: 1; color: var(--success); }
-  100%      { opacity: 0; }
-}
-
-/* ── Step 4: QR scan ─────────────────────────────────────────────────────── */
-.vis-qr {
+.ts-line-wrap {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
   position: relative;
+  min-width: 80px;
+  height: 20px;
 }
 
-.qr-grid {
-  display: grid;
-  grid-template-columns: repeat(8, 8px);
-  grid-template-rows: repeat(8, 8px);
-  gap: 1.5px;
-  position: relative;
-}
-
-.qr-cell {
-  border-radius: 1px;
-}
-
-.qr-cell.dark {
-  background: var(--espresso);
-}
-
-.qr-cell.amber {
-  background: var(--amber);
-}
-
-.qr-cell.light {
-  background: rgba(181, 112, 31, 0.12);
-}
-
-.qr-scanline {
+.ts-line {
   position: absolute;
   left: 0;
   right: 0;
   height: 2px;
-  background: var(--terracotta);
-  top: 0;
-  opacity: 0;
-  box-shadow: 0 0 6px rgba(162, 62, 45, 0.5);
+  background: linear-gradient(90deg, var(--neutral), var(--neutral));
+  border-radius: 1px;
 }
 
-.qr-check {
+.step-visual.animate .ts-line {
+  animation: ts-line-connect 3s ease-in-out infinite;
+}
+
+@keyframes ts-line-connect {
+  0%,  20% { background: linear-gradient(90deg, var(--neutral), var(--neutral)); box-shadow: none; }
+  50%, 80% { background: linear-gradient(90deg, var(--success), rgba(110,231,183,0.6), var(--success)); box-shadow: 0 0 8px rgba(110,231,183,0.3); }
+  100%     { background: linear-gradient(90deg, var(--neutral), var(--neutral)); box-shadow: none; }
+}
+
+.ts-lock {
+  font-size: 0.7rem;
   position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: var(--parchment);
+  padding: 2px 4px;
+  border-radius: 4px;
   opacity: 0;
 }
 
-.qr-check-circle {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--success);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--espresso);
-  font-size: 1.1rem;
+.step-visual.animate .ts-lock {
+  animation: ts-lock-appear 3s ease-in-out infinite;
 }
 
-.step-visual.animate .qr-scanline {
-  animation: qr-scan 4s 0s infinite;
+@keyframes ts-lock-appear {
+  0%,  35% { opacity: 0; transform: scale(0.5); }
+  55%, 80% { opacity: 1; transform: scale(1); }
+  95%,100% { opacity: 0; transform: scale(0.5); }
 }
 
-.step-visual.animate .qr-check {
-  animation: qr-check-appear 4s 0s infinite;
-}
-
-@keyframes qr-scan {
-  0%, 5%     { opacity: 0; top: 0; }
-  10%        { opacity: 1; top: 0; }
-  55%        { opacity: 1; top: 100%; }
-  60%, 100%  { opacity: 0; top: 100%; }
-}
-
-@keyframes qr-check-appear {
-  0%, 60%   { opacity: 0; transform: scale(0.5); }
-  72%       { opacity: 1; transform: scale(1.1); }
-  78%, 88%  { opacity: 1; transform: scale(1); }
-  95%, 100% { opacity: 0; transform: scale(0.5); }
-}
-
-/* ── Step 5: First question ───────────────────────────────────────────────── */
-.vis-query {
+/* ── Step 5: Terminal QR animation ──────────────────────────────────────── */
+.vis-qr-term {
+  height: 240px;
+  background: var(--terminal-bg);
   display: flex;
   flex-direction: column;
+}
+
+.qr-term-body {
+  flex: 1;
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.qr-prompt {
+  color: var(--amber);
+}
+
+.qr-prompt-char {
+  color: var(--cream);
+  opacity: 0.6;
+  margin-right: 4px;
+}
+
+.qr-generating {
+  color: rgba(252, 239, 230, 0.5);
+  opacity: 0;
+  font-size: 0.6rem;
+}
+
+.step-visual.animate .qr-generating {
+  animation: qr-gen-appear 5s 0s infinite;
+}
+
+@keyframes qr-gen-appear {
+  0%,  10% { opacity: 0; }
+  20%, 40% { opacity: 1; }
+  45%,100% { opacity: 0; }
+}
+
+.qr-ascii-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  opacity: 0;
+}
+
+.step-visual.animate .qr-ascii-grid {
+  animation: qr-grid-appear 5s 0s infinite;
+}
+
+@keyframes qr-grid-appear {
+  0%,  35% { opacity: 0; }
+  50%, 80% { opacity: 1; }
+  95%,100% { opacity: 0; }
+}
+
+.qr-row {
+  display: flex;
+  gap: 1px;
+}
+
+.qb {
+  width: 10px;
+  height: 10px;
+  border-radius: 1px;
+}
+
+.qb-d { background: var(--cream); }
+.qb-l { background: rgba(252, 239, 230, 0.15); }
+.qb-a { background: var(--amber); }
+
+.qr-scan-text {
+  color: var(--success);
+  font-size: 0.6rem;
+  opacity: 0;
+}
+
+.step-visual.animate .qr-scan-text {
+  animation: qr-scan-text-appear 5s 0s infinite;
+}
+
+@keyframes qr-scan-text-appear {
+  0%,  55% { opacity: 0; }
+  65%, 85% { opacity: 1; }
+  95%,100% { opacity: 0; }
+}
+
+/* ── Step 6: iPhone mockup ───────────────────────────────────────────────── */
+.vis-iphone {
+  height: 280px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 1rem;
-  gap: 0.75rem;
+  background: var(--parchment);
+}
+
+.iphone-shell {
+  width: 140px;
+  height: 240px;
+  background: #1a1a1a;
+  border-radius: 28px;
+  padding: 3px;
+  box-shadow:
+    0 8px 32px rgba(27, 22, 17, 0.25),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.iphone-notch {
+  width: 48px;
+  height: 8px;
+  background: #1a1a1a;
+  border-radius: 0 0 8px 8px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.iphone-screen {
   height: 100%;
-}
-
-.query-mark {
-  width: 32px;
-  height: 32px;
-  opacity: 0.4;
-}
-
-.step-visual.animate .query-mark {
-  animation: query-mark-breathe 3s ease-in-out infinite alternate;
-}
-
-@keyframes query-mark-breathe {
-  from { transform: scale(1);    opacity: 0.35; }
-  to   { transform: scale(1.08); opacity: 0.55; }
-}
-
-.query-bubbles {
-  width: 100%;
+  background: var(--parchment);
+  border-radius: 26px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
 }
 
-.query-bubble {
-  padding: 0.4rem 0.7rem;
-  border-radius: 12px;
+.iphone-topbar {
+  background: var(--parchment);
+  text-align: center;
   font-family: var(--font-body);
-  font-size: 0.68rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--espresso);
+  padding: 8px 0 4px;
+  border-bottom: 1px solid rgba(162, 62, 45, 0.1);
+}
+
+.iphone-chat-area {
+  flex: 1;
+  padding: 8px 8px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.iphone-msg {
+  font-family: var(--font-body);
+  font-size: 0.55rem;
   line-height: 1.4;
+  padding: 5px 7px;
+  border-radius: 10px;
+  max-width: 85%;
   opacity: 0;
 }
 
-.query-q {
+.iphone-msg-q {
   background: var(--terracotta);
   color: var(--cream);
   align-self: flex-end;
   border-bottom-right-radius: 3px;
-  max-width: 80%;
 }
 
-.query-a {
-  background: var(--parchment);
+.iphone-msg-a {
+  background: white;
   color: var(--espresso);
-  border: 1px solid var(--terracotta-15);
   align-self: flex-start;
   border-bottom-left-radius: 3px;
-  max-width: 90%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
-.step-visual.animate .query-q {
-  animation: query-q-loop 5s 0s infinite;
+.step-visual.animate .iphone-msg-q {
+  animation: iphone-q-loop 5s 0s infinite;
 }
 
-.step-visual.animate .query-a {
-  animation: query-a-loop 5s 0s infinite;
+.step-visual.animate .iphone-msg-a {
+  animation: iphone-a-loop 5s 0s infinite;
 }
 
-@keyframes query-q-loop {
-  0%, 5%    { opacity: 0; transform: translateX(10px); }
-  18%, 75%  { opacity: 1; transform: translateX(0); }
-  90%, 100% { opacity: 0; }
+@keyframes iphone-q-loop {
+  0%,   5% { opacity: 0; transform: translateY(6px); }
+  18%, 75% { opacity: 1; transform: translateY(0); }
+  90%,100% { opacity: 0; transform: translateY(0); }
 }
 
-@keyframes query-a-loop {
-  0%, 28%   { opacity: 0; transform: translateX(-10px); }
-  42%, 75%  { opacity: 1; transform: translateX(0); }
-  90%, 100% { opacity: 0; }
+@keyframes iphone-a-loop {
+  0%,  30% { opacity: 0; transform: translateY(4px); }
+  45%, 75% { opacity: 1; transform: translateY(0); }
+  90%,100% { opacity: 0; transform: translateY(0); }
+}
+
+.iphone-input-bar {
+  padding: 4px 6px 6px;
+  border-top: 1px solid rgba(162, 62, 45, 0.1);
+}
+
+.iphone-input-field {
+  background: rgba(162, 62, 45, 0.06);
+  border-radius: 12px;
+  padding: 4px 8px;
+  font-family: var(--font-body);
+  font-size: 0.5rem;
+  color: var(--espresso-40);
 }
 
 /* ── Done card ───────────────────────────────────────────────────────────── */
@@ -514,8 +806,9 @@
   padding: 0.75rem 1.75rem;
   border-radius: var(--radius-sm);
   text-decoration: none;
-  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
-              box-shadow 0.18s ease;
+  transition:
+    transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.18s ease;
   box-shadow: 0 4px 18px rgba(162, 62, 45, 0.28);
 }
 
