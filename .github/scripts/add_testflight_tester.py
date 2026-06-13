@@ -87,11 +87,16 @@ elif r.status_code == 409:
     if not testers:
         sys.exit(f"Could not find existing tester with email {EMAIL}")
     tester_id = testers[0]["id"]
-    api(
-        "post", f"/betaGroups/{group_id}/relationships/betaTesters",
+    r2 = requests.post(
+        f"{BASE}/betaGroups/{group_id}/relationships/betaTesters",
+        headers=_h(),
         json={"data": [{"type": "betaTesters", "id": tester_id}]},
     )
-    print(f"✓ Added existing tester {EMAIL} to group")
+    if r2.status_code == 409:
+        print(f"✓ {EMAIL} is already in the group — nothing to do")
+    else:
+        r2.raise_for_status()
+        print(f"✓ Added existing tester {EMAIL} to group")
 else:
     print(r.status_code, r.text[:500], file=sys.stderr)
     r.raise_for_status()
