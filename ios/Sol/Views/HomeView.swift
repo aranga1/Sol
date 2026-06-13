@@ -766,14 +766,18 @@ struct CaptureBar: View {
         try? WhisperService.shared.startRealtimeRecording()
 
         levelTimer = Timer.scheduledTimer(withTimeInterval: 0.08, repeats: true) { _ in
-            levels = levels.enumerated().map { i, prev in
-                let target = Double.random(in: 0.1...1.0)
-                return prev * 0.5 + target * 0.5
+            MainActor.assumeIsolated {
+                levels = levels.enumerated().map { i, prev in
+                    let target = Double.random(in: 0.1...1.0)
+                    return prev * 0.5 + target * 0.5
+                }
             }
         }
 
         recordTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-            recordSeconds += 1
+            MainActor.assumeIsolated {
+                recordSeconds += 1
+            }
         }
     }
 
