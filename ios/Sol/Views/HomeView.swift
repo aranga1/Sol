@@ -59,7 +59,9 @@ struct HomeView: View {
                             .zIndex(9)
                     }
                 }
-                .onPreferenceChange(ModeItemFrameKey.self) { MainActor.assumeIsolated { popupItemFrames = $0 } }
+                .onPreferenceChange(ModeItemFrameKey.self) { frames in
+                    MainActor.assumeIsolated { popupItemFrames = frames }
+                }
                 .navigationTitle("")
                 .navigationBarHidden(true)
                 .navigationDestination(isPresented: $navigateToAllChats) {
