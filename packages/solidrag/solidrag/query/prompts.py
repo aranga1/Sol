@@ -84,3 +84,23 @@ def build_rag_prompt(
         f"Question: {question}\n"
         f"Answer:"
     )
+
+
+CALENDAR_ACTION_PROMPT: str = """\
+Does the following message ask to CREATE a new calendar event, meeting, \
+appointment, or reminder?
+Today's date is {today}.
+If yes, extract the event details. Default duration to 60 minutes if not specified.
+Reply with valid JSON only — no markdown fences:
+
+{{
+  "is_calendar_action": true or false,
+  "event": {{
+    "title": "string or null",
+    "start": "ISO8601 datetime string or null",
+    "duration_minutes": number or null,
+    "notes": "string or null"
+  }}
+}}
+
+Message: {question}"""
