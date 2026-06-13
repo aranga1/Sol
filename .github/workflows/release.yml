@@ -129,6 +129,8 @@ jobs:
   create-release:
     name: Create release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     needs: [package-daemon]
     # build-ipa is optional — release proceeds even if IPA job was skipped
     if: always() && needs.package-daemon.result == 'success'
