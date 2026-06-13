@@ -5,7 +5,7 @@ import UIKit
 @MainActor
 final class CalendarService: NSObject {
     static let shared = CalendarService()
-    private let store = EKEventStore()
+    nonisolated(unsafe) private let store = EKEventStore()
     var eventStore: EKEventStore { store }
     private var onResult: ((Bool) -> Void)?
 
