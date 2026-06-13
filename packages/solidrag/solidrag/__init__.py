@@ -15,6 +15,7 @@ from solidrag.config import SolidRagConfig
 from solidrag.extractors.registry import ExtractorRegistry
 from solidrag.index.builder import build_index
 from solidrag.index.nodestore import NodeStore
+from solidrag.index.calendar_watcher import CalendarWatcher
 from solidrag.index.watcher import SourceWatcher
 from solidrag.query.engine import configure_settings, query_stream_async
 
@@ -23,6 +24,7 @@ __all__ = [
     "ExtractorRegistry",
     "build_index",
     "NodeStore",
+    "CalendarWatcher",
     "SourceWatcher",
     "configure_settings",
     "query_stream_async",
