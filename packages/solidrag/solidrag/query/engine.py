@@ -1,8 +1,11 @@
 """solidRag query engine — intent routing, streaming, and source extraction."""
 from __future__ import annotations
 
+import asyncio
 import hashlib
+import json
 import logging
+from datetime import date as _date
 from pathlib import Path
 from typing import TYPE_CHECKING, AsyncGenerator
 
@@ -14,6 +17,7 @@ from llama_index.llms.ollama import Ollama
 from solidrag.config import SolidRagConfig
 from solidrag.index.nodestore import NodeStore
 from solidrag.query.prompts import (
+    CALENDAR_ACTION_PROMPT,
     NEEDS_VAULT_PROMPT,
     build_direct_prompt,
     build_rag_prompt,
@@ -142,6 +146,36 @@ def _extract_sources(results: list[dict], max_sources: int = 5) -> list[dict]:
     return sources
 
 
+async def _is_calendar_action(question: str) -> tuple[bool, dict | None]:
+    """Classify whether the question is a calendar event creation request.
+
+    Returns (True, event_dict) if detected, (False, None) otherwise.
+    Never raises — malformed LLM output returns (False, None).
+    """
+    prompt = CALENDAR_ACTION_PROMPT.format(
+        today=_date.today().isoformat(),
+        question=question,
+    )
+    llm = _get_llm()
+    result = await llm.acomplete(prompt)
+    text = str(result).strip()
+
+    # Strip markdown fences if the model wrapped the JSON
+    if text.startswith("```"):
+        parts = text.split("```")
+        text = parts[1] if len(parts) > 1 else text
+        if text.startswith("json"):
+            text = text[4:].strip()
+
+    try:
+        data = json.loads(text)
+        if data.get("is_calendar_action") and isinstance(data.get("event"), dict):
+            return True, data["event"]
+        return False, None
+    except (json.JSONDecodeError, AttributeError):
+        return False, None
+
+
 async def query_stream_async(
     faiss_index: "faiss.IndexIDMap2 | None",
     nodestore: NodeStore | None,
@@ -163,7 +197,11 @@ async def query_stream_async(
         yield {"type": "done"}
         return
 
-    needs_vault = await _needs_vault_async(question, history)
+    # Run intent checks concurrently
+    needs_vault_task = asyncio.create_task(_needs_vault_async(question, history))
+    calendar_task = asyncio.create_task(_is_calendar_action(question))
+    needs_vault = await needs_vault_task
+    is_calendar, event_payload = await calendar_task
 
     if not needs_vault:
         prompt = build_direct_prompt(question, history)
@@ -172,6 +210,12 @@ async def query_stream_async(
             if chunk.delta:
                 yield {"type": "token", "content": chunk.delta}
         yield {"type": "sources", "sources": []}
+        if is_calendar and event_payload:
+            yield {
+                "type": "action",
+                "action": "create_event",
+                "payload": event_payload,
+            }
         yield {"type": "done"}
         return
 
@@ -201,4 +245,12 @@ async def query_stream_async(
             yield {"type": "token", "content": chunk.delta}
 
     yield {"type": "sources", "sources": sources}
+
+    if is_calendar and event_payload:
+        yield {
+            "type": "action",
+            "action": "create_event",
+            "payload": event_payload,
+        }
+
     yield {"type": "done"}
