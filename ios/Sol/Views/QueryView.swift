@@ -281,8 +281,7 @@ struct QueryView: View {
             }
         }
         .onChange(of: vm.pendingCalendarPayload) { _, payload in
-            guard let payload else { return }
-            _ = payload
+            guard payload != nil else { return }
             showCalendarEditor = true
         }
         .onChange(of: showCalendarEditor) { _, showing in
@@ -296,7 +295,7 @@ struct QueryView: View {
                 }
                 guard let windowScene = UIApplication.shared.connectedScenes
                     .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
-                      let rootVC = windowScene.windows.first?.rootViewController else {
+                      let rootVC = windowScene.keyWindow?.rootViewController else {
                     showCalendarEditor = false
                     vm.pendingCalendarPayload = nil
                     return
