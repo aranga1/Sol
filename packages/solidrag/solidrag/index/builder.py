@@ -23,6 +23,7 @@ from solidrag.index.nodestore import NodeStore
 
 if TYPE_CHECKING:
     from llama_index.core.schema import TextNode
+    from solidrag.extractors.base import IndexDiff
 
 logger = logging.getLogger(__name__)
 
@@ -347,3 +348,71 @@ def _index_files(
         for node in nodes:
             nodestore.add(node.node_id, node.get_content(), rel)
         logger.debug("Indexed %d nodes from %s", len(nodes), filepath)
+
+
+# ---------------------------------------------------------------------------
+# Source extractor integration
+# ---------------------------------------------------------------------------
+
+
+def apply_source_diff(
+    faiss_index: faiss.IndexIDMap2,
+    manifest: IndexManifest,
+    diff: "IndexDiff",
+    source_id: str,
+    source_key: str,
+    mtime: float,
+    config: "SolidRagConfig | None",
+    delete_keys: list[str] | None = None,
+) -> None:
+    """Apply an IndexDiff from a SourceExtractor to the live FAISS index.
+
+    Args:
+        faiss_index:  The live index to mutate.
+        manifest:     The manifest to update.
+        diff:         The diff returned by SourceExtractor.sync().
+        source_id:    Namespace key (e.g. "calendar").
+        source_key:   Individual item key (e.g. event ID) for to_add entries.
+        mtime:        Last-modified timestamp for the source item.
+        config:       SolidRagConfig (required when diff.to_add is non-empty).
+        delete_keys:  Source keys to remove from manifest (for deleted items).
+    """
+    # Collect all node IDs to delete (explicit deletes + updates' old nodes + delete_keys).
+    # Manifest entries for delete_keys are removed only after FAISS removal succeeds so
+    # a FAISS failure cannot leave a ghost vector with no manifest record.
+    all_delete_ids: list[str] = list(diff.to_delete)
+    for old_ids, _ in diff.to_update:
+        all_delete_ids.extend(old_ids)
+    keys_to_purge: list[str] = []
+    for key in (delete_keys or []):
+        entry = manifest.get_source(source_id, key)
+        if entry:
+            all_delete_ids.extend(entry.node_ids)
+            keys_to_purge.append(key)
+
+    if all_delete_ids:
+        ids = np.array([_node_id_to_int(nid) for nid in all_delete_ids], dtype=np.int64)
+        try:
+            faiss_index.remove_ids(ids)
+            for key in keys_to_purge:
+                manifest.remove_source(source_id, key)
+        except Exception:
+            logger.exception(
+                "apply_source_diff: failed to remove ids for %s/%s", source_id, source_key
+            )
+
+    # Collect all new nodes (to_add + updates' new nodes)
+    new_nodes = list(diff.to_add)
+    for _, nodes in diff.to_update:
+        new_nodes.extend(nodes)
+
+    if new_nodes and config is not None:
+        try:
+            embeddings = _embed_nodes(new_nodes, config)
+            ids = np.array([_node_id_to_int(n.node_id) for n in new_nodes], dtype=np.int64)
+            faiss_index.add_with_ids(embeddings, ids)
+            manifest.update_source(source_id, source_key, mtime, [n.node_id for n in new_nodes])
+        except Exception:
+            logger.exception(
+                "apply_source_diff: embedding failed for %s/%s", source_id, source_key
+            )
