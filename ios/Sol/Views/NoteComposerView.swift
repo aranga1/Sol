@@ -94,7 +94,7 @@ struct NoteComposerView: View {
                 tagSection
 
                 if isEditorFocused {
-                    FormattingToolbar(coordinator: editorCoordinator)
+                    FormattingToolbar(coordinator: editorCoordinator, onPhotoTap: { showImageSourceSheet = true })
                         .transition(.move(edge: .bottom))
                 }
             }
@@ -105,27 +105,24 @@ struct NoteComposerView: View {
         }
         .animation(.easeOut(duration: 0.2), value: isEditorFocused)
         .animation(.easeOut(duration: 0.15), value: showTagSuggestions)
+        .confirmationDialog("Add Photo", isPresented: $showImageSourceSheet) {
+            Button("Photo Library") { imagePickerSource = .photoLibrary; showImagePicker = true }
+            Button("Camera") { imagePickerSource = .camera; showImagePicker = true }
+            Button("Cancel", role: .cancel) {}
+        }
+        .sheet(isPresented: $showImagePicker) {
+            ImagePickerView(sourceType: imagePickerSource) { image in
+                handleImageSelected(image)
+            }
+        }
     }
 
     // ── Header ────────────────────────────────────────────────────────────────
     private var header: some View {
         HStack {
-            // Left: Cancel + photo button — keeps title centered against Send on the right
-            HStack(spacing: 0) {
-                Button("Cancel") { onDismiss() }
-                    .font(.system(size: 16))
-                    .foregroundStyle(DS.inkLight)
-                Button {
-                    showImageSourceSheet = true
-                } label: {
-                    Image(systemName: "photo")
-                        .font(.system(size: 16))
-                        .foregroundStyle(DS.inkFaint)
-                        .frame(width: 36, height: 44)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-            }
+            Button("Cancel") { onDismiss() }
+                .font(.system(size: 16))
+                .foregroundStyle(DS.inkLight)
             Spacer()
             Text(isVoice ? "Voice Note" : "New Note")
                 .font(DS.newsreader(19, weight: .medium))
@@ -146,16 +143,6 @@ struct NoteComposerView: View {
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 12)
-        .confirmationDialog("Add Photo", isPresented: $showImageSourceSheet) {
-            Button("Photo Library") { imagePickerSource = .photoLibrary; showImagePicker = true }
-            Button("Camera") { imagePickerSource = .camera; showImagePicker = true }
-            Button("Cancel", role: .cancel) {}
-        }
-        .sheet(isPresented: $showImagePicker) {
-            ImagePickerView(sourceType: imagePickerSource) { image in
-                handleImageSelected(image)
-            }
-        }
     }
 
     // ── Voice badge ───────────────────────────────────────────────────────────

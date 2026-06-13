@@ -147,6 +147,7 @@ struct MarkdownEditorView: UIViewRepresentable {
 // ── Formatting toolbar ────────────────────────────────────────────────────────
 struct FormattingToolbar: View {
     let coordinator: MarkdownEditorCoordinator?
+    var onPhotoTap: (() -> Void)? = nil
 
     private struct Fmt: Identifiable {
         let id: String; let icon: String; let prefix: String; let suffix: String
@@ -181,6 +182,18 @@ struct FormattingToolbar: View {
                     }
                 }
                 .padding(.horizontal, 12)
+            }
+
+            if let onPhotoTap {
+                Divider().frame(height: 20)
+                Button(action: onPhotoTap) {
+                    Image(systemName: "photo")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(DS.inkMid)
+                        .frame(width: 48, height: 42)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
             }
         }
         .frame(height: 48)
