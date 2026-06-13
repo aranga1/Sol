@@ -44,6 +44,8 @@
 		F101F75B9D6C75A4F37E814B /* ManualEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FE67FF6154832FC45DB127 /* ManualEntryView.swift */; };
 		FC74327D57E0D1F1050E1DB6 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31287DDB302C963B7E2AF002 /* OnboardingView.swift */; };
 		FD6C80BF3088049E9F14FC02 /* SolAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA85A75E093A4CE68C2CE8C8 /* SolAppDelegate.swift */; };
+		AA11BB22CC33DD44EE55FF66 /* UploadService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF67 /* UploadService.swift */; };
+		BB22CC33DD44EE55FF66AA11 /* UploadItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EE55FF66AA12 /* UploadItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -87,6 +89,8 @@
 		ED45EC41EF9E848BA58F6591 /* ConversationSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationSession.swift; sourceTree = "<group>"; };
 		F054FEA6F26B5A7196F679FB /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		F3EB1C2F2E30F67C9E973AF3 /* SolWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolWidget.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF67 /* UploadService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadService.swift; sourceTree = "<group>"; };
+		BB22CC33DD44EE55FF66AA12 /* UploadItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +122,7 @@
 				006805B7AFA09E6024C2BFEF /* Note.swift */,
 				7234FCACFC1F7924A21FF224 /* QueryResponse.swift */,
 				88A3073D14A9D604F13ED168 /* SystemPrompt.swift */,
+				BB22CC33DD44EE55FF66AA12 /* UploadItem.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -153,6 +158,7 @@
 				10174D681C9749FC5C9F3D7C /* KeychainService.swift */,
 				E22711CC4EA5A88833898CE8 /* NotificationService.swift */,
 				1DA69B30D4AD283DDA320EF7 /* TagStore.swift */,
+				AA11BB22CC33DD44EE55FF67 /* UploadService.swift */,
 				CD5DA0CD0F7301F36D00E441 /* WhisperService.swift */,
 			);
 			path = Services;
@@ -344,6 +350,8 @@
 				DF48CB3200F553D9E29DBC2F /* SystemPromptEditorView.swift in Sources */,
 				8A75F173527CA378DF4A4E2F /* TagStore.swift in Sources */,
 				C7ECABDF3EB1B26BAAD28071 /* TextNoteView.swift in Sources */,
+				BB22CC33DD44EE55FF66AA11 /* UploadItem.swift in Sources */,
+				AA11BB22CC33DD44EE55FF66 /* UploadService.swift in Sources */,
 				BF8A1D295BA7C9A7070F139E /* VoiceNoteView.swift in Sources */,
 				7900DE872A4F1391AA9B8309 /* WhisperService.swift in Sources */,
 			);

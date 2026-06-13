@@ -1,6 +1,6 @@
 import json
 import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi.testclient import TestClient
 
 VALID_CONFIG = {
@@ -19,13 +19,24 @@ def client(tmp_path, monkeypatch):
     cfg = tmp_path / "config.json"
     cfg.write_text(json.dumps(VALID_CONFIG))
     monkeypatch.setenv("SOL_CONFIG", str(cfg))
+    mock_faiss_idx = MagicMock()
+    mock_manifest = MagicMock()
+    mock_watcher = MagicMock()
+    mock_watcher.start = MagicMock()
+    mock_watcher.stop = MagicMock()
+    mock_scheduler = MagicMock()
+    mock_scheduler.start = MagicMock()
+    mock_scheduler.stop = MagicMock()
+    mock_llama_idx = MagicMock()
     with patch("daemon.main.ObsidianClient") as MockObs, \
-         patch("daemon.main.build_index") as mock_build, \
-         patch("daemon.main.VaultWatcher") as MockWatcher:
-        mock_build.return_value = MagicMock()  # mock index
-        mock_watcher = MockWatcher.return_value
-        mock_watcher.start = MagicMock()
-        mock_watcher.stop = MagicMock()
+         patch("daemon.main.build_index", return_value=(mock_faiss_idx, mock_manifest)), \
+         patch("daemon.main.configure_settings"), \
+         patch("daemon.main.default_registry", return_value=MagicMock()), \
+         patch("daemon.main.SourceWatcher", return_value=mock_watcher), \
+         patch("daemon.main.ResourceAwareScheduler", return_value=mock_scheduler), \
+         patch("daemon.main.FaissVectorStore", return_value=MagicMock()), \
+         patch("daemon.main.StorageContext"), \
+         patch("daemon.main.VectorStoreIndex", return_value=mock_llama_idx):
         inst = MockObs.return_value
         inst.health = AsyncMock(return_value=True)
         inst.note_count = AsyncMock(return_value=5)
@@ -35,19 +46,30 @@ def client(tmp_path, monkeypatch):
             yield c
 
 
-def test_query_returns_answer_and_sources(client):
-    with patch("daemon.routes.query.rag_query") as mock_q:
-        mock_q.return_value = ("The answer.", [{"file": "Notes/test.md", "title": "Test Note"}])
+async def _mock_stream(*_args, **_kwargs):
+    """Async generator that mimics query_stream_async SSE events."""
+    yield {"type": "token", "content": "The answer."}
+    yield {"type": "sources", "sources": [{"file": "Notes/test.md", "title": "Test Note"}]}
+    yield {"type": "done"}
+
+
+def test_query_streams_tokens_and_sources(client):
+    with patch("daemon.routes.query.query_stream_async", side_effect=_mock_stream):
         resp = client.post(
             "/api/query",
             json={"question": "What did I write?"},
             headers={"X-API-Key": "testkey123"},
         )
     assert resp.status_code == 200
-    data = resp.json()
-    assert data["answer"] == "The answer."
-    assert len(data["sources"]) == 1
-    assert data["sources"][0]["title"] == "Test Note"
+    lines = [ln for ln in resp.text.splitlines() if ln.startswith("data:")]
+    events = [json.loads(ln[len("data: "):]) for ln in lines]
+    token_events = [e for e in events if e["type"] == "token"]
+    source_events = [e for e in events if e["type"] == "sources"]
+    done_events = [e for e in events if e["type"] == "done"]
+    assert any("The answer." in e["content"] for e in token_events)
+    assert len(source_events) == 1
+    assert source_events[0]["sources"][0]["title"] == "Test Note"
+    assert len(done_events) == 1
 
 
 def test_query_empty_question_returns_422(client):
@@ -66,7 +88,7 @@ def test_query_missing_key_returns_401(client):
 
 def test_query_index_not_ready_returns_503(client):
     from daemon.main import app
-    app.state.vault_index = None
+    app.state.vault_index_llama = None
     resp = client.post(
         "/api/query",
         json={"question": "test"},

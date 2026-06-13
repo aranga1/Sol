@@ -1,11 +1,12 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 private var vaultName: String { KeychainService.load()?.vaultName ?? "Alysha" }
 private let drawerFraction: CGFloat = 0.82
 
 // MARK: - Mode enum
 
-enum CaptureMode { case ask, voice, text }
+enum CaptureMode: Hashable { case ask, voice, text, upload }
 
 // MARK: - HomeView
 
@@ -383,9 +384,10 @@ private struct ModePopup: View {
     }
 
     private let options: [ModeOption] = [
-        ModeOption(mode: .ask,   icon: "magnifyingglass", label: "Ask Vault"),
-        ModeOption(mode: .voice, icon: "mic.fill",         label: "Voice Note"),
-        ModeOption(mode: .text,  icon: "pencil",           label: "Text Note"),
+        ModeOption(mode: .ask,    icon: "magnifyingglass",  label: "Ask Vault"),
+        ModeOption(mode: .voice,  icon: "mic.fill",          label: "Voice Note"),
+        ModeOption(mode: .text,   icon: "pencil",            label: "Text Note"),
+        ModeOption(mode: .upload, icon: "arrow.up.doc.fill", label: "Upload File"),
     ]
 
     var body: some View {
@@ -474,6 +476,9 @@ struct CaptureBar: View {
     @State private var pressTimer: Timer?
     @State private var longPressActive = false
 
+    @State private var showFileImporter = false
+    @State private var uploadToastVisible = false
+
     @State private var recording = false
     @State private var recordSeconds = 0
     @State private var levels: [Double] = Array(repeating: 0.2, count: 54)
@@ -494,13 +499,34 @@ struct CaptureBar: View {
         .padding(7)
         .glassBackground(cornerRadius: 28)
         .shadow(color: Color(hex: "#50321E").opacity(0.22), radius: 20, x: 0, y: 8)
+        .overlay(alignment: .top) {
+            if uploadToastVisible {
+                Text("Saved to vault")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(DS.inkDark.opacity(0.85), in: Capsule())
+                    .offset(y: -52)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .animation(.easeOut(duration: 0.25), value: uploadToastVisible)
     }
 
     // MARK: Left button
 
     @ViewBuilder
     private var leftButton: some View {
-        let isVoiceOrText = barMode == .voice || barMode == .text
+        let isVoiceOrText = barMode == .voice || barMode == .text || barMode == .upload
+        let icon: String = {
+            switch barMode {
+            case .voice: return "mic.fill"
+            case .text: return "pencil"
+            case .upload: return "arrow.up.doc.fill"
+            default: return "plus"
+            }
+        }()
         ZStack {
             Circle()
                 .fill(isVoiceOrText
@@ -514,7 +540,7 @@ struct CaptureBar: View {
                     )
                 )
 
-            Image(systemName: barMode == .voice ? "mic.fill" : (barMode == .text ? "pencil" : "plus"))
+            Image(systemName: icon)
                 .font(.system(size: 16, weight: .medium))
                 .foregroundStyle(isVoiceOrText ? DS.terracotta : DS.inkLight)
         }
@@ -598,6 +624,12 @@ struct CaptureBar: View {
                         .foregroundStyle(DS.inkFaint)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
+
+            case .upload:
+                Text("Choose a file to upload\u{2026}")
+                    .font(.system(size: 16))
+                    .foregroundStyle(DS.inkFaint)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .frame(maxWidth: .infinity)
@@ -700,6 +732,32 @@ struct CaptureBar: View {
                 },
                 perform: {}
             )
+
+        case .upload:
+            Button {
+                showFileImporter = true
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(DS.terracottaGradient)
+                        .frame(width: 40, height: 40)
+                    Image(systemName: "arrow.up.doc.fill")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+            }
+            .buttonStyle(.plain)
+            .fileImporter(
+                isPresented: $showFileImporter,
+                allowedContentTypes: [
+                    UTType.pdf,
+                    UTType(filenameExtension: "xlsx") ?? .data,
+                    UTType(filenameExtension: "docx") ?? .data
+                ],
+                allowsMultipleSelection: false
+            ) { result in
+                handleFileImport(result)
+            }
         }
     }
 
@@ -733,6 +791,30 @@ struct CaptureBar: View {
 
         let transcript = await WhisperService.shared.stopRealtimeRecording()
         onOpenVoiceComposer(transcript, recordSeconds)
+    }
+
+    // MARK: File import handling
+
+    private func handleFileImport(_ result: Result<[URL], Error>) {
+        switch result {
+        case .success(let urls):
+            guard let url = urls.first else { return }
+            Task {
+                guard url.startAccessingSecurityScopedResource() else { return }
+                defer { url.stopAccessingSecurityScopedResource() }
+                do {
+                    try await UploadService.shared.uploadFile(at: url)
+                    await MainActor.run { uploadToastVisible = true }
+                    try? await Task.sleep(nanoseconds: 2_000_000_000)
+                    await MainActor.run { uploadToastVisible = false }
+                } catch {
+                    // error is swallowed here — UploadService throws, user sees nothing yet
+                    // Future: surface error alert
+                }
+            }
+        case .failure:
+            break
+        }
     }
 }
 

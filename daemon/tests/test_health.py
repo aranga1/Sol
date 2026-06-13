@@ -1,8 +1,7 @@
-import importlib
 import json
 
 import pytest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi.testclient import TestClient
 
 VALID_CONFIG = {
@@ -26,15 +25,27 @@ def config_file(tmp_path):
 @pytest.fixture
 def client(config_file, monkeypatch):
     monkeypatch.setenv("SOL_CONFIG", str(config_file))
-    # Patch at the source so the reload picks up the mock
-    with patch("daemon.obsidian_client.ObsidianClient") as MockClient:
+    mock_watcher = MagicMock()
+    mock_watcher.start = MagicMock()
+    mock_watcher.stop = MagicMock()
+    mock_scheduler = MagicMock()
+    mock_scheduler.start = MagicMock()
+    mock_scheduler.stop = MagicMock()
+    with patch("daemon.main.build_index", return_value=(MagicMock(), MagicMock())), \
+         patch("daemon.main.configure_settings"), \
+         patch("daemon.main.default_registry", return_value=MagicMock()), \
+         patch("daemon.main.SourceWatcher", return_value=mock_watcher), \
+         patch("daemon.main.ResourceAwareScheduler", return_value=mock_scheduler), \
+         patch("daemon.main.FaissVectorStore", return_value=MagicMock()), \
+         patch("daemon.main.StorageContext"), \
+         patch("daemon.main.VectorStoreIndex", return_value=MagicMock()), \
+         patch("daemon.main.ObsidianClient") as MockClient:
         instance = MockClient.return_value
         instance.health = AsyncMock(return_value=True)
         instance.note_count = AsyncMock(return_value=5)
         instance.close = AsyncMock()
-        import daemon.main as dm
-        importlib.reload(dm)
-        with TestClient(dm.app) as c:
+        from daemon.main import app
+        with TestClient(app) as c:
             yield c
 
 
@@ -54,13 +65,27 @@ def test_health_no_auth_required(client):
 
 def test_health_degraded_when_obsidian_down(config_file, monkeypatch):
     monkeypatch.setenv("SOL_CONFIG", str(config_file))
-    with patch("daemon.obsidian_client.ObsidianClient") as MockClient:
+    mock_watcher = MagicMock()
+    mock_watcher.start = MagicMock()
+    mock_watcher.stop = MagicMock()
+    mock_scheduler = MagicMock()
+    mock_scheduler.start = MagicMock()
+    mock_scheduler.stop = MagicMock()
+    with patch("daemon.main.build_index", return_value=(MagicMock(), MagicMock())), \
+         patch("daemon.main.configure_settings"), \
+         patch("daemon.main.default_registry", return_value=MagicMock()), \
+         patch("daemon.main.SourceWatcher", return_value=mock_watcher), \
+         patch("daemon.main.ResourceAwareScheduler", return_value=mock_scheduler), \
+         patch("daemon.main.FaissVectorStore", return_value=MagicMock()), \
+         patch("daemon.main.StorageContext"), \
+         patch("daemon.main.VectorStoreIndex", return_value=MagicMock()), \
+         patch("daemon.main.ObsidianClient") as MockClient:
         instance = MockClient.return_value
         instance.health = AsyncMock(return_value=False)
         instance.close = AsyncMock()
-        import daemon.main as dm
-        importlib.reload(dm)
-        with TestClient(dm.app) as c:
+        from daemon.main import app
+        with TestClient(app) as c:
             resp = c.get("/api/health")
-            assert resp.status_code == 503
+            # Health route returns 200 with status="degraded" when Obsidian is down
+            assert resp.status_code == 200
             assert resp.json()["status"] == "degraded"

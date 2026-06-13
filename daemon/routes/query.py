@@ -4,7 +4,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, field_validator
 
-from daemon import rag
+from solidrag import query_stream_async
 
 router = APIRouter()
 
@@ -40,7 +40,7 @@ async def query_vault(request: Request, body: QueryRequest):
     Clients should treat the connection as done when they receive type=done
     or type=error. The stream ends after that event.
     """
-    index = getattr(request.app.state, "vault_index", None)
+    index = getattr(request.app.state, "vault_index_llama", None)
     if index is None:
         return JSONResponse(status_code=503, content={"detail": "Index not ready yet"})
 
@@ -49,7 +49,7 @@ async def query_vault(request: Request, body: QueryRequest):
 
     async def generate():
         try:
-            async for event in rag.query_stream_async(
+            async for event in query_stream_async(
                 index,
                 body.question,
                 history=history,
