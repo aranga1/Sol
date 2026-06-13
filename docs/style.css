@@ -108,6 +108,12 @@ img, svg {
   text-decoration: none;
 }
 
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
 /* ── Code blocks ────────────────────────────────────────────────────────── */
 .code-block {
   position: relative;

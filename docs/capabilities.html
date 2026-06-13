@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sol — Capabilities &amp; CLI Reference</title>
+  <meta name="description" content="Everything Sol can do — iOS features, supported file types, and a complete CLI reference.">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="capabilities.css">
+</head>
+<body>
+
+  <nav class="site-nav" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="nav-link" aria-label="Back to Sol home">← Sol</a>
+    <div class="nav-links">
+      <a href="beta.html"    class="nav-link">Beta</a>
+      <a href="install.html" class="nav-link">Install</a>
+      <a href="https://github.com/aranga1/Sol" class="nav-link" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+    </div>
+  </nav>
+
+  <main class="cap-main">
+
+    <!-- ── Page header ────────────────────────────────────────────────────── -->
+    <header class="cap-header">
+      <h1 class="cap-heading">Capabilities.</h1>
+      <p class="cap-subhead">Everything Sol can do — iOS features, what gets indexed, and the full CLI reference.</p>
+    </header>
+
+    <!-- ══ 1. iOS app features ══════════════════════════════════════════════ -->
+    <section class="cap-section" aria-labelledby="features-heading">
+      <h2 class="section-heading" id="features-heading">iOS app</h2>
+
+      <div class="feat-grid" role="list">
+
+        <article class="feat-card" role="listitem">
+          <div class="feat-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="1.5"/><path d="M10 16h12M16 10l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h3 class="feat-name">Ask your vault</h3>
+          <p class="feat-desc">Type or speak any question. Sol uses semantic search (FAISS + Ollama embeddings) to find the relevant notes and answers in plain language — with links back to the source.</p>
+        </article>
+
+        <article class="feat-card" role="listitem">
+          <div class="feat-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none"><rect x="13" y="4" width="6" height="16" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 18a8 8 0 0 0 16 0M16 26v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <h3 class="feat-name">Voice notes</h3>
+          <p class="feat-desc">Tap the mic, speak, done. WhisperKit transcribes entirely on-device — no audio ever leaves your phone. The transcription is saved as a Markdown note to your Obsidian vault.</p>
+        </article>
+
+        <article class="feat-card" role="listitem">
+          <div class="feat-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none"><rect x="4" y="6" width="24" height="20" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M9 12h14M9 17h10M9 22h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <h3 class="feat-name">Text &amp; markdown notes</h3>
+          <p class="feat-desc">Quick-capture panel with Markdown formatting and tag autocomplete pulled from your vault. Notes land in Obsidian instantly via the daemon's Obsidian URI integration.</p>
+        </article>
+
+        <article class="feat-card" role="listitem">
+          <div class="feat-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none"><rect x="4" y="6" width="24" height="22" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M4 11h24M11 6V4M21 6V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="8" y="15" width="6" height="5" rx="1" fill="currentColor" opacity=".25"/><rect x="18" y="15" width="6" height="5" rx="1" stroke="currentColor" stroke-width="1.2" opacity=".5"/></svg>
+          </div>
+          <h3 class="feat-name">Calendar</h3>
+          <p class="feat-desc">Ask about your schedule in natural language — "what do I have this week?" Sol reads from EventKit and understands relative time. You can also say "schedule a meeting tomorrow at 2pm" and Sol opens the calendar editor pre-filled.</p>
+        </article>
+
+        <article class="feat-card" role="listitem">
+          <div class="feat-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none"><path d="M16 4a8 8 0 1 0 8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M20 4h8v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="10" y="21" width="12" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M16 21v-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <h3 class="feat-name">Push notifications</h3>
+          <p class="feat-desc">Send yourself a notification from your Mac with <code class="inline-code">sol notify</code>. Three types: <code class="inline-code">info</code>, <code class="inline-code">warning</code>, and <code class="inline-code">update</code>. Useful for reminders, automation scripts, or any background task output.</p>
+        </article>
+
+        <article class="feat-card" role="listitem">
+          <div class="feat-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none"><path d="M6 26V10l10-6 10 6v16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="12" y="18" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M12 14h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <h3 class="feat-name">Conversation history</h3>
+          <p class="feat-desc">Every query session is saved locally. Browse past conversations from the sidebar, pick up any thread, and re-run queries against an updated vault.</p>
+        </article>
+
+        <article class="feat-card" role="listitem">
+          <div class="feat-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="12" stroke="currentColor" stroke-width="1.5"/><path d="M16 10v6l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 6l2 2M24 6l2-2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".4"/></svg>
+          </div>
+          <h3 class="feat-name">Fully local &amp; private</h3>
+          <p class="feat-desc">The daemon runs on your Mac. LLM inference runs via Ollama — no API keys, no cloud calls. Your notes never leave your network. Sol connects over Tailscale so it works anywhere on mobile data.</p>
+        </article>
+
+        <article class="feat-card" role="listitem">
+          <div class="feat-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none"><rect x="4" y="4" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="17" y="4" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="4" y="17" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="17" y="17" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.5" opacity=".35"/></svg>
+          </div>
+          <h3 class="feat-name">QR connection setup</h3>
+          <p class="feat-desc">Run <code class="inline-code">sol qr</code> on your Mac to print a QR code to the terminal. Scan it in the Sol app to configure your Tailscale IP, port, and API key in one tap — no manual entry.</p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ══ 2. Supported file types ══════════════════════════════════════════ -->
+    <section class="cap-section" aria-labelledby="filetypes-heading">
+      <h2 class="section-heading" id="filetypes-heading">What gets indexed</h2>
+      <p class="section-subhead">Sol watches your vault directory and automatically indexes everything below. New or changed files are picked up within seconds by the background watcher.</p>
+
+      <div class="filetype-grid" role="list">
+
+        <div class="filetype-group" role="listitem">
+          <div class="filetype-label">Markdown</div>
+          <div class="filetype-chips">
+            <span class="ext-chip">.md</span>
+          </div>
+          <p class="filetype-desc">The native format. Front matter, headings, tags, wikilinks, and callouts are all parsed. Text is split into overlapping chunks for retrieval.</p>
+        </div>
+
+        <div class="filetype-group" role="listitem">
+          <div class="filetype-label">PDF</div>
+          <div class="filetype-chips">
+            <span class="ext-chip">.pdf</span>
+          </div>
+          <p class="filetype-desc">Full text extraction via pypdf. Drop PDFs anywhere in your vault — research papers, articles, receipts — and ask about them naturally.</p>
+        </div>
+
+        <div class="filetype-group" role="listitem">
+          <div class="filetype-label">Word documents</div>
+          <div class="filetype-chips">
+            <span class="ext-chip">.docx</span>
+            <span class="ext-chip">.doc</span>
+          </div>
+          <p class="filetype-desc">Body text and paragraphs extracted from Word files. Useful for imported documents, reports, or notes originally written outside Obsidian.</p>
+        </div>
+
+        <div class="filetype-group" role="listitem">
+          <div class="filetype-label">Spreadsheets</div>
+          <div class="filetype-chips">
+            <span class="ext-chip">.xlsx</span>
+            <span class="ext-chip">.xls</span>
+          </div>
+          <p class="filetype-desc">Cell contents from all sheets are extracted and indexed as searchable text — handy for tracking data stored in Excel format alongside your notes.</p>
+        </div>
+
+        <div class="filetype-group" role="listitem">
+          <div class="filetype-label">Images</div>
+          <div class="filetype-chips">
+            <span class="ext-chip">.jpg</span>
+            <span class="ext-chip">.jpeg</span>
+            <span class="ext-chip">.png</span>
+            <span class="ext-chip">.gif</span>
+            <span class="ext-chip">.webp</span>
+          </div>
+          <p class="filetype-desc">Images are described by a local vision model (llava via Ollama). The description is embedded and indexed — so you can search for "photo of the whiteboard from Tuesday" and find it. Run <code class="inline-code">sol index-images</code> to process new images.</p>
+        </div>
+
+        <div class="filetype-group" role="listitem">
+          <div class="filetype-label">Calendar events</div>
+          <div class="filetype-chips">
+            <span class="ext-chip">EventKit</span>
+          </div>
+          <p class="filetype-desc">All calendars on your Mac are synced every 60 seconds via EventKit. Events include title, date/time, location, and notes. Ask "what meetings do I have this week?" and Sol answers directly from the index — no FAISS search needed for date queries.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══ 3. CLI reference ══════════════════════════════════════════════════ -->
+    <section class="cap-section" aria-labelledby="cli-heading">
+      <h2 class="section-heading" id="cli-heading">CLI reference</h2>
+      <p class="section-subhead">The <code class="inline-code">sol</code> command is installed to <code class="inline-code">~/.local/bin/sol</code> by the installer. It controls the daemon and provides utility shortcuts.</p>
+
+      <!-- ── Daemon control ─────────────────────────────────────────────── -->
+      <h3 class="cli-group-heading">Daemon control</h3>
+      <div class="cli-table" role="table" aria-label="Daemon control commands">
+
+        <div class="cli-row" role="row">
+          <div class="cli-cmd" role="cell">
+            <div class="code-block"><button class="copy-btn" type="button" aria-label="Copy sol status"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button><code>sol status</code></div>
+          </div>
+          <div class="cli-desc" role="cell">
+            <p>Print the current state of the daemon, Ollama, Tailscale, and your vault. Shows the running port, connected Tailscale IP, Ollama model, and note count.</p>
+          </div>
+        </div>
+
+        <div class="cli-row" role="row">
+          <div class="cli-cmd" role="cell">
+            <div class="code-block"><button class="copy-btn" type="button" aria-label="Copy sol start"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button><code>sol start</code></div>
+          </div>
+          <div class="cli-desc" role="cell">
+            <p>Start the daemon via launchd. No-op if it's already running. The daemon binds to <code class="inline-code">0.0.0.0:8765</code> so it's reachable from your iPhone over Tailscale.</p>
+          </div>
+        </div>
+
+        <div class="cli-row" role="row">
+          <div class="cli-cmd" role="cell">
+            <div class="code-block"><button class="copy-btn" type="button" aria-label="Copy sol stop"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button><code>sol stop</code></div>
+          </div>
+          <div class="cli-desc" role="cell">
+            <p>Stop the daemon. The LaunchAgent will restart it automatically on next login unless you run this each time.</p>
+          </div>
+        </div>
+
+        <div class="cli-row" role="row">
+          <div class="cli-cmd" role="cell">
+            <div class="code-block"><button class="copy-btn" type="button" aria-label="Copy sol restart"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button><code>sol restart</code></div>
+          </div>
+          <div class="cli-desc" role="cell">
+            <p>Unload and reload the LaunchAgent. Use this after editing config or after installing updates manually.</p>
+          </div>
+        </div>
+
+        <div class="cli-row" role="row">
+          <div class="cli-cmd" role="cell">
+            <div class="code-block"><button class="copy-btn" type="button" aria-label="Copy sol logs"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button><code>sol logs</code></div>
+          </div>
+          <div class="cli-desc" role="cell">
+            <p>Tail <code class="inline-code">~/.sol/daemon.log</code> in real time. Ctrl-C to exit. Useful for debugging indexing, query errors, or calendar sync issues.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Updates ───────────────────────────────────────────────────── -->
+      <h3 class="cli-group-heading">Updates</h3>
+      <div class="cli-table" role="table" aria-label="Update commands">
+
+        <div class="cli-row" role="row">
+          <div class="cli-cmd" role="cell">
+            <div class="code-block"><button class="copy-btn" type="button" aria-label="Copy sol update"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button><code>sol update</code></div>
+          </div>
+          <div class="cli-desc" role="cell">
+            <p>Pull the latest code from GitHub, reinstall the <code class="inline-code">solidrag</code> package into the daemon's venv, update all dependencies, and restart the daemon. Run this whenever a new version is released.</p>
+          </div>
+        </div>
+
+        <div class="cli-row" role="row">
+          <div class="cli-cmd" role="cell">
+            <div class="code-block"><button class="copy-btn" type="button" aria-label="Copy sol update-ios"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button><code>sol update-ios</code></div>
+          </div>
+          <div class="cli-desc" role="cell">
+            <p>Check GitHub Releases for a new iOS build. If a newer version is available, prints an OTA install URL and renders a QR code you can scan with your iPhone.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Configuration ─────────────────────────────────────────────── -->
+      <h3 class="cli-group-heading">Configuration</h3>
+      <div class="cli-table" role="table" aria-label="Configuration commands">
+
+        <div class="cli-row" role="row">
+          <div class="cli-cmd" role="cell">
+            <div class="code-block"><button class="copy-btn" type="button" aria-label="Copy sol config"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button><code>sol config</code></div>
+          </div>
+          <div class="cli-desc" role="cell">
+            <p>Open <code class="inline-code">~/.sol/config.json</code> in your <code class="inline-code">$EDITOR</code>. Useful for changing <code class="inline-code">vault_path</code>, <code class="inline-code">ollama_model</code>, <code class="inline-code">vision_model</code>, or the system prompt. Run <code class="inline-code">sol restart</code> after saving.</p>
+          </div>
+        </div>
+
+        <div class="cli-row" role="row">
+          <div class="cli-cmd" role="cell">
+            <div class="code-block"><button class="copy-btn" type="button" aria-label="Copy sol qr"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button><code>sol qr</code></div>
+          </div>
+          <div class="cli-desc" role="cell">
+            <p>Regenerate the iPhone connection QR code using the current Tailscale IP, port, and API key. Run this after rotating your API key or if you sign into a different Tailscale account.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Indexing ───────────────────────────────────────────────────── -->
+      <h3 class="cli-group-heading">Indexing</h3>
+      <div class="cli-table" role="table" aria-label="Indexing commands">
+
+        <div class="cli-row" role="row">
+          <div class="cli-cmd" role="cell">
+            <div class="code-block"><button class="copy-btn" type="button" aria-label="Copy sol index-images"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button><code>sol index-images</code></div>
+          </div>
+          <div class="cli-desc" role="cell">
+            <p>Scan the vault for images not yet in the index. Each image is sent to the local vision model (llava) for description, then embedded and added to FAISS. Also prunes entries for deleted images. Reloads the daemon on completion so the new entries are immediately queryable.</p>
+            <div class="cli-note">Images are not indexed automatically — run this after dropping new images into your vault.</div>
+          </div>
+        </div>
+
+        <div class="cli-row" role="row">
+          <div class="cli-cmd" role="cell">
+            <div class="code-block"><button class="copy-btn" type="button" aria-label="Copy sol index-calendar"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button><code>sol index-calendar</code></div>
+          </div>
+          <div class="cli-desc" role="cell">
+            <p>Trigger an immediate EventKit sync without waiting for the automatic 60-second polling cycle. Useful after adding calendar events you want to query right away.</p>
+            <div class="cli-note">Calendar events sync automatically every 60s while the daemon is running. Use this only when you need an instant update.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Notifications ─────────────────────────────────────────────── -->
+      <h3 class="cli-group-heading">Notifications</h3>
+      <div class="cli-table" role="table" aria-label="Notification commands">
+
+        <div class="cli-row" role="row">
+          <div class="cli-cmd" role="cell">
+            <div class="code-block notify-block"><button class="copy-btn" type="button" aria-label="Copy sol notify example"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button><code>sol notify <span class="token-amber">"Title"</span> <span class="token-amber">"Body text"</span> [type]</code></div>
+            <div class="notify-types">
+              <span class="type-chip type-info">info</span>
+              <span class="type-chip type-warning">warning</span>
+              <span class="type-chip type-update">update</span>
+            </div>
+          </div>
+          <div class="cli-desc" role="cell">
+            <p>Queue a push notification to your iPhone. The app must be in the foreground (or recently backgrounded) to receive it. The optional third argument sets the notification style — defaults to <code class="inline-code">info</code>.</p>
+            <div class="cli-examples">
+              <div class="cli-example-label">Examples</div>
+              <div class="code-block"><button class="copy-btn" type="button" aria-label="Copy example"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button><code>sol notify <span class="token-amber">"Backup done"</span> <span class="token-amber">"Time Machine finished"</span></code></div>
+              <div class="code-block"><button class="copy-btn" type="button" aria-label="Copy example"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button><code>sol notify <span class="token-amber">"CI failed"</span> <span class="token-amber">"Build #42 on main"</span> warning</code></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Maintenance ───────────────────────────────────────────────── -->
+      <h3 class="cli-group-heading">Maintenance</h3>
+      <div class="cli-table" role="table" aria-label="Maintenance commands">
+
+        <div class="cli-row" role="row">
+          <div class="cli-cmd" role="cell">
+            <div class="code-block"><button class="copy-btn" type="button" aria-label="Copy sol uninstall"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button><code>sol uninstall</code></div>
+          </div>
+          <div class="cli-desc" role="cell">
+            <p>Run the uninstall script. Stops the daemon, removes the LaunchAgent plist, and cleans up installed files. Your <code class="inline-code">~/.sol/config.json</code> and vault are untouched.</p>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ══ 4. Quick-start box ════════════════════════════════════════════════ -->
+    <section class="cap-section cap-section-last" aria-label="Get started">
+      <div class="quickstart-card">
+        <h2 class="quickstart-heading">New here?</h2>
+        <p class="quickstart-desc">Get the iOS app via TestFlight, then follow the setup guide to connect it to your vault.</p>
+        <div class="quickstart-links">
+          <a href="beta.html"    class="qs-btn qs-primary">Join the iOS beta →</a>
+          <a href="install.html" class="qs-btn qs-secondary">Setup guide →</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer role="contentinfo">
+    <div class="cap-footer-inner">
+      <span>Sol · Open source</span>
+      <a href="https://github.com/aranga1/Sol" target="_blank" rel="noopener">aranga1/Sol ↗</a>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
