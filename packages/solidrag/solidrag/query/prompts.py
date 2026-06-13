@@ -3,15 +3,20 @@ from __future__ import annotations
 
 NEEDS_VAULT_PROMPT: str = """\
 Does answering the following question require searching the user's personal \
-notes, vault, or uploaded documents?
+notes, vault, or uploaded files?
 Answer YES if the question is about: the user's own memories, notes, people \
-they know, events in their life, uploaded files or documents (PDFs, letters, \
-contracts, spreadsheets), specific fees, amounts, dates, or names that would \
-only be found in personal records.
+they know, events in their life, uploaded documents (PDFs, letters, contracts, \
+spreadsheets), images or photos they have uploaded, the contents of an image \
+or attachment, specific fees, amounts, dates, or names that would only be \
+found in personal records.
 Answer NO only if the question can be answered entirely from general knowledge \
+with no reference to the user's personal files \
 (greetings, questions about the assistant itself, general facts, math).
 When in doubt, answer YES.
 Reply with exactly one word: YES or NO.
+
+Conversation so far:
+{history}
 
 Question: {question}
 Answer:"""

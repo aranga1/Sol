@@ -54,8 +54,15 @@ def _node_id_to_int(node_id: str) -> int:
     return int(digest[:16], 16) % (2**63)
 
 
-async def _needs_vault_async(question: str) -> bool:
-    prompt = NEEDS_VAULT_PROMPT.format(question=question)
+async def _needs_vault_async(question: str, history: list[dict] | None) -> bool:
+    history_text = ""
+    if history:
+        lines = [
+            f"{'User' if m['role'] == 'user' else 'Sol'}: {m['content']}"
+            for m in history[-4:]  # last 2 turns is enough context
+        ]
+        history_text = "\n".join(lines)
+    prompt = NEEDS_VAULT_PROMPT.format(question=question, history=history_text or "(none)")
     llm = _get_llm()
     result = await llm.acomplete(prompt)
     return str(result).strip().upper().startswith("Y")
@@ -156,7 +163,7 @@ async def query_stream_async(
         yield {"type": "done"}
         return
 
-    needs_vault = await _needs_vault_async(question)
+    needs_vault = await _needs_vault_async(question, history)
 
     if not needs_vault:
         prompt = build_direct_prompt(question, history)
@@ -175,7 +182,9 @@ async def query_stream_async(
 
     _default_system = (
         "You are Sol, a personal second-brain assistant. "
-        "Answer the user's question using the relevant notes and documents provided. "
+        "Answer the user's question using the relevant notes, documents, and image descriptions provided. "
+        "Image contents have been extracted by a vision model and stored as text descriptions — "
+        "treat those descriptions as the ground truth about what is in the image. "
         "Cite specific details from the content where helpful."
     )
 
