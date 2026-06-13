@@ -28,10 +28,11 @@ jobs:
 
       - name: Resolve Swift packages
         working-directory: ios
-        run: xcodebuild -resolvePackageDependencies \
-               -project Sol.xcodeproj \
-               -scheme Sol \
-               -clonedSourcePackagesDirPath .spm-cache
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project Sol.xcodeproj \
+            -scheme Sol \
+            -clonedSourcePackagesDirPath .spm-cache
 
       - name: Build for simulator
         working-directory: ios
@@ -66,11 +67,10 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        working-directory: daemon
         run: |
           python -m pip install --upgrade pip
-          pip install fastapi uvicorn httpx pytest pytest-asyncio pydantic
+          pip install -r daemon/requirements.txt
+          pip install pytest pytest-asyncio
 
       - name: Run tests
-        working-directory: daemon
-        run: pytest tests/ -v
+        run: PYTHONPATH=. pytest daemon/tests/ -v
