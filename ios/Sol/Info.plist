@@ -40,6 +40,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Sol uses your camera to scan the QR code from your Mac setup.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Sol needs calendar access to create events on your behalf.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Sol uses your microphone to record voice notes.</string>
 	<key>UIAppFonts</key>
