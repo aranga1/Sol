@@ -89,11 +89,14 @@ jobs:
             -scheme Sol \
             -configuration Release \
             -archivePath $RUNNER_TEMP/Sol.xcarchive \
+            -sdk iphoneos \
             -destination 'generic/platform=iOS' \
             DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Apple Distribution" \
-            PROVISIONING_PROFILE="$PROFILE_UUID"
+            PROVISIONING_PROFILE="$PROFILE_UUID" \
+            ONLY_ACTIVE_ARCH=NO \
+            EXCLUDED_ARCHS=""
 
       - name: Export IPA
         run: |
