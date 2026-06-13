@@ -80,6 +80,7 @@ extension View {
     /// Apply liquid glass to any shape. `interactive` adds the press-response animation.
     @ViewBuilder
     func liquidGlass<S: InsettableShape>(shape: S, interactive: Bool = false) -> some View {
+        #if swift(>=6.2)
         if #available(iOS 26, *) {
             if interactive {
                 self.glassEffect(.regular.interactive(), in: shape)
@@ -89,6 +90,9 @@ extension View {
         } else {
             self.modifier(FallbackGlass(shape: shape))
         }
+        #else
+        self.modifier(FallbackGlass(shape: shape))
+        #endif
     }
 
     /// Legacy alias kept for existing call sites that pass a cornerRadius.

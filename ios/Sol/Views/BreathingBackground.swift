@@ -35,7 +35,7 @@ struct BreathingBackground: View {
             guard !reduceMotion else { return }
             // 60 fps drive via a 1/60 timer
             Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { timer in
-                t += 1.0 / 60.0
+                MainActor.assumeIsolated { t += 1.0 / 60.0 }
             }
         }
     }

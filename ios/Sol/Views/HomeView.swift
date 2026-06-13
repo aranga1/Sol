@@ -59,7 +59,7 @@ struct HomeView: View {
                             .zIndex(9)
                     }
                 }
-                .onPreferenceChange(ModeItemFrameKey.self) { popupItemFrames = $0 }
+                .onPreferenceChange(ModeItemFrameKey.self) { MainActor.assumeIsolated { popupItemFrames = $0 } }
                 .navigationTitle("")
                 .navigationBarHidden(true)
                 .navigationDestination(isPresented: $navigateToAllChats) {
@@ -548,10 +548,12 @@ struct CaptureBar: View {
                     // Phase 1: start the long-press timer on first touch
                     if pressTimer == nil && !longPressActive {
                         pressTimer = Timer.scheduledTimer(withTimeInterval: 0.45, repeats: false) { _ in
-                            withAnimation(.spring(response: 0.32, dampingFraction: 0.74)) {
-                                popOpen = true          // triggers .sensoryFeedback below
+                            MainActor.assumeIsolated {
+                                withAnimation(.spring(response: 0.32, dampingFraction: 0.74)) {
+                                    popOpen = true
+                                }
+                                longPressActive = true
                             }
-                            longPressActive = true
                         }
                     }
                     // Phase 2: popup is open — update hover from drag position
