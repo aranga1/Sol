@@ -203,6 +203,16 @@ async def query_stream_async(
     needs_vault = await needs_vault_task
     is_calendar, event_payload = await calendar_task
 
+    # For calendar/time queries: inject today's date AND pull all calendar events
+    # directly (bypassing FAISS) since date-based queries don't match semantically.
+    _CALENDAR_TERMS = {"calendar", "event", "meeting", "appointment", "schedule",
+                       "tomorrow", "today", "next week", "this week"}
+    is_calendar_query = any(t in question.lower() for t in _CALENDAR_TERMS)
+    retrieval_question = question
+    if is_calendar_query:
+        today_str = _date.today().strftime("%A %d %B %Y")
+        retrieval_question = f"{question} [Today is {today_str}]"
+
     if not needs_vault:
         prompt = build_direct_prompt(question, history)
         llm = _get_llm()
@@ -219,7 +229,22 @@ async def query_stream_async(
         yield {"type": "done"}
         return
 
-    results = await _retrieve(faiss_index, nodestore, question, top_k)
+    # Calendar queries: inject all calendar events first, then fill with note results.
+    if is_calendar_query:
+        seen_fps: set[str] = set()
+        cal_results: list[dict] = []
+        for nid in nodestore.all_node_ids():
+            fp = nodestore.get_file_path(nid) or ""
+            if fp.startswith("calendar:") and fp not in seen_fps:
+                content = nodestore.get_content(nid)
+                if content:
+                    cal_results.append({"content": content, "file_path": fp, "score": 0.0})
+                    seen_fps.add(fp)
+        note_results = await _retrieve(faiss_index, nodestore, retrieval_question, top_k)
+        note_results = [r for r in note_results if not r["file_path"].startswith("calendar:")]
+        results = cal_results + note_results[:max(0, top_k - len(cal_results))]
+    else:
+        results = await _retrieve(faiss_index, nodestore, retrieval_question, top_k)
     sources = _extract_sources(results)
 
     context_str = "\n\n---\n\n".join(r["content"] for r in results)

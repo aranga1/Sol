@@ -1,4 +1,6 @@
 import SwiftUI
+import EventKit
+import EventKitUI
 
 // Renders markdown (bold, italic, code) from a plain string
 private func markdownText(_ raw: String) -> Text {
@@ -127,6 +129,7 @@ struct QueryView: View {
     @State private var thinkPhase = false
     @State private var showCalendarEditor = false
     @State private var eventNotCreated = false
+    @State private var calendarSaved: Bool? = nil
     @Environment(\.dismiss) private var dismiss
 
     init(initialQuestion: String = "", onDismiss: (() -> Void)? = nil, onOpenDrawer: (() -> Void)? = nil) {
@@ -269,32 +272,24 @@ struct QueryView: View {
         }
         .onChange(of: vm.pendingCalendarPayload) { _, payload in
             guard payload != nil else { return }
-            showCalendarEditor = true
-        }
-        .onChange(of: showCalendarEditor) { _, showing in
-            guard showing, let payload = vm.pendingCalendarPayload else { return }
             Task { @MainActor in
                 let granted = await CalendarService.shared.requestAccess()
-                guard granted else {
-                    showCalendarEditor = false
+                if granted {
+                    showCalendarEditor = true
+                } else {
                     vm.pendingCalendarPayload = nil
-                    return
                 }
-                guard let windowScene = UIApplication.shared.connectedScenes
-                    .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
-                      let rootVC = windowScene.keyWindow?.rootViewController else {
-                    showCalendarEditor = false
-                    vm.pendingCalendarPayload = nil
-                    return
-                }
-                CalendarService.shared.presentEventEditor(
-                    payload: payload,
-                    from: rootVC
-                ) { saved in
-                    showCalendarEditor = false
-                    vm.pendingCalendarPayload = nil
-                    if !saved { eventNotCreated = true }
-                }
+            }
+        }
+        .sheet(isPresented: $showCalendarEditor, onDismiss: {
+            if let saved = calendarSaved {
+                if !saved { eventNotCreated = true }
+            }
+            calendarSaved = nil
+            vm.pendingCalendarPayload = nil
+        }) {
+            if let payload = vm.pendingCalendarPayload {
+                CalendarEditorSheet(payload: payload, saved: $calendarSaved)
             }
         }
     }
@@ -621,6 +616,47 @@ private struct FlowLayout: Layout {
             view.place(at: CGPoint(x: x, y: y), proposal: ProposedViewSize(size))
             x += size.width + spacing
             rowHeight = max(rowHeight, size.height)
+        }
+    }
+}
+
+// MARK: - Calendar event editor (UIViewControllerRepresentable)
+
+private struct CalendarEditorSheet: UIViewControllerRepresentable {
+    let payload: CreateEventPayload
+    @Binding var saved: Bool?
+
+    func makeCoordinator() -> Coordinator { Coordinator(saved: $saved) }
+
+    func makeUIViewController(context: Context) -> EKEventEditViewController {
+        let store = CalendarService.shared.eventStore
+        let event = EKEvent(eventStore: store)
+        event.title = payload.title
+        event.startDate = payload.start
+        event.endDate = payload.start.addingTimeInterval(TimeInterval(payload.durationMinutes * 60))
+        if let notes = payload.notes, !notes.isEmpty { event.notes = notes }
+        event.calendar = store.defaultCalendarForNewEvents
+
+        let vc = EKEventEditViewController()
+        vc.eventStore = store
+        vc.event = event
+        vc.editViewDelegate = context.coordinator
+        return vc
+    }
+
+    func updateUIViewController(_ uiViewController: EKEventEditViewController, context: Context) {}
+
+    final class Coordinator: NSObject, EKEventEditViewDelegate {
+        @Binding var saved: Bool?
+        init(saved: Binding<Bool?>) { _saved = saved }
+
+        nonisolated func eventEditViewController(
+            _ controller: EKEventEditViewController,
+            didCompleteWith action: EKEventEditViewAction
+        ) {
+            let wasSaved = action == .saved
+            let binding = _saved
+            Task { @MainActor in binding.wrappedValue = wasSaved }
         }
     }
 }
