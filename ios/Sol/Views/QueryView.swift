@@ -147,89 +147,76 @@ struct QueryView: View {
         if let onDismiss { onDismiss() } else { dismiss() }
     }
 
+    @ViewBuilder
+    private func scrollContent() -> some View {
+        ForEach(vm.messages) { msg in
+            VStack(alignment: .leading, spacing: 0) {
+                userBubble(msg.question)
+                    .padding(.bottom, 14)
+                assistantMessage(msg)
+            }
+            .padding(.vertical, 12)
+            .id(msg.id)
+        }
+        if let pending = vm.pendingQuestion {
+            userBubble(pending).padding(.vertical, 12)
+        }
+        if vm.pendingQuestion != nil {
+            thinkingIndicator
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
+                .id("loading")
+        }
+        if let error = vm.errorMessage {
+            VStack(spacing: 8) {
+                Text(error)
+                    .foregroundStyle(DS.terracotta)
+                    .font(.caption)
+                    .padding(.horizontal, 20)
+                Button("Retry") {
+                    if let last = vm.messages.last {
+                        Task { await vm.ask(last.question) }
+                    }
+                }
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(DS.terracottaDark)
+            }
+            .padding(.vertical, 12)
+        }
+        if vm.messages.isEmpty && !vm.isLoading && vm.pendingQuestion == nil {
+            Text("Ask anything about your notes.")
+                .foregroundStyle(DS.inkFaint)
+                .font(.system(size: 16))
+                .frame(maxWidth: .infinity)
+                .padding(.top, 60)
+        }
+        if eventNotCreated {
+            Text("Event not created.")
+                .font(.system(size: 14))
+                .foregroundStyle(DS.inkFaint)
+                .italic()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 16)
+                .onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                        eventNotCreated = false
+                    }
+                }
+        }
+        Color.clear.frame(height: 20)
+    }
+
     var body: some View {
         ZStack {
-            // Breathing background shows through semi-transparent parchment
             BreathingBackground()
             DS.parchment.opacity(0.82).ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Overlay mode: show manual top bar (no NavigationStack wrapping us)
                 if onDismiss != nil { overlayTopBar }
                 ScrollViewReader { proxy in
                     ScrollView {
                         VStack(alignment: .leading, spacing: 0) {
-
-                            // Conversation thread
-                            ForEach(vm.messages) { msg in
-                                VStack(alignment: .leading, spacing: 0) {
-                                    // User bubble
-                                    userBubble(msg.question)
-                                        .padding(.bottom, 14)
-
-                                    // Assistant message
-                                    assistantMessage(msg)
-                                }
-                                .padding(.vertical, 12)
-                                .id(msg.id)
-                            }
-
-                            // Pending question bubble
-                            if let pending = vm.pendingQuestion {
-                                userBubble(pending)
-                                    .padding(.vertical, 12)
-                            }
-
-                            // Thinking indicator — only while waiting for first token
-                            if vm.pendingQuestion != nil {
-                                thinkingIndicator
-                                    .padding(.horizontal, 20)
-                                    .padding(.vertical, 16)
-                                    .id("loading")
-                            }
-
-                            // Error
-                            if let error = vm.errorMessage {
-                                VStack(spacing: 8) {
-                                    Text(error)
-                                        .foregroundStyle(DS.terracotta)
-                                        .font(.caption)
-                                        .padding(.horizontal, 20)
-                                    Button("Retry") {
-                                        if let last = vm.messages.last {
-                                            Task { await vm.ask(last.question) }
-                                        }
-                                    }
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundStyle(DS.terracottaDark)
-                                }
-                                .padding(.vertical, 12)
-                            }
-
-                            // Empty state
-                            if vm.messages.isEmpty && !vm.isLoading && vm.pendingQuestion == nil {
-                                Text("Ask anything about your notes.")
-                                    .foregroundStyle(DS.inkFaint)
-                                    .font(.system(size: 16))
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.top, 60)
-                            }
-
-                            if eventNotCreated {
-                                Text("Event not created.")
-                                    .font(.system(size: 14))
-                                    .foregroundStyle(DS.inkFaint)
-                                    .italic()
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.horizontal, 16)
-                                    .onAppear {
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                                            eventNotCreated = false
-                                        }
-                                    }
-                            }
-
-                            Color.clear.frame(height: 20)
+                            scrollContent()
                         }
                         .padding(.top, 16)
                         .padding(.horizontal, 16)
