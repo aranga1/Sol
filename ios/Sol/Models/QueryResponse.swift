@@ -37,7 +37,7 @@ struct CreateEventPayload: Decodable, Equatable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        title = try container.decode(String.self, forKey: .title)
+        title = (try? container.decode(String.self, forKey: .title)) ?? "New Event"
         notes = try container.decodeIfPresent(String.self, forKey: .notes)
         durationMinutes = try container.decode(Int.self, forKey: .durationMinutes)
 

@@ -24,6 +24,7 @@ from solidrag.index.nodestore import NodeStore
 if TYPE_CHECKING:
     from llama_index.core.schema import TextNode
     from solidrag.extractors.base import IndexDiff
+    from solidrag.index.nodestore import NodeStore
 
 logger = logging.getLogger(__name__)
 
@@ -364,6 +365,7 @@ def apply_source_diff(
     mtime: float,
     config: "SolidRagConfig | None",
     delete_keys: list[str] | None = None,
+    nodestore: "NodeStore | None" = None,
 ) -> None:
     """Apply an IndexDiff from a SourceExtractor to the live FAISS index.
 
@@ -376,6 +378,7 @@ def apply_source_diff(
         mtime:        Last-modified timestamp for the source item.
         config:       SolidRagConfig (required when diff.to_add is non-empty).
         delete_keys:  Source keys to remove from manifest (for deleted items).
+        nodestore:    NodeStore to write node content into (required for retrieval).
     """
     # Collect all node IDs to delete (explicit deletes + updates' old nodes + delete_keys).
     # Manifest entries for delete_keys are removed only after FAISS removal succeeds so
@@ -412,6 +415,13 @@ def apply_source_diff(
             ids = np.array([_node_id_to_int(n.node_id) for n in new_nodes], dtype=np.int64)
             faiss_index.add_with_ids(embeddings, ids)
             manifest.update_source(source_id, source_key, mtime, [n.node_id for n in new_nodes])
+            if nodestore is not None:
+                for node in new_nodes:
+                    nodestore.add(
+                        node_id=node.node_id,
+                        content=node.get_content(),
+                        file_path=f"{source_id}:{node.metadata.get('event_id', node.node_id)}",
+                    )
         except Exception:
             logger.exception(
                 "apply_source_diff: embedding failed for %s/%s", source_id, source_key

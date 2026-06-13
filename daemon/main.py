@@ -97,29 +97,26 @@ async def lifespan(app: FastAPI):
         async with app.state.index_lock:
             fi = app.state.vault_index
             manifest = app.state.index_manifest
+            nodestore = app.state.vault_nodestore
             config = app.state.solidrag_config
             if fi is None:
                 return
             now = time.time()
             for node in diff.to_add:
                 apply_source_diff(
-                    fi,
-                    manifest,
+                    fi, manifest,
                     IndexDiff(to_add=[node]),
                     source_id="calendar",
                     source_key=node.metadata.get("event_id", node.node_id),
-                    mtime=now,
-                    config=config,
+                    mtime=now, config=config, nodestore=nodestore,
                 )
             for old_ids, new_nodes in diff.to_update:
                 apply_source_diff(
-                    fi,
-                    manifest,
+                    fi, manifest,
                     IndexDiff(to_update=[(old_ids, new_nodes)]),
                     source_id="calendar",
                     source_key=new_nodes[0].metadata.get("event_id", new_nodes[0].node_id) if new_nodes else "unknown",
-                    mtime=now,
-                    config=config,
+                    mtime=now, config=config, nodestore=nodestore,
                 )
             if diff.to_delete:
                 ids = np.array([_node_id_to_int(nid) for nid in diff.to_delete], dtype=np.int64)
@@ -127,6 +124,7 @@ async def lifespan(app: FastAPI):
                     fi.remove_ids(ids)
                 except Exception as e:
                     print(f"[CalendarWatcher] remove_ids error: {e}")
+            nodestore.save()
             manifest.save()
 
     loop = asyncio.get_running_loop()
