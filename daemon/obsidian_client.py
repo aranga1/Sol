@@ -64,5 +64,34 @@ class ObsidianClient:
         except Exception:
             return 0
 
+    async def put_file(self, vault_path: str, data: bytes) -> None:
+        """PUT /vault/<vault_path> — write raw bytes to the vault.
+
+        Used for binary uploads (PDF, XLSX, images) and markdown notes.
+        ``vault_path`` is relative to the vault root, e.g.
+        ``"uploads/pdf/26-01-06-12-00/report.pdf"`` or ``"notes.md"``.
+        """
+        # Infer content-type so Obsidian REST API doesn't reject the request
+        suffix = vault_path.rsplit(".", 1)[-1].lower() if "." in vault_path else ""
+        _ct_map = {
+            "md": "text/markdown",
+            "pdf": "application/pdf",
+            "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "xls": "application/vnd.ms-excel",
+            "png": "image/png",
+            "jpg": "image/jpeg",
+            "jpeg": "image/jpeg",
+            "gif": "image/gif",
+            "webp": "image/webp",
+        }
+        content_type = _ct_map.get(suffix, "application/octet-stream")
+        resp = await self._client.put(
+            f"/vault/{vault_path}",
+            content=data,
+            headers={"Content-Type": content_type},
+        )
+        if not resp.is_success:
+            raise ObsidianError(resp.text, resp.status_code)
+
     async def close(self):
         await self._client.aclose()
