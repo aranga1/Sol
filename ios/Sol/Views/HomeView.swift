@@ -477,7 +477,7 @@ struct CaptureBar: View {
     @State private var longPressActive = false
 
     @State private var showFileImporter = false
-    @State private var uploadToastVisible = false
+    @StateObject private var uploadJob = FileUploadJob()
 
     @State private var recording = false
     @State private var recordSeconds = 0
@@ -499,19 +499,14 @@ struct CaptureBar: View {
         .padding(7)
         .glassBackground(cornerRadius: 28)
         .shadow(color: Color(hex: "#50321E").opacity(0.22), radius: 20, x: 0, y: 8)
-        .overlay(alignment: .top) {
-            if uploadToastVisible {
-                Text("Saved to vault")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(DS.inkDark.opacity(0.85), in: Capsule())
-                    .offset(y: -52)
-                    .transition(.move(edge: .top).combined(with: .opacity))
+        .overlay(alignment: .bottom) {
+            if uploadJob.phase.isActive {
+                UploadProgressBanner(job: uploadJob)
+                    .padding(.bottom, 64)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .animation(.easeOut(duration: 0.25), value: uploadToastVisible)
+        .animation(.spring(response: 0.38, dampingFraction: 0.82), value: uploadJob.phase)
     }
 
     // MARK: Left button
@@ -799,22 +794,99 @@ struct CaptureBar: View {
         switch result {
         case .success(let urls):
             guard let url = urls.first else { return }
-            Task {
-                guard url.startAccessingSecurityScopedResource() else { return }
-                defer { url.stopAccessingSecurityScopedResource() }
-                do {
-                    try await UploadService.shared.uploadFile(at: url)
-                    await MainActor.run { uploadToastVisible = true }
-                    try? await Task.sleep(nanoseconds: 2_000_000_000)
-                    await MainActor.run { uploadToastVisible = false }
-                } catch {
-                    // error is swallowed here — UploadService throws, user sees nothing yet
-                    // Future: surface error alert
-                }
-            }
-        case .failure:
-            break
+            uploadJob.start(url: url)
+        case .failure(let error):
+            uploadJob.phase = .failure(message: error.localizedDescription)
         }
+    }
+}
+
+// MARK: - UploadProgressBanner
+
+private struct UploadProgressBanner: View {
+    @ObservedObject var job: FileUploadJob
+
+    var body: some View {
+        Group {
+            switch job.phase {
+            case .idle:
+                EmptyView()
+
+            case .reading:
+                pill {
+                    ProgressView().scaleEffect(0.75).tint(DS.terracotta)
+                    Text("Reading file…")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(DS.inkDark)
+                }
+
+            case .uploading(let progress):
+                pill {
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text("Uploading…")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(DS.inkDark)
+                            Spacer()
+                            Text("\(Int(progress * 100))%")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(DS.inkLight)
+                                .monospacedDigit()
+                        }
+                        ProgressView(value: progress)
+                            .tint(DS.terracotta)
+                            .scaleEffect(x: 1, y: 1.4)
+                    }
+                }
+                .frame(width: 240)
+
+            case .success:
+                pill {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(DS.terracotta)
+                    Text("Saved to vault")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(DS.inkDark)
+                }
+
+            case .failure(let message):
+                pill {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(DS.terracottaDark)
+                        .frame(width: 20)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Upload failed")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(DS.inkDark)
+                        Text(message)
+                            .font(.system(size: 12))
+                            .foregroundStyle(DS.inkLight)
+                            .lineLimit(2)
+                    }
+                    Spacer()
+                    VStack(spacing: 4) {
+                        Button("Retry") { job.retry() }
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(DS.terracotta)
+                        Button("Dismiss") { job.dismiss() }
+                            .font(.system(size: 12))
+                            .foregroundStyle(DS.inkLight)
+                    }
+                }
+                .frame(width: 300)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func pill<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        HStack(spacing: 10) {
+            content()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .liquidGlass(shape: Capsule())
+        .shadow(color: Color(hex: "#50321E").opacity(0.16), radius: 16, x: 0, y: 6)
     }
 }
 

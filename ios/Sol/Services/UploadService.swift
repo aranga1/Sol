@@ -1,5 +1,19 @@
 import Foundation
 
+// Receives URLSession delegate callbacks to forward upload byte counts.
+private final class ProgressDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+    private let onProgress: @Sendable (Double) -> Void
+    init(_ onProgress: @escaping @Sendable (Double) -> Void) { self.onProgress = onProgress }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask,
+                    didSendBodyData bytesSent: Int64,
+                    totalBytesSent: Int64,
+                    totalBytesExpectedToSend: Int64) {
+        guard totalBytesExpectedToSend > 0 else { return }
+        onProgress(Double(totalBytesSent) / Double(totalBytesExpectedToSend))
+    }
+}
+
 enum UploadError: LocalizedError {
     case noConfig
     case httpError(Int)
@@ -52,23 +66,33 @@ final class UploadService: ObservableObject {
         return "![[\(filename)]]"
     }
 
-    func uploadFile(at url: URL) async throws {
+    func uploadFile(
+        at url: URL,
+        onProgress: @escaping @Sendable (Double) -> Void = { _ in }
+    ) async throws {
         let cfg = try config()
+
+        // Read file bytes off the main thread — Data(contentsOf:) is blocking.
+        let (filename, data): (String, Data) = try await Task.detached(priority: .userInitiated) {
+            do {
+                return (url.lastPathComponent, try Data(contentsOf: url))
+            } catch {
+                throw UploadError.networkError(error)
+            }
+        }.value
+
         let boundary = UUID().uuidString
         var req = URLRequest(url: cfg.baseURL.appendingPathComponent("/api/upload/file"))
         req.httpMethod = "POST"
         req.setValue(cfg.apiKey, forHTTPHeaderField: "X-API-Key")
         req.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
 
-        let filename = url.lastPathComponent
-        let data: Data
-        do { data = try Data(contentsOf: url) }
-        catch { throw UploadError.networkError(error) }
+        let body = buildMultipart(boundary: boundary, fieldName: "file", filename: filename,
+                                  mimeType: "application/octet-stream", data: data)
 
-        req.httpBody = buildMultipart(boundary: boundary, fieldName: "file", filename: filename, mimeType: "application/octet-stream", data: data)
-
+        let delegate = ProgressDelegate(onProgress)
         let (_, response): (Data, URLResponse)
-        do { (_, response) = try await session.data(for: req) }
+        do { (_, response) = try await session.upload(for: req, from: body, delegate: delegate) }
         catch { throw UploadError.networkError(error) }
 
         guard let http = response as? HTTPURLResponse, (200...201).contains(http.statusCode) else {

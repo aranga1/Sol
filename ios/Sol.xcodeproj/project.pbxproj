@@ -46,6 +46,7 @@
 		FD6C80BF3088049E9F14FC02 /* SolAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA85A75E093A4CE68C2CE8C8 /* SolAppDelegate.swift */; };
 		AA11BB22CC33DD44EE55FF66 /* UploadService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF67 /* UploadService.swift */; };
 		BB22CC33DD44EE55FF66AA11 /* UploadItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EE55FF66AA12 /* UploadItem.swift */; };
+		CC33DD44EE55FF66AA11BB22 /* FileUploadJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC33DD44EE55FF66AA11BB23 /* FileUploadJob.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -91,6 +92,7 @@
 		F3EB1C2F2E30F67C9E973AF3 /* SolWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolWidget.swift; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF67 /* UploadService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadService.swift; sourceTree = "<group>"; };
 		BB22CC33DD44EE55FF66AA12 /* UploadItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadItem.swift; sourceTree = "<group>"; };
+		CC33DD44EE55FF66AA11BB23 /* FileUploadJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUploadJob.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +125,7 @@
 				7234FCACFC1F7924A21FF224 /* QueryResponse.swift */,
 				88A3073D14A9D604F13ED168 /* SystemPrompt.swift */,
 				BB22CC33DD44EE55FF66AA12 /* UploadItem.swift */,
+				CC33DD44EE55FF66AA11BB23 /* FileUploadJob.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -351,6 +354,7 @@
 				8A75F173527CA378DF4A4E2F /* TagStore.swift in Sources */,
 				C7ECABDF3EB1B26BAAD28071 /* TextNoteView.swift in Sources */,
 				BB22CC33DD44EE55FF66AA11 /* UploadItem.swift in Sources */,
+				CC33DD44EE55FF66AA11BB22 /* FileUploadJob.swift in Sources */,
 				AA11BB22CC33DD44EE55FF66 /* UploadService.swift in Sources */,
 				BF8A1D295BA7C9A7070F139E /* VoiceNoteView.swift in Sources */,
 				7900DE872A4F1391AA9B8309 /* WhisperService.swift in Sources */,
