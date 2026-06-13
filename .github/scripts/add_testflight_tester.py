@@ -46,10 +46,8 @@ app_id = apps[0]["id"]
 print(f"App: {apps[0]['attributes']['name']} ({app_id})")
 
 # 2. Find or create an external beta group
-groups = api(
-    "get", f"/apps/{app_id}/betaGroups",
-    params={"filter[isInternalGroup]": "false"},
-).json()["data"]
+all_groups = api("get", f"/apps/{app_id}/betaGroups").json()["data"]
+groups = [g for g in all_groups if not g["attributes"].get("isInternalGroup", True)]
 
 if groups:
     group_id = groups[0]["id"]
