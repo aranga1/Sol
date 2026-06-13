@@ -377,22 +377,25 @@ def apply_source_diff(
         config:       SolidRagConfig (required when diff.to_add is non-empty).
         delete_keys:  Source keys to remove from manifest (for deleted items).
     """
-    from solidrag.extractors.base import IndexDiff  # local import avoids circular
-
-    # Collect all node IDs to delete (explicit deletes + updates' old nodes + delete_keys)
+    # Collect all node IDs to delete (explicit deletes + updates' old nodes + delete_keys).
+    # Manifest entries for delete_keys are removed only after FAISS removal succeeds so
+    # a FAISS failure cannot leave a ghost vector with no manifest record.
     all_delete_ids: list[str] = list(diff.to_delete)
     for old_ids, _ in diff.to_update:
         all_delete_ids.extend(old_ids)
+    keys_to_purge: list[str] = []
     for key in (delete_keys or []):
         entry = manifest.get_source(source_id, key)
         if entry:
             all_delete_ids.extend(entry.node_ids)
-            manifest.remove_source(source_id, key)
+            keys_to_purge.append(key)
 
     if all_delete_ids:
         ids = np.array([_node_id_to_int(nid) for nid in all_delete_ids], dtype=np.int64)
         try:
             faiss_index.remove_ids(ids)
+            for key in keys_to_purge:
+                manifest.remove_source(source_id, key)
         except Exception:
             logger.exception(
                 "apply_source_diff: failed to remove ids for %s/%s", source_id, source_key
