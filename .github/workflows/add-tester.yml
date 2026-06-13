@@ -1,0 +1,31 @@
+name: Add TestFlight Tester
+
+on:
+  workflow_dispatch:
+    inputs:
+      email:
+        description: Tester email address
+        required: true
+        type: string
+      first_name:
+        description: First name (optional)
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  add-tester:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add tester to TestFlight
+        env:
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+          TESTER_EMAIL: ${{ inputs.email }}
+          TESTER_FIRST: ${{ inputs.first_name }}
+        run: |
+          pip install PyJWT cryptography requests -q
+          python .github/scripts/add_testflight_tester.py

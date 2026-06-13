@@ -24,6 +24,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+
+      - name: Inject beta dispatch token
+        env:
+          GH_BETA_DISPATCH_TOKEN: ${{ secrets.GH_BETA_DISPATCH_TOKEN }}
+        run: |
+          python3 -c "
+          import os, pathlib
+          p = pathlib.Path('docs/beta.html')
+          p.write_text(p.read_text().replace('__DISPATCH_TOKEN__', os.environ['GH_BETA_DISPATCH_TOKEN']))
+          "
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs/

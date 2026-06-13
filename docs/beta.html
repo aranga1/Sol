@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join the Sol beta — TestFlight</title>
+  <meta name="description" content="Sign up for early access to Sol on iOS. We'll send you a TestFlight invite.">
+  <meta property="og:title" content="Join the Sol beta">
+  <meta property="og:description" content="Sign up for early access to Sol on iOS. We'll send you a TestFlight invite.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="beta.css">
+</head>
+<body>
+
+  <nav class="site-nav" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="nav-link" aria-label="Back to Sol home">← Sol</a>
+    <a href="https://github.com/aranga1/Sol" class="nav-link" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+  </nav>
+
+  <main class="beta-main">
+
+    <!-- ── Header ────────────────────────────────────────────────────────── -->
+    <header class="beta-header">
+      <h1 class="beta-heading">Join the Sol beta.</h1>
+      <p class="beta-subhead">Enter your email and we'll send you a TestFlight invite.</p>
+    </header>
+
+    <!-- ── Sign-up form ──────────────────────────────────────────────────── -->
+    <section class="beta-form-section" aria-label="Beta sign-up form">
+
+      <form class="beta-form" id="beta-form" novalidate>
+        <div class="beta-inputs">
+          <input
+            type="text"
+            id="beta-name"
+            name="first_name"
+            class="beta-input"
+            placeholder="First name (optional)"
+            autocomplete="given-name"
+            maxlength="50"
+          >
+          <input
+            type="email"
+            id="beta-email"
+            name="email"
+            class="beta-input beta-input-email"
+            placeholder="your@email.com"
+            required
+            autocomplete="email"
+            inputmode="email"
+          >
+        </div>
+        <button type="submit" class="beta-submit" id="beta-submit">
+          Request access →
+        </button>
+      </form>
+
+      <!-- Success state -->
+      <div class="beta-state beta-success" id="beta-success" role="alert" aria-live="polite" hidden>
+        <div class="beta-state-icon" aria-hidden="true">✓</div>
+        <div class="beta-state-body">
+          <strong>You're on the list.</strong>
+          <span>Check your inbox for an invite from <code>testflight@email.apple.com</code> — it usually arrives in a few minutes.</span>
+        </div>
+      </div>
+
+      <!-- Error state -->
+      <div class="beta-error" id="beta-error" role="alert" aria-live="polite" hidden>
+        Something went wrong. Try again or email
+        <a href="mailto:aakashranga@gmail.com">aakashranga@gmail.com</a>.
+      </div>
+
+    </section>
+
+    <!-- ── How it works ───────────────────────────────────────────────────── -->
+    <section class="beta-steps-section" aria-label="How to install via TestFlight">
+      <h2 class="beta-steps-heading">Then follow these steps</h2>
+
+      <div class="steps-container" role="list">
+
+        <!-- Step 1: Email invite -->
+        <article class="step" role="listitem" aria-label="Step 1: Check your email">
+          <div class="step-circle" aria-hidden="true">1</div>
+          <div class="step-body">
+            <h3 class="step-title">Check your email</h3>
+            <p class="step-desc">You'll receive an invitation from <code class="inline-code">testflight@email.apple.com</code>. Open it on your iPhone for the smoothest experience.</p>
+            <div class="step-visual vis-email" aria-hidden="true">
+              <div class="email-card">
+                <div class="email-from">
+                  <div class="email-avatar">TF</div>
+                  <div class="email-meta">
+                    <div class="email-sender">testflight@email.apple.com</div>
+                    <div class="email-time">just now</div>
+                  </div>
+                </div>
+                <div class="email-subject">Aakash Ranga has invited you to test Sol</div>
+                <div class="email-preview">You have been invited to test Sol, an app by Aakash Ranga…</div>
+                <div class="email-cta-btn">View in TestFlight</div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Step 2: Install TestFlight -->
+        <article class="step" role="listitem" aria-label="Step 2: Get TestFlight">
+          <div class="step-circle" aria-hidden="true">2</div>
+          <div class="step-body">
+            <h3 class="step-title">Get TestFlight</h3>
+            <p class="step-desc">TestFlight is Apple's free beta testing app. If you don't have it, install it from the App Store first — the invite link will prompt you.</p>
+            <a
+              href="https://apps.apple.com/app/testflight/id899247664"
+              target="_blank"
+              rel="noopener"
+              class="beta-app-link"
+              aria-label="Download TestFlight from the App Store (opens in new tab)"
+            >↓ TestFlight on the App Store</a>
+          </div>
+        </article>
+
+        <!-- Step 3: Accept the invite -->
+        <article class="step" role="listitem" aria-label="Step 3: Accept and install">
+          <div class="step-circle" aria-hidden="true">3</div>
+          <div class="step-body">
+            <h3 class="step-title">Accept &amp; install</h3>
+            <p class="step-desc">Open the email on your iPhone, tap <strong>View in TestFlight</strong>, then tap <strong>Accept</strong> → <strong>Install</strong>. Sol will appear on your home screen.</p>
+            <div class="step-visual vis-tf-screen" aria-hidden="true">
+              <div class="tf-header">
+                <div class="tf-wordmark">TestFlight</div>
+                <div class="tf-tab-row">
+                  <div class="tf-tab tf-tab-active">Apps</div>
+                  <div class="tf-tab">Invitations</div>
+                </div>
+              </div>
+              <div class="tf-app-row">
+                <div class="tf-app-icon">
+                  <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="40" height="40" rx="9" fill="#A23E2D"/>
+                    <circle cx="20" cy="20" r="8" fill="none" stroke="#FCEFE6" stroke-width="1.5"/>
+                    <line x1="20" y1="20" x2="20" y2="12.5" stroke="#B5701F" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="20" y1="20" x2="26" y2="23.5" stroke="#B5701F" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="20" y1="20" x2="14" y2="23.5" stroke="#B5701F" stroke-width="1.5" stroke-linecap="round"/>
+                    <circle cx="20" cy="20" r="3" fill="#B5701F"/>
+                  </svg>
+                </div>
+                <div class="tf-app-info">
+                  <div class="tf-app-name">Sol</div>
+                  <div class="tf-app-meta">Beta · Latest build</div>
+                </div>
+                <div class="tf-install-btn">Install</div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Step 4: Set up Sol -->
+        <article class="step" role="listitem" aria-label="Step 4: Set up Sol">
+          <div class="step-circle" aria-hidden="true">4</div>
+          <div class="step-body">
+            <h3 class="step-title">Set up Sol</h3>
+            <p class="step-desc">Sol connects to a daemon running on your Mac. Follow the setup guide to install it and link your Obsidian vault.</p>
+            <a href="install.html" class="beta-app-link">Read the setup guide →</a>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer role="contentinfo">
+    <div class="beta-footer-inner">
+      <span>Sol · Open source</span>
+      <a href="https://github.com/aranga1/Sol" target="_blank" rel="noopener">aranga1/Sol ↗</a>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var REPO     = 'aranga1/Sol';
+      var WORKFLOW = 'add-tester.yml';
+      var TOKEN    = '__DISPATCH_TOKEN__';
+
+      var form      = document.getElementById('beta-form');
+      var submitBtn = document.getElementById('beta-submit');
+      var successEl = document.getElementById('beta-success');
+      var errorEl   = document.getElementById('beta-error');
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        var email     = document.getElementById('beta-email').value.trim();
+        var firstName = document.getElementById('beta-name').value.trim();
+
+        if (!email || !email.includes('@')) {
+          document.getElementById('beta-email').focus();
+          return;
+        }
+
+        submitBtn.disabled    = true;
+        submitBtn.textContent = 'Sending…';
+        errorEl.hidden        = true;
+
+        fetch(
+          'https://api.github.com/repos/' + REPO +
+          '/actions/workflows/' + WORKFLOW + '/dispatches',
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': 'token ' + TOKEN,
+              'Accept': 'application/vnd.github.v3+json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              ref: 'main',
+              inputs: { email: email, first_name: firstName }
+            })
+          }
+        )
+        .then(function (r) {
+          if (r.status === 204) {
+            form.hidden    = true;
+            successEl.hidden = false;
+          } else {
+            throw new Error('HTTP ' + r.status);
+          }
+        })
+        .catch(function () {
+          submitBtn.disabled    = false;
+          submitBtn.textContent = 'Try again →';
+          errorEl.hidden        = false;
+        });
+      });
+    })();
+  </script>
+  <script src="main.js"></script>
+</body>
+</html>
