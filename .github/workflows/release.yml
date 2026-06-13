@@ -52,7 +52,9 @@ jobs:
         run: brew install xcodegen && cd ios && xcodegen generate
 
       - name: Initialize Xcode platforms
-        run: sudo xcodebuild -runFirstLaunch
+        run: |
+          sudo xcodebuild -runFirstLaunch
+          defaults write com.apple.dt.Xcode DVTSkipDeviceSupportCheck YES
 
       - name: Import signing certificate
         env:
