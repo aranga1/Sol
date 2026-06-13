@@ -238,8 +238,8 @@
         )
         .then(function (r) {
           if (r.status === 204) {
-            form.hidden      = true;
-            successEl.hidden = false;
+            form.style.display = 'none';
+            successEl.hidden   = false;
             successEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           } else {
             throw new Error('HTTP ' + r.status);
