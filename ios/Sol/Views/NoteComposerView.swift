@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 // MarkdownTextStorage, MarkdownEditorCoordinator, MarkdownEditorView, FormattingToolbar
 // are defined in MarkdownEditor.swift
 
@@ -23,6 +24,10 @@ struct NoteComposerView: View {
     @State private var isSending = false
     @State private var errorMessage: String?
     @State private var editorCoordinator: MarkdownEditorCoordinator? = nil
+    @State private var uploadItems: [UploadItem] = []
+    @State private var showImagePicker = false
+    @State private var imagePickerSource: UIImagePickerController.SourceType = .photoLibrary
+    @State private var showImageSourceSheet = false
 
     private let tagStore = TagStore.shared
 
@@ -66,6 +71,18 @@ struct NoteComposerView: View {
                 )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
+                if !uploadItems.isEmpty {
+                    ThumbnailStripView(items: uploadItems) { item in
+                        uploadItems.removeAll { $0.id == item.id }
+                        noteBody = noteBody.replacingOccurrences(of: item.embedString, with: "")
+                    } onRetry: { item in
+                        retryUpload(item)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 8)
+                    .animation(.easeOut(duration: 0.2), value: uploadItems.count)
+                }
+
                 if let msg = errorMessage {
                     Text(msg)
                         .font(.system(size: 13))
@@ -102,6 +119,15 @@ struct NoteComposerView: View {
                 .foregroundStyle(DS.inkDark)
             Spacer()
             Button {
+                showImageSourceSheet = true
+            } label: {
+                Image(systemName: "photo.on.rectangle.angled")
+                    .font(.system(size: 18))
+                    .foregroundStyle(DS.inkLight)
+            }
+            .buttonStyle(.plain)
+            .padding(.trailing, 12)
+            Button {
                 Task { await send() }
             } label: {
                 if isSending {
@@ -116,6 +142,16 @@ struct NoteComposerView: View {
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 12)
+        .confirmationDialog("Add Photo", isPresented: $showImageSourceSheet) {
+            Button("Photo Library") { imagePickerSource = .photoLibrary; showImagePicker = true }
+            Button("Camera") { imagePickerSource = .camera; showImagePicker = true }
+            Button("Cancel", role: .cancel) {}
+        }
+        .sheet(isPresented: $showImagePicker) {
+            ImagePickerView(sourceType: imagePickerSource) { image in
+                handleImageSelected(image)
+            }
+        }
     }
 
     // ── Voice badge ───────────────────────────────────────────────────────────
@@ -301,6 +337,37 @@ struct NoteComposerView: View {
     }
 
     // ── Actions ───────────────────────────────────────────────────────────────
+    private func handleImageSelected(_ image: UIImage) {
+        guard let data = image.jpegData(compressionQuality: 0.85) else { return }
+        let formatter = ISO8601DateFormatter()
+        let filename = formatter.string(from: Date())
+            .replacingOccurrences(of: ":", with: "-")
+            .replacingOccurrences(of: "+", with: "") + "-img.jpg"
+        let item = UploadItem(filename: filename, imageData: data)
+        uploadItems.append(item)
+        noteBody += (noteBody.isEmpty ? "" : "\n") + item.embedString
+        Task {
+            do {
+                _ = try await UploadService.shared.uploadImage(data, filename: filename)
+                item.state = .done
+            } catch {
+                item.state = .failed(error)
+            }
+        }
+    }
+
+    private func retryUpload(_ item: UploadItem) {
+        item.state = .uploading
+        Task {
+            do {
+                _ = try await UploadService.shared.uploadImage(item.imageData, filename: item.filename)
+                item.state = .done
+            } catch {
+                item.state = .failed(error)
+            }
+        }
+    }
+
     private func commitTagInput() {
         let t = tagInput
             .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -329,6 +396,136 @@ struct NoteComposerView: View {
         } catch {
             errorMessage = error.localizedDescription
             isSending = false
+        }
+    }
+}
+
+// ── Thumbnail strip ───────────────────────────────────────────────────────────
+struct ThumbnailStripView: View {
+    let items: [UploadItem]
+    let onRemove: (UploadItem) -> Void
+    let onRetry: (UploadItem) -> Void
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                ForEach(items) { item in
+                    ThumbnailCell(item: item, onRemove: { onRemove(item) }, onRetry: { onRetry(item) })
+                }
+            }
+        }
+    }
+}
+
+private struct ThumbnailCell: View {
+    @ObservedObject var item: UploadItem
+    let onRemove: () -> Void
+    let onRetry: () -> Void
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            Button {
+                if case .failed = item.state { onRetry() }
+            } label: {
+                ZStack {
+                    if let uiImage = UIImage(data: item.imageData) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 40, height: 40)
+                            .clipped()
+                            .cornerRadius(8)
+                    } else {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(DS.parchmentDeep)
+                            .frame(width: 40, height: 40)
+                    }
+
+                    stateOverlay
+                }
+            }
+            .buttonStyle(.plain)
+
+            Button(action: onRemove) {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 14))
+                    .foregroundStyle(DS.inkMid)
+                    .background(Circle().fill(DS.parchment).padding(2))
+            }
+            .buttonStyle(.plain)
+            .offset(x: 6, y: -6)
+        }
+        .animation(.easeOut(duration: 0.2), value: stateTag)
+    }
+
+    @ViewBuilder
+    private var stateOverlay: some View {
+        switch item.state {
+        case .uploading:
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.black.opacity(0.35))
+                .frame(width: 40, height: 40)
+                .overlay(ProgressView().tint(.white).scaleEffect(0.7))
+        case .done:
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.black.opacity(0.18))
+                .frame(width: 40, height: 40)
+                .overlay(
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(.white)
+                )
+        case .failed:
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.black.opacity(0.45))
+                .frame(width: 40, height: 40)
+                .overlay(
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color.yellow)
+                )
+        }
+    }
+
+    // Stable tag for animation value — avoids Error non-Equatable issue
+    private var stateTag: Int {
+        switch item.state {
+        case .uploading: return 0
+        case .done: return 1
+        case .failed: return 2
+        }
+    }
+}
+
+// ── Image picker ──────────────────────────────────────────────────────────────
+struct ImagePickerView: UIViewControllerRepresentable {
+    let sourceType: UIImagePickerController.SourceType
+    let onImagePicked: (UIImage) -> Void
+
+    func makeCoordinator() -> Coordinator { Coordinator(onImagePicked: onImagePicked) }
+
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.sourceType = sourceType
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+
+    final class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+        let onImagePicked: (UIImage) -> Void
+        init(onImagePicked: @escaping (UIImage) -> Void) { self.onImagePicked = onImagePicked }
+
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+            picker.dismiss(animated: true)
+            if let image = info[.editedImage] as? UIImage ?? info[.originalImage] as? UIImage {
+                onImagePicked(image)
+            }
+        }
+
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            picker.dismiss(animated: true)
         }
     }
 }
