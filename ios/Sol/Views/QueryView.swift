@@ -129,7 +129,6 @@ struct QueryView: View {
     @State private var thinkPhase = false
     @State private var showCalendarEditor = false
     @State private var eventNotCreated = false
-    @State private var calendarSaved: Bool? = nil
     @Environment(\.dismiss) private var dismiss
 
     init(initialQuestion: String = "", onDismiss: (() -> Void)? = nil, onOpenDrawer: (() -> Void)? = nil) {
@@ -281,15 +280,13 @@ struct QueryView: View {
                 }
             }
         }
-        .sheet(isPresented: $showCalendarEditor, onDismiss: {
-            if let saved = calendarSaved {
-                if !saved { eventNotCreated = true }
-            }
-            calendarSaved = nil
-            vm.pendingCalendarPayload = nil
-        }) {
+        .sheet(isPresented: $showCalendarEditor) {
             if let payload = vm.pendingCalendarPayload {
-                CalendarEditorSheet(payload: payload, saved: $calendarSaved)
+                CalendarEditorSheet(payload: payload) { saved in
+                    showCalendarEditor = false
+                    vm.pendingCalendarPayload = nil
+                    if !saved { eventNotCreated = true }
+                }
             }
         }
     }
@@ -624,9 +621,9 @@ private struct FlowLayout: Layout {
 
 private struct CalendarEditorSheet: UIViewControllerRepresentable {
     let payload: CreateEventPayload
-    @Binding var saved: Bool?
+    let onComplete: (Bool) -> Void
 
-    func makeCoordinator() -> Coordinator { Coordinator(saved: $saved) }
+    func makeCoordinator() -> Coordinator { Coordinator(onComplete: onComplete) }
 
     func makeUIViewController(context: Context) -> EKEventEditViewController {
         let store = CalendarService.shared.eventStore
@@ -646,17 +643,16 @@ private struct CalendarEditorSheet: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: EKEventEditViewController, context: Context) {}
 
+    // EventKit calls this delegate method on the main thread — nonisolated(unsafe) is safe here.
     final class Coordinator: NSObject, EKEventEditViewDelegate {
-        @Binding var saved: Bool?
-        init(saved: Binding<Bool?>) { _saved = saved }
+        nonisolated(unsafe) let onComplete: (Bool) -> Void
+        init(onComplete: @escaping (Bool) -> Void) { self.onComplete = onComplete }
 
-        nonisolated func eventEditViewController(
+        func eventEditViewController(
             _ controller: EKEventEditViewController,
             didCompleteWith action: EKEventEditViewAction
         ) {
-            let wasSaved = action == .saved
-            let binding = _saved
-            Task { @MainActor in binding.wrappedValue = wasSaved }
+            onComplete(action == .saved)
         }
     }
 }
