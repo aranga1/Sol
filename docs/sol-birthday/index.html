@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Happy Birthday, Ayesha</title>
+  <meta name="description" content="A birthday card for Ayesha.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="scene" id="scene">
+
+    <!-- drifting background -->
+    <div class="bg" id="bg" aria-hidden="true">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+    </div>
+
+    <!-- section nav dots -->
+    <nav class="dots" id="dots" aria-label="Section navigation">
+      <button type="button" data-go="0" aria-label="Opener"><span class="dot"></span></button>
+      <button type="button" data-go="1" aria-label="Message"><span class="dot"></span></button>
+      <button type="button" data-go="2" aria-label="Gift"><span class="dot"></span></button>
+    </nav>
+
+    <!-- 1 — OPENER -->
+    <section class="sec opener" id="s0" data-i="0">
+      <div class="sun" id="sun" aria-hidden="true"><div class="sun-core"></div></div>
+      <div class="reveal" style="--d:0s"><p class="kicker">ANOTHER LAP AROUND THE SUN</p></div>
+      <div class="reveal" style="--d:.08s"><p class="hb">Happy Birthday,</p></div>
+      <h1 class="name letters" data-word="Ayesha"></h1>
+      <div class="reveal" style="--d:.55s"><p class="sub">(yes, again — try to act surprised)</p></div>
+      <div class="reveal cue-wrap" style="--d:.9s"><div class="cue">SCROLL ↓</div></div>
+    </section>
+
+    <!-- 2 — MESSAGE -->
+    <section class="sec message" id="s1" data-i="1">
+      <div class="msg-col">
+        <div class="reveal" style="--d:0s"><p class="kicker">A NOTE — SINCE I'M BAD AT CARDS</p></div>
+        <div class="reveal" style="--d:.12s"><p class="copy">So that might've been an underwhelming first impression, but I hope this makes up for it. I've never really gotten you a nice gift, and I struggled with the thought this time as well. As expected — I came up short.</p></div>
+        <div class="reveal" style="--d:.24s"><p class="copy">After seeing one too many “build your own running socks” websites, I decided I'd do something I actually find fun, and that could count as <em>(potentially)</em> unique.</p></div>
+        <div class="reveal" style="--d:.36s"><p class="copy">So happy birthday, Ayesha. I hope life keeps giving you the best, and that you keep overcoming challenges with that go-getter personality. You're passionate, ideas-driven, always trying things out — and in that spirit, I figured this might be a good fit.</p></div>
+        <div class="reveal" style="--d:.5s">
+          <p class="sign">Have a great year ahead. I value your friendship.</p>
+          <p class="ps">P.S. The actual gift is just downstairs. Keep scrolling ↓</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — GIFT -->
+    <section class="sec gift" id="s2" data-i="2">
+      <div class="reveal" style="--d:0s"><p class="kicker center">OKAY — THE ACTUAL GIFT</p></div>
+      <div class="stage">
+        <div class="prompt" id="prompt">
+          <div class="reveal" style="--d:.12s"><h2 class="ask">Ready to open your gift?</h2></div>
+          <div class="reveal" style="--d:.26s"><p class="sub center">Spoiler: it's not running socks.</p></div>
+          <div class="reveal" style="--d:.4s"><button type="button" class="btn" id="openBtn">Yes — open it</button></div>
+        </div>
+        <div class="panel" id="panel">
+          <div class="sun-sm" aria-hidden="true"></div>
+          <h2 class="meet letters" data-word="Meet Sol."></h2>
+          <p class="copy center narrow">Your Obsidian vault, on your phone — a second brain that runs entirely on your own Mac. Ask it questions, capture thoughts and voice notes, and keep every idea you almost-started. No cloud, no subscriptions. Your data, your rules.</p>
+          <p class="foot">Named after the sun. Fitting — for someone on another lap around it.</p>
+          <a class="btn" href="https://aranga1.github.io/Sol/" target="_blank" rel="noopener">Open the instructions →</a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
