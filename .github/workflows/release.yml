@@ -85,6 +85,21 @@ jobs:
             | plutil -extract UUID raw -)
           echo "PROFILE_UUID=$PROFILE_UUID" >> $GITHUB_ENV
 
+      - name: Generate BuildSecrets.swift
+        env:
+          GH_ISSUES_PAT: ${{ secrets.GH_ISSUES_PAT }}
+        run: |
+          python3 -c "
+          import os
+          pat = os.environ.get('GH_ISSUES_PAT', 'release-stub')
+          content = f'''enum BuildSecrets {{
+              static let githubIssuesPAT = \"{pat}\"
+              static let githubRepo = \"aranga1/Sol\"
+          }}
+          '''
+          open('ios/Sol/BuildSecrets.swift', 'w').write(content)
+          "
+
       - name: Build archive
         run: |
           xcodebuild archive \
