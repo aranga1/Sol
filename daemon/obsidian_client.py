@@ -93,5 +93,28 @@ class ObsidianClient:
         if not resp.is_success:
             raise ObsidianError(resp.text, resp.status_code)
 
+    async def list_directories(self) -> list[str]:
+        """GET /vault/ — return sorted unique parent directories in the vault.
+
+        Parses the ``files`` list from the response and extracts the parent
+        directory of each path (everything before the last ``/``).  Root-level
+        files (no ``/`` in path) are skipped.  The result is deduplicated and
+        sorted alphabetically.
+        """
+        try:
+            resp = await self._client.get("/vault/")
+            if not resp.is_success:
+                return []
+            data = resp.json()
+            files = data.get("files", [])
+            dirs: set[str] = set()
+            for f in files:
+                f = str(f)
+                if "/" in f:
+                    dirs.add(f.rsplit("/", 1)[0])
+            return sorted(dirs)
+        except Exception:
+            return []
+
     async def close(self):
         await self._client.aclose()
