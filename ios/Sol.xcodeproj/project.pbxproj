@@ -41,6 +41,7 @@
 		BFFBFF29646C6FEB96664DAC /* UploadService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7F56168CED4CA1041455E5B /* UploadService.swift */; };
 		C3CB68D690D0E27F8674100F /* CalendarModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74C9C6E3D30F02CF0B618A22 /* CalendarModels.swift */; };
 		C3E6AC28C86094F6E7D9D126 /* NoteComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FDDD108104B852671CB4C73 /* NoteComposerView.swift */; };
+		C53599D76825F39B7A19D4E9 /* FolderPickerSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574EDECA4C55393AF8D88DBF /* FolderPickerSection.swift */; };
 		C7ECABDF3EB1B26BAAD28071 /* TextNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4460F7B444409B5A81A7B654 /* TextNoteView.swift */; };
 		CA05C24530DEEAA186DD0D06 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 452FE6CDB9179A1DCE564E33 /* Assets.xcassets */; };
 		D1A98C4951484D077C820F36 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F4C5D5909E42CE6C46E8081 /* SettingsView.swift */; };
@@ -88,6 +89,7 @@
 		49FE67FF6154832FC45DB127 /* ManualEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualEntryView.swift; sourceTree = "<group>"; };
 		4ADFE3DAD33FB8568630E622 /* DaemonStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaemonStatusViewModel.swift; sourceTree = "<group>"; };
 		4CBB9AA2E1CBC2EE0927B6A3 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		574EDECA4C55393AF8D88DBF /* FolderPickerSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderPickerSection.swift; sourceTree = "<group>"; };
 		589E7DE7431141E134DEAD90 /* BuildSecrets.swift.template */ = {isa = PBXFileReference; path = BuildSecrets.swift.template; sourceTree = "<group>"; };
 		5CC310179CA903C007A3A301 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		6059C5D5F8FC3FA6FE40E5E4 /* FileUploadJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUploadJob.swift; sourceTree = "<group>"; };
@@ -171,6 +173,7 @@
 				38358FEC4BCA209328EE3D0A /* AllChatsView.swift */,
 				4075C452ECF4EBE74177F209 /* BreathingBackground.swift */,
 				85C83053B4CFA176EE0CC5A7 /* FeedbackView.swift */,
+				574EDECA4C55393AF8D88DBF /* FolderPickerSection.swift */,
 				3EC29BEB51B22345243B5D41 /* HelpView.swift */,
 				E4D636FB5C3E9FE738D13280 /* HistoryView.swift */,
 				F054FEA6F26B5A7196F679FB /* HomeView.swift */,
@@ -405,6 +408,7 @@
 				B738C2A4E140CF433699D779 /* DesignSystem.swift in Sources */,
 				4BDB385194AB5759CEEDADCB /* FeedbackView.swift in Sources */,
 				6DC772732F4A78B7E571FFC7 /* FileUploadJob.swift in Sources */,
+				C53599D76825F39B7A19D4E9 /* FolderPickerSection.swift in Sources */,
 				2D0E2E3456A1479B29199E39 /* GitHubService.swift in Sources */,
 				BC38490E3A6A97E9BB2A0720 /* HelpView.swift in Sources */,
 				7CA171B9A1380E35D163BE50 /* HistoryStore.swift in Sources */,

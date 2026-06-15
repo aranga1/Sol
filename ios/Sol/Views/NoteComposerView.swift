@@ -28,6 +28,7 @@ struct NoteComposerView: View {
     @State private var showImagePicker = false
     @State private var imagePickerSource: UIImagePickerController.SourceType = .photoLibrary
     @State private var showImageSourceSheet = false
+    @State private var selectedFolder: String? = nil
 
     private let tagStore = TagStore.shared
 
@@ -92,6 +93,8 @@ struct NoteComposerView: View {
                 }
 
                 tagSection
+
+                FolderPickerSection(selectedFolder: $selectedFolder, apiClient: APIClient.shared)
 
                 if isEditorFocused {
                     FormattingToolbar(coordinator: editorCoordinator, onPhotoTap: { showImageSourceSheet = true })
@@ -381,8 +384,10 @@ struct NoteComposerView: View {
                 content: content,
                 title: title.isEmpty ? nil : title,
                 tags: selectedTags.isEmpty ? nil : selectedTags,
-                source: isVoice ? .voice : .text
+                source: isVoice ? .voice : .text,
+                folder: selectedFolder
             ))
+            selectedFolder = nil
             onDismiss()
         } catch {
             errorMessage = error.localizedDescription
