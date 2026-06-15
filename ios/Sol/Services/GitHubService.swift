@@ -30,7 +30,7 @@ struct GitHubService {
     }
 
     func uploadImage(_ data: Data, uuid: String) async throws -> String {
-        let path = "feedback/attachments/\(uuid).png"
+        let path = "feedback/attachments/\(uuid).jpg"
         guard let url = URL(string: "\(base)/repos/\(repo)/contents/\(path)") else {
             throw GitHubServiceError.requestFailed(0)
         }

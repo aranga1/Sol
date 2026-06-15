@@ -284,10 +284,9 @@ private struct SentConfirmationOverlay: View {
             }
             .padding(40)
         }
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                onDismiss()
-            }
+        .task {
+            try? await Task.sleep(for: .seconds(2))
+            onDismiss()
         }
     }
 }
