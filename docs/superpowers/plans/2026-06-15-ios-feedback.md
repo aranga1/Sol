@@ -631,7 +631,8 @@ struct FeedbackView: View {
             }
         }
         .sheet(isPresented: $showImagePicker) {
-            ImagePickerController(sourceType: imagePickerSource) { image in
+            // ImagePickerView is defined in NoteComposerView.swift (not private — accessible here)
+            ImagePickerView(sourceType: imagePickerSource) { image in
                 if selectedImages.count < 3 { selectedImages.append(image) }
             }
         }
