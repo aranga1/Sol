@@ -59,3 +59,10 @@ async def create_note(request: Request, body: NoteRequest):
 
     file_path = await obsidian.create_note(filename, note_content)
     return NoteResponse(file_path=file_path)
+
+
+@router.get("/api/vault/directories")
+async def get_vault_directories(request: Request) -> dict:
+    """Return sorted unique vault directory paths from the Obsidian vault."""
+    dirs = await request.app.state.obsidian.list_directories()
+    return {"directories": dirs}

@@ -109,3 +109,43 @@ def test_filename_format_includes_timestamp_and_source(client):
     assert re.match(
         r"\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-voice\.md", filename_arg
     )
+
+
+# ---------------------------------------------------------------------------
+# GET /api/vault/directories
+# ---------------------------------------------------------------------------
+
+def test_get_vault_directories_returns_list(client):
+    """GET /api/vault/directories returns sorted directory list from obsidian."""
+    from daemon.main import app
+    from unittest.mock import AsyncMock
+
+    app.state.obsidian.list_directories = AsyncMock(return_value=["Notes", "ideas"])
+
+    resp = client.get(
+        "/api/vault/directories",
+        headers={"X-API-Key": "testkey123"},
+    )
+    assert resp.status_code == 200
+    assert resp.json() == {"directories": ["Notes", "ideas"]}
+
+
+def test_get_vault_directories_requires_auth(client):
+    """GET /api/vault/directories requires X-API-Key header."""
+    resp = client.get("/api/vault/directories")
+    assert resp.status_code == 401
+
+
+def test_get_vault_directories_empty_vault(client):
+    """Returns empty list when vault has no subdirectories."""
+    from daemon.main import app
+    from unittest.mock import AsyncMock
+
+    app.state.obsidian.list_directories = AsyncMock(return_value=[])
+
+    resp = client.get(
+        "/api/vault/directories",
+        headers={"X-API-Key": "testkey123"},
+    )
+    assert resp.status_code == 200
+    assert resp.json() == {"directories": []}
