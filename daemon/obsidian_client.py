@@ -32,16 +32,17 @@ class ObsidianClient:
             transport=transport,
         )
 
-    async def create_note(self, filename: str, content: str) -> str:
-        """PUT /vault/Notes/<filename> — returns the file path."""
+    async def create_note(self, filename: str, content: str, folder: str = "Notes") -> str:
+        """PUT /vault/{folder}/<filename> — returns the file path."""
+        target_folder = folder.strip() if folder.strip() else "Notes"
         resp = await self._client.put(
-            f"/vault/Notes/{filename}",
+            f"/vault/{target_folder}/{filename}",
             content=content.encode(),
             headers={"Content-Type": "text/markdown"},
         )
         if not resp.is_success:
             raise ObsidianError(resp.text, resp.status_code)
-        return f"Notes/{filename}"
+        return f"{target_folder}/{filename}"
 
     async def health(self) -> bool:
         """GET / — returns True if Obsidian Local REST API plugin is running."""

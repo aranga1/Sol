@@ -14,6 +14,7 @@ class NoteRequest(BaseModel):
     title: Optional[str] = None
     tags: Optional[List[str]] = None
     source: Literal["voice", "text"]
+    folder: str = "Notes"
 
     @field_validator("content")
     @classmethod
@@ -21,6 +22,11 @@ class NoteRequest(BaseModel):
         if not v.strip():
             raise ValueError("content cannot be empty")
         return v
+
+    @field_validator("folder")
+    @classmethod
+    def folder_default_if_empty(cls, v: str) -> str:
+        return v.strip() if v.strip() else "Notes"
 
 
 class NoteResponse(BaseModel):
@@ -57,7 +63,7 @@ async def create_note(request: Request, body: NoteRequest):
     # Title is already the filename — don't repeat it as a # heading inside the note
     note_content = frontmatter + body.content
 
-    file_path = await obsidian.create_note(filename, note_content)
+    file_path = await obsidian.create_note(filename, note_content, folder=body.folder)
     return NoteResponse(file_path=file_path)
 
 
