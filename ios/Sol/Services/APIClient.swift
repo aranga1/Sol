@@ -121,6 +121,17 @@ final class APIClient: ObservableObject {
         catch { throw SolAPIError.decodingError(error) }
     }
 
+    func fetchDirectories() async throws -> [String] {
+        let req = try makeRequest("/api/vault/directories")
+        let (data, response) = try await session.data(for: req)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            throw SolAPIError.httpError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0)
+        }
+        struct DirectoriesResponse: Decodable { let directories: [String] }
+        do { return try JSONDecoder().decode(DirectoriesResponse.self, from: data).directories }
+        catch { throw SolAPIError.decodingError(error) }
+    }
+
     func fetchNotifications() async throws -> [DaemonNotification] {
         let req = try makeRequest("/api/notifications")
         let (data, response) = try await session.data(for: req)

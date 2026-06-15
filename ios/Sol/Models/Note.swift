@@ -9,6 +9,7 @@ struct NoteRequest: Codable {
     let title: String?
     let tags: [String]?
     let source: NoteSource
+    var folder: String?
 }
 
 struct NoteResponse: Codable {
