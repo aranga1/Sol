@@ -569,7 +569,7 @@ def cmd_chat(_args):
         except urllib.error.HTTPError as e:
             if e.code == 503:
                 console.print("[yellow]Index not ready yet — try again in a moment.[/yellow]")
-                history.pop()  # remove unprocessed user message
+                history.pop()  # undo the append above — user msg was never answered
                 continue
             fail(f"HTTP {e.code} from daemon")
             break
@@ -583,13 +583,10 @@ def cmd_chat(_args):
 
         if assistant_content:
             history.append({"role": "assistant", "content": assistant_content})
+        elif not sources:
+            console.print("[dim]No response.[/dim]")
 
         console.print()
-
-
-def import_time():
-    import time
-    return time.time()
 
 
 def cmd_config(_args):
