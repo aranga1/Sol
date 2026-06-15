@@ -67,3 +67,17 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.aakashranga.Sol.widget
       DEVELOPMENT_TEAM: J6X383NXGF
       CODE_SIGN_STYLE: Automatic
+
+  SolTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - SolTests
+    settings:
+      SWIFT_VERSION: 6.0
+      IPHONEOS_DEPLOYMENT_TARGET: 17.0
+      PRODUCT_BUNDLE_IDENTIFIER: com.aakashranga.SolTests
+      DEVELOPMENT_TEAM: J6X383NXGF
+      CODE_SIGN_STYLE: Automatic
+    dependencies:
+      - target: Sol
