@@ -20,6 +20,7 @@ struct HomeView: View {
 
     // Sheets
     @State private var showSettings = false
+    @State private var showFeedback = false
     @State private var showObsidianAlert = false
 
     // Full-screen overlays (slide up)
@@ -103,7 +104,8 @@ struct HomeView: View {
                         navigateToAllChats = true
                     }
                 },
-                onOpenObsidian: { closeDrawer(); openObsidianVault() }
+                onOpenObsidian: { closeDrawer(); openObsidianVault() },
+                onOpenFeedback: { closeDrawer(); showFeedback = true }
             )
             .frame(width: drawerWidth)
             .shadow(color: .black.opacity(0.18), radius: 16, x: 6)
@@ -139,6 +141,9 @@ struct HomeView: View {
                 showSettings = false
                 onResetConnection()
             })
+        }
+        .sheet(isPresented: $showFeedback) {
+            FeedbackView()
         }
         .alert("Obsidian Not Installed", isPresented: $showObsidianAlert) {
             Button("OK", role: .cancel) {}
@@ -907,6 +912,7 @@ private struct DrawerView: View {
     let onOpenSettings: () -> Void
     let onOpenAllChats: () -> Void
     let onOpenObsidian: () -> Void
+    let onOpenFeedback: () -> Void
 
     private let rowHeight: CGFloat = 48
 
@@ -1014,6 +1020,21 @@ private struct DrawerView: View {
                         .foregroundStyle(Color(hex: "#CBB994"))
                         .frame(width: 20)
                     Text("Open in Obsidian")
+                        .font(.body)
+                        .foregroundStyle(Color(hex: "#E7DDCA"))
+                }
+                .padding(.horizontal, 22)
+                .padding(.vertical, 14)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            // Feedback
+            Button(action: onOpenFeedback) {
+                HStack(spacing: 12) {
+                    Image(systemName: "bubble.left.and.exclamationmark.bubble.right")
+                        .foregroundStyle(Color(hex: "#CBB994"))
+                        .frame(width: 20)
+                    Text("Feedback")
                         .font(.body)
                         .foregroundStyle(Color(hex: "#E7DDCA"))
                 }

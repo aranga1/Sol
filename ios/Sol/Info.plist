@@ -32,7 +32,6 @@
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>obsidian</string>
-		<string>calshow</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
@@ -41,16 +40,28 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Sol uses your camera to scan the QR code from your Mac setup.</string>
-	<key>NSCalendarsUsageDescription</key>
-	<string>Sol needs calendar access to create events on your behalf.</string>
-	<key>NSCalendarsFullAccessUsageDescription</key>
-	<string>Sol needs full calendar access to create events on your behalf.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Sol uses your microphone to record voice notes.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Newsreader.ttf</string>
 		<string>Newsreader-Italic.ttf</string>
+	</array>
+	<key>UILaunchScreen</key>
+	<dict/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 </dict>
 </plist>
