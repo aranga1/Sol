@@ -8,6 +8,23 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+
+def _parse_sse_stream(response_iter):
+    """Yield parsed event dicts from an SSE HTTP response iterator.
+
+    Each element of response_iter may be bytes or str.
+    Non-data lines and malformed JSON are silently skipped.
+    """
+    for raw in response_iter:
+        line = (raw.decode() if isinstance(raw, bytes) else raw).rstrip("\r\n")
+        if not line.startswith("data: "):
+            continue
+        try:
+            yield json.loads(line[6:])
+        except json.JSONDecodeError:
+            continue
+
+
 # ── Paths ──────────────────────────────────────────────────────────────────────
 SCRIPT_DIR   = Path(__file__).resolve().parent
 REPO_DIR     = SCRIPT_DIR.parent
@@ -462,9 +479,114 @@ def cmd_index_calendar(_args):
     print()
 
 
-def import_time():
-    import time
-    return time.time()
+def cmd_chat(_args):
+    """Interactive terminal chat session with the Sol daemon LLM."""
+    try:
+        from rich.console import Console
+        from rich.live import Live
+        from rich.markdown import Markdown
+        from rich.panel import Panel
+    except ImportError:
+        fail("rich not installed — run: sol update")
+        sys.exit(1)
+
+    cfg = load_config()
+    api_key = cfg.get("daemon_api_key", "")
+    port = cfg.get("daemon_port", 8765)
+    url = f"http://localhost:{port}/api/query"
+
+    console = Console()
+    history: list[dict] = []
+
+    def _print_header() -> None:
+        console.print()
+        console.print(
+            Panel(
+                "[bold]Sol[/bold]  [dim]chat session  ·  /exit to quit  ·  /clear to reset history[/dim]",
+                border_style="dim",
+                expand=False,
+            )
+        )
+        console.print()
+
+    _print_header()
+
+    while True:
+        try:
+            user_input = console.input("[bold]You[/bold] › ")
+        except (EOFError, KeyboardInterrupt):
+            console.print("\n[dim]Goodbye.[/dim]")
+            break
+
+        stripped = user_input.strip()
+        if not stripped:
+            continue
+        if stripped.lower() in ("/exit", "/quit"):
+            console.print("[dim]Goodbye.[/dim]")
+            break
+        if stripped.lower() == "/clear":
+            history.clear()
+            console.clear()
+            _print_header()
+            continue
+
+        history.append({"role": "user", "content": stripped})
+
+        payload = json.dumps({"question": stripped, "history": history}).encode()
+        req = urllib.request.Request(
+            url,
+            data=payload,
+            headers={"Content-Type": "application/json", "X-API-Key": api_key},
+        )
+
+        assistant_content = ""
+        sources: list[dict] = []
+        console.print()
+
+        try:
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                with Live(
+                    Markdown("▌"),
+                    console=console,
+                    refresh_per_second=15,
+                    vertical_overflow="visible",
+                ) as live:
+                    for event in _parse_sse_stream(resp):
+                        etype = event.get("type")
+                        if etype == "token":
+                            assistant_content += event["content"]
+                            live.update(Markdown(assistant_content + " ▌"))
+                        elif etype == "sources":
+                            sources = event.get("sources", [])
+                        elif etype == "error":
+                            live.update(Markdown(assistant_content or "*Error from daemon*"))
+                            console.print(f"\n[red]{event.get('content', 'Unknown error')}[/red]")
+                            break
+                        elif etype == "done":
+                            live.update(Markdown(assistant_content))
+                            break
+
+        except urllib.error.HTTPError as e:
+            if e.code == 503:
+                console.print("[yellow]Index not ready yet — try again in a moment.[/yellow]")
+                history.pop()  # undo the append above — user msg was never answered
+                continue
+            fail(f"HTTP {e.code} from daemon")
+            break
+        except urllib.error.URLError:
+            fail("Cannot connect to daemon — is it running? Try: sol start")
+            break
+
+        if sources:
+            titles = "  ·  ".join(s.get("title") or s.get("file", "") for s in sources)
+            console.print(f"[dim]Sources: {titles}[/dim]")
+
+        if assistant_content:
+            history.append({"role": "assistant", "content": assistant_content})
+        elif not sources:
+            console.print("[dim]No response.[/dim]")
+
+        console.print()
 
 
 def cmd_config(_args):
@@ -627,6 +749,7 @@ USAGE = f"""\
   {cyan('uninstall')}     Run the uninstall script
   {cyan('qr')}            Regenerate the iPhone connection QR code
   {cyan('notify')}        Queue a notification to your iPhone  (title body [type])
+  {cyan('chat')}          Start an interactive chat session with the Sol LLM
   {cyan('update-ios')}    Check for a new iOS app release and show install QR
   {cyan('index-images')}    Describe unindexed images with the vision model and add to index
   {cyan('index-calendar')}  Sync calendar events into the index immediately (no 60s wait)
@@ -648,6 +771,7 @@ COMMANDS = {
     "uninstall":    cmd_uninstall,
     "qr":           cmd_qr,
     "notify":       cmd_notify,
+    "chat":         cmd_chat,
     "update-ios":   cmd_update_ios,
     "index-images":    cmd_index_images,
     "index-calendar":  cmd_index_calendar,
