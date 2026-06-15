@@ -109,3 +109,103 @@ def test_filename_format_includes_timestamp_and_source(client):
     assert re.match(
         r"\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-voice\.md", filename_arg
     )
+
+
+# ---------------------------------------------------------------------------
+# GET /api/vault/directories
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# folder field on POST /api/note
+# ---------------------------------------------------------------------------
+
+def test_create_note_with_folder_uses_correct_path(client):
+    """When folder is specified, note is created at /vault/{folder}/{filename}."""
+    from daemon.main import app
+
+    app.state.obsidian.create_note = AsyncMock(return_value="ideas/ai/My Note.md")
+
+    resp = client.post(
+        "/api/note",
+        json={"content": "An idea", "title": "My Note", "source": "text", "folder": "ideas/ai"},
+        headers={"X-API-Key": "testkey123"},
+    )
+    assert resp.status_code == 201
+    call_kwargs = app.state.obsidian.create_note.call_args
+    # folder must be passed and match what was requested
+    folder_arg = call_kwargs[1]["folder"] if call_kwargs[1] else call_kwargs[0][2]
+    assert folder_arg == "ideas/ai"
+
+
+def test_create_note_default_folder_is_Notes(client):
+    """When folder is omitted, note goes to Notes/ (backward compat)."""
+    from daemon.main import app
+
+    app.state.obsidian.create_note = AsyncMock(return_value="Notes/My Note.md")
+
+    resp = client.post(
+        "/api/note",
+        json={"content": "A thought", "title": "My Note", "source": "text"},
+        headers={"X-API-Key": "testkey123"},
+    )
+    assert resp.status_code == 201
+    call_kwargs = app.state.obsidian.create_note.call_args
+    folder_arg = call_kwargs[1]["folder"] if call_kwargs[1] else call_kwargs[0][2]
+    assert folder_arg == "Notes"
+
+
+def test_create_note_with_empty_folder_uses_default(client):
+    """Empty string folder falls back to default Notes/."""
+    from daemon.main import app
+
+    app.state.obsidian.create_note = AsyncMock(return_value="Notes/My Note.md")
+
+    resp = client.post(
+        "/api/note",
+        json={"content": "A thought", "title": "My Note", "source": "text", "folder": ""},
+        headers={"X-API-Key": "testkey123"},
+    )
+    assert resp.status_code == 201
+    call_kwargs = app.state.obsidian.create_note.call_args
+    folder_arg = call_kwargs[1]["folder"] if call_kwargs[1] else call_kwargs[0][2]
+    assert folder_arg == "Notes"
+
+
+# ---------------------------------------------------------------------------
+# GET /api/vault/directories
+# ---------------------------------------------------------------------------
+
+def test_get_vault_directories_returns_list(client):
+    """GET /api/vault/directories returns sorted directory list from obsidian."""
+    from daemon.main import app
+    from unittest.mock import AsyncMock
+
+    app.state.obsidian.list_directories = AsyncMock(return_value=["Notes", "ideas"])
+
+    resp = client.get(
+        "/api/vault/directories",
+        headers={"X-API-Key": "testkey123"},
+    )
+    assert resp.status_code == 200
+    assert resp.json() == {"directories": ["Notes", "ideas"]}
+
+
+def test_get_vault_directories_requires_auth(client):
+    """GET /api/vault/directories requires X-API-Key header."""
+    resp = client.get("/api/vault/directories")
+    assert resp.status_code == 401
+
+
+def test_get_vault_directories_empty_vault(client):
+    """Returns empty list when vault has no subdirectories."""
+    from daemon.main import app
+    from unittest.mock import AsyncMock
+
+    app.state.obsidian.list_directories = AsyncMock(return_value=[])
+
+    resp = client.get(
+        "/api/vault/directories",
+        headers={"X-API-Key": "testkey123"},
+    )
+    assert resp.status_code == 200
+    assert resp.json() == {"directories": []}

@@ -87,3 +87,59 @@ async def test_note_count_missing_files_key_returns_zero():
     count = await client.note_count()
     await client.close()
     assert count == 0
+
+
+@pytest.mark.asyncio
+async def test_list_directories_returns_sorted_unique_paths():
+    """list_directories() extracts unique parent dirs from vault file list."""
+    mock_files = {
+        "files": [
+            "Notes/daily/2026-06-15.md",
+            "Notes/daily/2026-06-14.md",
+            "Notes/projects/sol.md",
+            "ideas/ai-thoughts.md",
+            "ideas/travel.md",
+            "readme.md",  # root file — no parent dir to extract
+        ]
+    }
+    router = respx.MockRouter(assert_all_called=False)
+    router.get("/vault/").mock(return_value=Response(200, json=mock_files))
+    client = make_client(router)
+    dirs = await client.list_directories()
+    await client.close()
+    assert dirs == ["Notes/daily", "Notes/projects", "ideas"]
+
+
+@pytest.mark.asyncio
+async def test_list_directories_excludes_root_files():
+    """Files at vault root (no slash in path) don't produce a directory entry."""
+    mock_files = {"files": ["readme.md", "Notes/a.md"]}
+    router = respx.MockRouter(assert_all_called=False)
+    router.get("/vault/").mock(return_value=Response(200, json=mock_files))
+    client = make_client(router)
+    dirs = await client.list_directories()
+    await client.close()
+    assert dirs == ["Notes"]
+
+
+@pytest.mark.asyncio
+async def test_list_directories_empty_vault():
+    mock_files = {"files": []}
+    router = respx.MockRouter(assert_all_called=False)
+    router.get("/vault/").mock(return_value=Response(200, json=mock_files))
+    client = make_client(router)
+    dirs = await client.list_directories()
+    await client.close()
+    assert dirs == []
+
+
+@pytest.mark.asyncio
+async def test_list_directories_deduplicates():
+    """Multiple files in same dir → dir appears once."""
+    mock_files = {"files": ["ideas/a.md", "ideas/b.md", "ideas/c.md"]}
+    router = respx.MockRouter(assert_all_called=False)
+    router.get("/vault/").mock(return_value=Response(200, json=mock_files))
+    client = make_client(router)
+    dirs = await client.list_directories()
+    await client.close()
+    assert dirs == ["ideas"]
