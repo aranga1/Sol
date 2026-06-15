@@ -8,3 +8,6 @@ __pycache__/
 
 # Claude Code local memory/session files
 .claude/
+
+# iOS build secrets (never commit)
+ios/Sol/BuildSecrets.swift

@@ -22,13 +22,17 @@ jobs:
       - name: Install xcodegen
         run: brew install xcodegen
 
-      - name: Generate BuildSecrets.swift (stub for build)
+      - name: Generate BuildSecrets.swift
+        env:
+          GH_ISSUES_PAT: ${{ secrets.GH_ISSUES_PAT }}
         run: |
           python3 -c "
-          content = '''enum BuildSecrets {
-              static let githubIssuesPAT = \"ci-stub\"
+          import os
+          pat = os.environ.get('GH_ISSUES_PAT', 'ci-stub')
+          content = f'''enum BuildSecrets {{
+              static let githubIssuesPAT = \"{pat}\"
               static let githubRepo = \"aranga1/Sol\"
-          }
+          }}
           '''
           open('ios/Sol/BuildSecrets.swift', 'w').write(content)
           "
@@ -80,13 +84,17 @@ jobs:
       - name: Install xcodegen
         run: brew install xcodegen
 
-      - name: Generate BuildSecrets.swift (test stub)
+      - name: Generate BuildSecrets.swift
+        env:
+          GH_ISSUES_PAT: ${{ secrets.GH_ISSUES_PAT }}
         run: |
           python3 -c "
-          content = '''enum BuildSecrets {
-              static let githubIssuesPAT = \"test-pat-stub\"
+          import os
+          pat = os.environ.get('GH_ISSUES_PAT', 'test-pat-stub')
+          content = f'''enum BuildSecrets {{
+              static let githubIssuesPAT = \"{pat}\"
               static let githubRepo = \"aranga1/Sol\"
-          }
+          }}
           '''
           open('ios/Sol/BuildSecrets.swift', 'w').write(content)
           "
