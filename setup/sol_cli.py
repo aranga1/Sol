@@ -8,6 +8,23 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+
+def _parse_sse_stream(response_iter):
+    """Yield parsed event dicts from an SSE HTTP response iterator.
+
+    Each element of response_iter may be bytes or str.
+    Non-data lines and malformed JSON are silently skipped.
+    """
+    for raw in response_iter:
+        line = (raw.decode() if isinstance(raw, bytes) else raw).rstrip("\r\n")
+        if not line.startswith("data: "):
+            continue
+        try:
+            yield json.loads(line[6:])
+        except json.JSONDecodeError:
+            continue
+
+
 # ── Paths ──────────────────────────────────────────────────────────────────────
 SCRIPT_DIR   = Path(__file__).resolve().parent
 REPO_DIR     = SCRIPT_DIR.parent
